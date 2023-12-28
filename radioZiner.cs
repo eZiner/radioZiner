@@ -206,11 +206,19 @@ namespace radioZiner
                     double lastPos = recorders[curChannelName].lastPlayPos;
                     if (lastPos > 0)
                     {
+                        if (!recorders[curChannelName].hasIcyTitles)
+                        {
+                            Player.SetPropertyBool("pause", true);
+                        }
                         Player.CommandV("seek", lastPos.ToString(CultureInfo.InvariantCulture), "absolute");
                         curPos = Player.GetPropertyDouble("time-pos");
                         if (curPos >= lastPos)
                         {
                             recorders[curChannelName].lastPlayPos = 0;
+                            if (!recorders[curChannelName].hasIcyTitles)
+                            {
+                                Player.SetPropertyBool("pause", false);
+                            }
                         }
                     }
                     trackBar1.Value = (int)curPos >= 0 ? (int)curPos : 0;
