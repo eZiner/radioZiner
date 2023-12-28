@@ -6,6 +6,12 @@ Recorder for audio- and video-streams
 * Read after write monitoring (listen / watch while recording)
 * Saves audio/video to .mkv container file
 
-libmpv shinchiro 2023-08-16
+EXPERIMENTAL CODE - no release yet
+
+Change streaming path in project config before using !!! 
+
+Uses libmpv-2.dll (mpv-player)
+Tested with build from shinchiro 2023-08-16:
+
 https://sourceforge.net/projects/mpv-player-windows/files/libmpv/
 
