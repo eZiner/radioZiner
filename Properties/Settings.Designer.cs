@@ -25,25 +25,13 @@ namespace radioZiner.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("G:\\Temp\\mpv-streaming\\streams\\")]
-        public string recordingFolder {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string recordingDir {
             get {
-                return ((string)(this["recordingFolder"]));
+                return ((string)(this["recordingDir"]));
             }
             set {
-                this["recordingFolder"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("G:\\Temp\\mpv-streaming\\streams\\")]
-        public string channelsFolder {
-            get {
-                return ((string)(this["channelsFolder"]));
-            }
-            set {
-                this["channelsFolder"] = value;
+                this["recordingDir"] = value;
             }
         }
     }

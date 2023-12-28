@@ -2,11 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="radioZiner.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="recordingFolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">G:\Temp\mpv-streaming\streams\</Value>
-    </Setting>
-    <Setting Name="channelsFolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">G:\Temp\mpv-streaming\streams\</Value>
+    <Setting Name="recordingDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

@@ -16,7 +16,11 @@ namespace radioZiner
 {
     public partial class radioZiner : Form
     {
-        private string streamingFolder = "";
+        private string appDataFolder = "";
+        private string recordingFolder = "";
+        private string channelFolder = "";
+        private string m3uChannelPath = "";
+
         private string curChannelName = "";
         private bool channelSwitched = false;
 
@@ -31,7 +35,7 @@ namespace radioZiner
         {
             InitializeComponent();
 
-            streamingFolder = Properties.Settings.Default.recordingFolder;
+            appDataFolder = Properties.Settings.Default.recordingDir;
             Player = new MpvPlayer();
 
             listBox1.Dock = DockStyle.Fill;
@@ -49,7 +53,30 @@ namespace radioZiner
 
             Player.Init(pictureBox1.Handle);
 
-            channels = M3u.GetTvgChannels("https://iptv-org.github.io/iptv/countries/de.m3u");
+            if (appDataFolder == "")
+            {
+                appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "radioZiner");
+                if (!Directory.Exists(appDataFolder))
+                {
+                    Directory.CreateDirectory(appDataFolder);
+                }
+            }
+
+            recordingFolder = Path.Combine(appDataFolder, "recordings");
+            if (!Directory.Exists(recordingFolder))
+            {
+                Directory.CreateDirectory(recordingFolder);
+            }
+
+            channelFolder = Path.Combine(appDataFolder, "channels");
+            if (!Directory.Exists(channelFolder))
+            {
+                Directory.CreateDirectory(channelFolder);
+            }
+
+            m3uChannelPath = Path.Combine(channelFolder, "channels.m3u");
+
+            channels = M3u.GetTvgChannels(m3uChannelPath);
 
             foreach (var c in channels)
             {
@@ -102,7 +129,7 @@ namespace radioZiner
 
         private void BtnAddChannel_Click(object sender, EventArgs e)
         {
-                AddRecorder(tbURL.Text, streamingFolder, cbShortName.Text);
+                AddRecorder(tbURL.Text, recordingFolder, cbShortName.Text);
         }
 
         private void BtnChangeChannel_Click(object sender, EventArgs e)

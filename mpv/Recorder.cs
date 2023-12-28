@@ -59,7 +59,7 @@ namespace radioZiner
         {
             if (streamingFolder != "")
             {
-                recordingToFile = streamingFolder + shortName + ".mkv";
+                recordingToFile = Path.Combine(streamingFolder, shortName + ".mkv");
                 Player.SetPropertyBool("mute", true);
                 Player.SetPropertyString("stream-record", recordingToFile);
                 Player.CommandV("loadfile", url, "replace");
@@ -113,7 +113,7 @@ namespace radioZiner
             {
                 if (AddTitle(Player.GetPropertyDouble("time-pos", false), Player.GetPropertyString("media-title")))
                 {
-                    File.WriteAllLines(streamingFolder + shortName + ".txt", icyPosTitles);
+                    File.WriteAllLines(Path.Combine(streamingFolder, shortName + ".txt"), icyPosTitles);
                     TitleAdded?.Invoke(shortName);
                 }
             }

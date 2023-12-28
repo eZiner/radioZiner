@@ -21,13 +21,22 @@ namespace radioZiner
 
         public static Dictionary<string, TvgChannel> GetTvgChannels(string url)
         {
-            int idc = 0;
-            WebClient client = new WebClient();
             Dictionary<string, TvgChannel> channels = new Dictionary<string, TvgChannel>();
 
             try
             {
-                Stream stream = client.OpenRead(url);
+                Stream stream;
+
+                if (url.StartsWith("http"))
+                {
+                    WebClient client = new WebClient();
+                    stream = client.OpenRead(url);
+                }
+                else
+                {
+                    stream = File.OpenRead(url);
+                }
+
                 StreamReader reader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
                 string tvg_url = "";
                 string tvg_id = "";
@@ -36,6 +45,7 @@ namespace radioZiner
                 string line;
                 string[] a;
 
+                int idc = 0;
                 while ((line = reader.ReadLine()) != null)
                 {
                     line = line.Trim(' ');
@@ -93,6 +103,10 @@ namespace radioZiner
             {
                 var statusCode = ((HttpWebResponse)ex.Response).StatusCode;
                 Console.WriteLine("AddTvgChannels: " + url + " " + statusCode);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AddTvgChannels: " + url + " " + ex.Message);
             }
             return channels;
         }
