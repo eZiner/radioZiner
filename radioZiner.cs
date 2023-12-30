@@ -89,7 +89,7 @@ namespace radioZiner
                 Combo_ChannelSet.Items.Add(Path.GetFileName(sFile).Split('.')[0]);
             }
 
-            Player.SetPropertyBool("mute", true);
+            // Player.SetPropertyBool("mute", true);
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
