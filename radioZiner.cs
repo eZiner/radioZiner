@@ -16,15 +16,12 @@ namespace radioZiner
 {
     public partial class radioZiner : Form
     {
-        private string appDataFolder = "";
+        private string mainDir = "";
         private string recordingFolder = "";
         private string channelFolder = "";
-        private string m3uChannelPath = "";
 
         private string curChannelName = "";
         private bool channelSwitched = false;
-
-        private Timer timer1 = new Timer();
 
         private static MpvPlayer Player;
 
@@ -35,7 +32,17 @@ namespace radioZiner
         {
             InitializeComponent();
 
-            appDataFolder = Properties.Settings.Default.recordingDir;
+            mainDir = Properties.Settings.Default.mainDir.Trim();
+
+            foreach (var sArg in Environment.GetCommandLineArgs())
+            {
+                var a = sArg.Split('=');
+                if (a[0].Trim().ToLower() == "maindir")
+                {
+                    mainDir = a[1].Trim().Trim('"');
+                }
+            }
+
             Player = new MpvPlayer();
 
             listBox1.Dock = DockStyle.Fill;
@@ -43,44 +50,43 @@ namespace radioZiner
 
             pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.Visible = true;
+
+            cbChannelSet.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void RadioZiner_Load(object sender, EventArgs e)
         {
+            Timer timer1 = new Timer();
             timer1.Enabled = true;
             timer1.Interval = 1000;
             timer1.Tick += new EventHandler(Timer1_Tick);
 
             Player.Init(pictureBox1.Handle);
 
-            if (appDataFolder == "")
+            if (mainDir == "")
             {
-                appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "radioZiner");
-                if (!Directory.Exists(appDataFolder))
+                mainDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "radioZiner");
+                if (!Directory.Exists(mainDir))
                 {
-                    Directory.CreateDirectory(appDataFolder);
+                    Directory.CreateDirectory(mainDir);
                 }
             }
 
-            recordingFolder = Path.Combine(appDataFolder, "recordings");
+            recordingFolder = Path.Combine(mainDir, "recordings");
             if (!Directory.Exists(recordingFolder))
             {
                 Directory.CreateDirectory(recordingFolder);
             }
 
-            channelFolder = Path.Combine(appDataFolder, "channels");
+            channelFolder = Path.Combine(mainDir, "channels");
             if (!Directory.Exists(channelFolder))
             {
                 Directory.CreateDirectory(channelFolder);
             }
 
-            m3uChannelPath = Path.Combine(channelFolder, "channels.m3u");
-
-            channels = M3u.GetTvgChannels(m3uChannelPath);
-
-            foreach (var c in channels)
+            foreach (var sFile in Directory.GetFiles(channelFolder,"*.m3u"))
             {
-                cbShortName.Items.Add(c.Key);
+                cbChannelSet.Items.Add(Path.GetFileName(sFile).Split('.')[0]);
             }
         }
 
@@ -129,44 +135,45 @@ namespace radioZiner
 
         private void BtnAddChannel_Click(object sender, EventArgs e)
         {
+            if (cbShortName.Text != curChannelName)
+            {
                 AddRecorder(tbURL.Text, recordingFolder, cbShortName.Text);
+            }
+            else
+            {
+                if (curChannelName != "")
+                {
+                    foreach (var c in flowPanel.Controls)
+                    {
+                        if (c is Button button && button.Text == curChannelName)
+                        {
+                            flowPanel.Controls.Remove(button);
+                            break;
+                        }
+                    }
+                    listBox1.Items.Clear();
+                    var r = recorders[curChannelName];
+                    recorders.Remove(curChannelName);
+                    curChannelName = "";
+                    r.Stop();
+                    Player.CommandV("stop");
+                    btnAddChannel.Text = "Rec";
+                }
+            }
         }
 
         private void BtnChangeChannel_Click(object sender, EventArgs e)
         {
+            channelSwitched = true;
             if (curChannelName!="")
             {
                 recorders[curChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
             }
             curChannelName = ((Button)sender).Text;
+            cbShortName.Text = curChannelName;
+            tbURL.Text = recorders[curChannelName].url;
             UpdateListBox(curChannelName);
-            channelSwitched = true;
-        }
-
-        private void BtnRemoveChannel_Click(object sender, EventArgs e)
-        {
-            if (curChannelName!="")
-            {
-                foreach (var c in flowPanel.Controls)
-                {
-                    if (c is Button button && button.Text == curChannelName)
-                    {
-                        flowPanel.Controls.Remove(button);
-                        break;
-                    }
-                }
-                listBox1.Items.Clear();
-                var r = recorders[curChannelName];
-                recorders.Remove(curChannelName);
-                curChannelName = "";
-                r.Stop();
-                Player.CommandV("stop");
-            }
-        }
-
-        private void BtnToggleAddPanel_Click(object sender, EventArgs e)
-        {
-            panel2.Visible = !panel2.Visible;
+            btnAddChannel.Text = "Stop";
         }
 
         private void Button3_Click(object sender, EventArgs e)
@@ -259,10 +266,20 @@ namespace radioZiner
 
         private void CbShortName_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var a = cbShortName.Text.Split('|');
-            string s = a.Count()>1 ? cbShortName.Text.Split('|')[1].Trim() : cbShortName.Text;
-            tbURL.Text = channels.Keys.Contains(s) ? channels[s].url : "";
-            cbShortName.Text = s;
+            if (!channelSwitched)
+            {
+                var a = cbShortName.Text.Split('|');
+                string s = a.Count() > 1 ? cbShortName.Text.Split('|')[1].Trim() : cbShortName.Text;
+                tbURL.Text = channels.Keys.Contains(s) ? channels[s].url : "";
+                cbShortName.Text = s;
+                Player.CommandV("stop");
+                curChannelName = "";
+                pictureBox1.Show();
+                listBox1.Hide();
+                Player.CommandV("loadfile", tbURL.Text, "replace");
+                btnAddChannel.Text = "Rec";
+            }
+            channelSwitched = false;
         }
 
         private void TrackBar1_Scroll(object sender, EventArgs e)
@@ -290,6 +307,18 @@ namespace radioZiner
                 string s = (string)e.Data.GetData(typeof(string));
                 tbURL.Text = s;
                 cbShortName.Text = "";
+            }
+        }
+
+        private void CbChannelSet_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string s = cbChannelSet.SelectedItem.ToString() + ".m3u";
+            channels = M3u.GetTvgChannels(Path.Combine(channelFolder,s));
+
+            cbShortName.Items.Clear();
+            foreach (var c in channels)
+            {
+                cbShortName.Items.Add(c.Key);
             }
         }
     }

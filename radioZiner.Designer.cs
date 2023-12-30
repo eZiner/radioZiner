@@ -28,41 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.Timer timer1;
             this.tbURL = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.btnAddChannel = new System.Windows.Forms.Button();
             this.cbShortName = new System.Windows.Forms.ComboBox();
-            this.btnRemoveChannel = new System.Windows.Forms.Button();
-            this.btnToggleAddPanel = new System.Windows.Forms.Button();
             this.btnPlayPause = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.lblRecordLength = new System.Windows.Forms.Label();
+            this.cbChannelSet = new System.Windows.Forms.ComboBox();
             this.lblPlayerPos = new System.Windows.Forms.Label();
+            this.lblRecordLength = new System.Windows.Forms.Label();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
-            // timer1
-            // 
-            timer1.Enabled = true;
-            timer1.Interval = 1000;
-            // 
             // tbURL
             // 
             this.tbURL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbURL.Location = new System.Drawing.Point(392, 8);
+            this.tbURL.Location = new System.Drawing.Point(671, 8);
             this.tbURL.Name = "tbURL";
             this.tbURL.Size = new System.Drawing.Size(127, 20);
             this.tbURL.TabIndex = 5;
@@ -71,7 +60,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(354, 11);
+            this.label2.Location = new System.Drawing.Point(635, 12);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(32, 13);
             this.label2.TabIndex = 4;
@@ -81,14 +70,14 @@
             // btnAddChannel
             // 
             this.btnAddChannel.AutoSize = true;
-            this.btnAddChannel.BackColor = System.Drawing.Color.Black;
+            this.btnAddChannel.BackColor = System.Drawing.Color.Maroon;
             this.btnAddChannel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddChannel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddChannel.Location = new System.Drawing.Point(525, 4);
+            this.btnAddChannel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddChannel.Location = new System.Drawing.Point(806, 4);
             this.btnAddChannel.Name = "btnAddChannel";
-            this.btnAddChannel.Size = new System.Drawing.Size(55, 27);
+            this.btnAddChannel.Size = new System.Drawing.Size(55, 28);
             this.btnAddChannel.TabIndex = 3;
-            this.btnAddChannel.Text = "Add";
+            this.btnAddChannel.Text = "Rec";
             this.btnAddChannel.UseVisualStyleBackColor = false;
             this.btnAddChannel.Click += new System.EventHandler(this.BtnAddChannel_Click);
             // 
@@ -97,51 +86,23 @@
             this.cbShortName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbShortName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbShortName.FormattingEnabled = true;
-            this.cbShortName.Location = new System.Drawing.Point(3, 3);
+            this.cbShortName.Location = new System.Drawing.Point(368, 4);
             this.cbShortName.Name = "cbShortName";
-            this.cbShortName.Size = new System.Drawing.Size(345, 28);
+            this.cbShortName.Size = new System.Drawing.Size(263, 28);
             this.cbShortName.TabIndex = 1;
             this.cbShortName.SelectedIndexChanged += new System.EventHandler(this.CbShortName_SelectedIndexChanged);
-            // 
-            // btnRemoveChannel
-            // 
-            this.btnRemoveChannel.AutoSize = true;
-            this.btnRemoveChannel.BackColor = System.Drawing.Color.Black;
-            this.btnRemoveChannel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRemoveChannel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRemoveChannel.Location = new System.Drawing.Point(175, 20);
-            this.btnRemoveChannel.Name = "btnRemoveChannel";
-            this.btnRemoveChannel.Size = new System.Drawing.Size(81, 25);
-            this.btnRemoveChannel.TabIndex = 1;
-            this.btnRemoveChannel.Text = "Delete";
-            this.btnRemoveChannel.UseVisualStyleBackColor = false;
-            this.btnRemoveChannel.Click += new System.EventHandler(this.BtnRemoveChannel_Click);
-            // 
-            // btnToggleAddPanel
-            // 
-            this.btnToggleAddPanel.AutoSize = true;
-            this.btnToggleAddPanel.BackColor = System.Drawing.Color.Black;
-            this.btnToggleAddPanel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnToggleAddPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnToggleAddPanel.Location = new System.Drawing.Point(262, 20);
-            this.btnToggleAddPanel.Name = "btnToggleAddPanel";
-            this.btnToggleAddPanel.Size = new System.Drawing.Size(64, 25);
-            this.btnToggleAddPanel.TabIndex = 0;
-            this.btnToggleAddPanel.Text = "Channel";
-            this.btnToggleAddPanel.UseVisualStyleBackColor = false;
-            this.btnToggleAddPanel.Click += new System.EventHandler(this.BtnToggleAddPanel_Click);
             // 
             // btnPlayPause
             // 
             this.btnPlayPause.AutoSize = true;
             this.btnPlayPause.BackColor = System.Drawing.Color.Black;
             this.btnPlayPause.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPlayPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnPlayPause.Location = new System.Drawing.Point(89, 21);
+            this.btnPlayPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPlayPause.Location = new System.Drawing.Point(83, 5);
             this.btnPlayPause.Name = "btnPlayPause";
-            this.btnPlayPause.Size = new System.Drawing.Size(80, 25);
+            this.btnPlayPause.Size = new System.Drawing.Size(58, 28);
             this.btnPlayPause.TabIndex = 1;
-            this.btnPlayPause.Text = "Play / Pause";
+            this.btnPlayPause.Text = "Pause";
             this.btnPlayPause.UseVisualStyleBackColor = false;
             this.btnPlayPause.Click += new System.EventHandler(this.Button3_Click);
             // 
@@ -170,58 +131,70 @@
             // panel3
             // 
             this.panel3.Controls.Add(this.panel2);
-            this.panel3.Controls.Add(this.btnToggleAddPanel);
-            this.panel3.Controls.Add(this.btnRemoveChannel);
-            this.panel3.Controls.Add(this.btnPlayPause);
-            this.panel3.Controls.Add(this.lblRecordLength);
-            this.panel3.Controls.Add(this.lblPlayerPos);
             this.panel3.Controls.Add(this.trackBar1);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(0, 680);
+            this.panel3.Location = new System.Drawing.Point(0, 664);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1008, 49);
+            this.panel3.Size = new System.Drawing.Size(1008, 65);
             this.panel3.TabIndex = 3;
             // 
             // panel2
             // 
+            this.panel2.BackColor = System.Drawing.Color.DimGray;
+            this.panel2.Controls.Add(this.cbChannelSet);
+            this.panel2.Controls.Add(this.btnPlayPause);
             this.panel2.Controls.Add(this.cbShortName);
+            this.panel2.Controls.Add(this.lblPlayerPos);
+            this.panel2.Controls.Add(this.lblRecordLength);
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.btnAddChannel);
             this.panel2.Controls.Add(this.tbURL);
-            this.panel2.Location = new System.Drawing.Point(332, 15);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(0, 24);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(587, 31);
+            this.panel2.Size = new System.Drawing.Size(1008, 41);
             this.panel2.TabIndex = 6;
             // 
-            // lblRecordLength
+            // cbChannelSet
             // 
-            this.lblRecordLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblRecordLength.AutoSize = true;
-            this.lblRecordLength.Location = new System.Drawing.Point(925, 22);
-            this.lblRecordLength.Name = "lblRecordLength";
-            this.lblRecordLength.Size = new System.Drawing.Size(80, 24);
-            this.lblRecordLength.TabIndex = 4;
-            this.lblRecordLength.Text = "00:00:00";
-            this.lblRecordLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbChannelSet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbChannelSet.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbChannelSet.FormattingEnabled = true;
+            this.cbChannelSet.Location = new System.Drawing.Point(149, 4);
+            this.cbChannelSet.Name = "cbChannelSet";
+            this.cbChannelSet.Size = new System.Drawing.Size(211, 28);
+            this.cbChannelSet.TabIndex = 6;
+            this.cbChannelSet.SelectedIndexChanged += new System.EventHandler(this.CbChannelSet_SelectedIndexChanged);
             // 
             // lblPlayerPos
             // 
             this.lblPlayerPos.AutoSize = true;
-            this.lblPlayerPos.Location = new System.Drawing.Point(3, 22);
+            this.lblPlayerPos.Location = new System.Drawing.Point(3, 8);
             this.lblPlayerPos.Name = "lblPlayerPos";
             this.lblPlayerPos.Size = new System.Drawing.Size(80, 24);
             this.lblPlayerPos.TabIndex = 3;
             this.lblPlayerPos.Text = "00:00:00";
             this.lblPlayerPos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // lblRecordLength
+            // 
+            this.lblRecordLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblRecordLength.AutoSize = true;
+            this.lblRecordLength.Location = new System.Drawing.Point(928, 7);
+            this.lblRecordLength.Name = "lblRecordLength";
+            this.lblRecordLength.Size = new System.Drawing.Size(80, 24);
+            this.lblRecordLength.TabIndex = 4;
+            this.lblRecordLength.Text = "00:00:00";
+            this.lblRecordLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // trackBar1
             // 
-            this.trackBar1.BackColor = System.Drawing.Color.Black;
+            this.trackBar1.BackColor = System.Drawing.Color.DimGray;
             this.trackBar1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trackBar1.Location = new System.Drawing.Point(0, 0);
             this.trackBar1.Maximum = 7200;
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(1008, 49);
+            this.trackBar1.Size = new System.Drawing.Size(1008, 65);
             this.trackBar1.TabIndex = 2;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.TrackBar1_Scroll);
@@ -230,7 +203,7 @@
             // 
             this.flowPanel.AutoSize = true;
             this.flowPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.flowPanel.Location = new System.Drawing.Point(0, 680);
+            this.flowPanel.Location = new System.Drawing.Point(0, 664);
             this.flowPanel.Name = "flowPanel";
             this.flowPanel.Size = new System.Drawing.Size(1008, 0);
             this.flowPanel.TabIndex = 2;
@@ -258,7 +231,6 @@
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.RadioZiner_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.RadioZiner_DragEnter);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -270,8 +242,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button btnRemoveChannel;
-        private System.Windows.Forms.Button btnToggleAddPanel;
         private System.Windows.Forms.Button btnPlayPause;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.TextBox tbURL;
@@ -279,13 +249,13 @@
         private System.Windows.Forms.Button btnAddChannel;
         private System.Windows.Forms.ComboBox cbShortName;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.BindingSource bindingSource1;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.FlowLayoutPanel flowPanel;
         private System.Windows.Forms.Label lblPlayerPos;
         private System.Windows.Forms.Label lblRecordLength;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ComboBox cbChannelSet;
     }
 }
 
