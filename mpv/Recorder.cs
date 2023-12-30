@@ -12,6 +12,7 @@ namespace radioZiner
     {
         public string streamingFolder = "";
         public DateTime recordStartTime = DateTime.Now;
+        public string recTimeStamp = "";
         public string name = "";
         public string shortName = "";
         public string url = "";
@@ -55,15 +56,26 @@ namespace radioZiner
             stopped = true;
         }
 
+
+
         public void Record()
         {
             if (streamingFolder != "")
             {
-                recordingToFile = Path.Combine(streamingFolder, shortName + ".mkv");
+                recordStartTime = DateTime.Now;
+                recTimeStamp = string.Format(
+                    "{0:D4}-{1:D2}-{2:D2}-{3:D2}-{4:D2}-{5:D2}",
+                    recordStartTime.Year,
+                    recordStartTime.Month,
+                    recordStartTime.Day,
+                    recordStartTime.Hour,
+                    recordStartTime.Minute,
+                    recordStartTime.Second
+                );
+                recordingToFile = Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".mkv");
                 Player.SetPropertyBool("mute", true);
                 Player.SetPropertyString("stream-record", recordingToFile);
                 Player.CommandV("loadfile", url, "replace");
-                recordStartTime = DateTime.Now;
                 ChkStreamTimer.Start();
             }
         }
@@ -113,7 +125,7 @@ namespace radioZiner
             {
                 if (AddTitle(Player.GetPropertyDouble("time-pos", false), Player.GetPropertyString("media-title")))
                 {
-                    File.WriteAllLines(Path.Combine(streamingFolder, shortName + ".txt"), icyPosTitles);
+                    File.WriteAllLines(Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".txt"), icyPosTitles);
                     TitleAdded?.Invoke(shortName);
                 }
             }
