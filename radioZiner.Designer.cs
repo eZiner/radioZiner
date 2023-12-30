@@ -28,33 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tbURL = new System.Windows.Forms.TextBox();
+            this.TextBox_Url = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnAddChannel = new System.Windows.Forms.Button();
-            this.cbShortName = new System.Windows.Forms.ComboBox();
+            this.Button_Rec = new System.Windows.Forms.Button();
+            this.Combo_ShortName = new System.Windows.Forms.ComboBox();
             this.btnPlayPause = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.ListBox_Titles = new System.Windows.Forms.ListBox();
+            this.PictureBox_Player = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.cbChannelSet = new System.Windows.Forms.ComboBox();
+            this.Combo_ChannelSet = new System.Windows.Forms.ComboBox();
             this.lblPlayerPos = new System.Windows.Forms.Label();
             this.lblRecordLength = new System.Windows.Forms.Label();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
-            // tbURL
+            // TextBox_Url
             // 
-            this.tbURL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbURL.Location = new System.Drawing.Point(671, 8);
-            this.tbURL.Name = "tbURL";
-            this.tbURL.Size = new System.Drawing.Size(127, 20);
-            this.tbURL.TabIndex = 5;
+            this.TextBox_Url.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextBox_Url.Location = new System.Drawing.Point(671, 8);
+            this.TextBox_Url.Name = "tbURL";
+            this.TextBox_Url.Size = new System.Drawing.Size(127, 20);
+            this.TextBox_Url.TabIndex = 5;
             // 
             // label2
             // 
@@ -67,30 +67,30 @@
             this.label2.Text = "URL:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // btnAddChannel
+            // Button_Rec
             // 
-            this.btnAddChannel.AutoSize = true;
-            this.btnAddChannel.BackColor = System.Drawing.Color.Maroon;
-            this.btnAddChannel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddChannel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddChannel.Location = new System.Drawing.Point(806, 4);
-            this.btnAddChannel.Name = "btnAddChannel";
-            this.btnAddChannel.Size = new System.Drawing.Size(55, 28);
-            this.btnAddChannel.TabIndex = 3;
-            this.btnAddChannel.Text = "Rec";
-            this.btnAddChannel.UseVisualStyleBackColor = false;
-            this.btnAddChannel.Click += new System.EventHandler(this.BtnAddChannel_Click);
+            this.Button_Rec.AutoSize = true;
+            this.Button_Rec.BackColor = System.Drawing.Color.Maroon;
+            this.Button_Rec.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Button_Rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Button_Rec.Location = new System.Drawing.Point(806, 4);
+            this.Button_Rec.Name = "btnAddChannel";
+            this.Button_Rec.Size = new System.Drawing.Size(55, 28);
+            this.Button_Rec.TabIndex = 3;
+            this.Button_Rec.Text = "Rec";
+            this.Button_Rec.UseVisualStyleBackColor = false;
+            this.Button_Rec.Click += new System.EventHandler(this.Button_Rec_Click);
             // 
-            // cbShortName
+            // Combo_ShortName
             // 
-            this.cbShortName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbShortName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbShortName.FormattingEnabled = true;
-            this.cbShortName.Location = new System.Drawing.Point(368, 4);
-            this.cbShortName.Name = "cbShortName";
-            this.cbShortName.Size = new System.Drawing.Size(263, 28);
-            this.cbShortName.TabIndex = 1;
-            this.cbShortName.SelectedIndexChanged += new System.EventHandler(this.CbShortName_SelectedIndexChanged);
+            this.Combo_ShortName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Combo_ShortName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Combo_ShortName.FormattingEnabled = true;
+            this.Combo_ShortName.Location = new System.Drawing.Point(368, 4);
+            this.Combo_ShortName.Name = "cbShortName";
+            this.Combo_ShortName.Size = new System.Drawing.Size(263, 28);
+            this.Combo_ShortName.TabIndex = 1;
+            this.Combo_ShortName.SelectedIndexChanged += new System.EventHandler(this.Combo_ShortName_SelectedIndexChanged);
             // 
             // btnPlayPause
             // 
@@ -104,29 +104,29 @@
             this.btnPlayPause.TabIndex = 1;
             this.btnPlayPause.Text = "Pause";
             this.btnPlayPause.UseVisualStyleBackColor = false;
-            this.btnPlayPause.Click += new System.EventHandler(this.Button3_Click);
+            this.btnPlayPause.Click += new System.EventHandler(this.Button_PlayPause_Click);
             // 
-            // listBox1
+            // ListBox_Titles
             // 
-            this.listBox1.BackColor = System.Drawing.Color.Black;
-            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.listBox1.ForeColor = System.Drawing.Color.White;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 29;
-            this.listBox1.Location = new System.Drawing.Point(0, 45);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(507, 232);
-            this.listBox1.TabIndex = 1;
-            this.listBox1.Click += new System.EventHandler(this.ListBox1_Click);
+            this.ListBox_Titles.BackColor = System.Drawing.Color.Black;
+            this.ListBox_Titles.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ListBox_Titles.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ListBox_Titles.ForeColor = System.Drawing.Color.White;
+            this.ListBox_Titles.FormattingEnabled = true;
+            this.ListBox_Titles.ItemHeight = 29;
+            this.ListBox_Titles.Location = new System.Drawing.Point(0, 45);
+            this.ListBox_Titles.Name = "listBox1";
+            this.ListBox_Titles.Size = new System.Drawing.Size(507, 232);
+            this.ListBox_Titles.TabIndex = 1;
+            this.ListBox_Titles.Click += new System.EventHandler(this.ListBox_Titles_Click);
             // 
-            // pictureBox1
+            // PictureBox_Player
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(592, 156);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(100, 50);
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
+            this.PictureBox_Player.Location = new System.Drawing.Point(592, 156);
+            this.PictureBox_Player.Name = "pictureBox1";
+            this.PictureBox_Player.Size = new System.Drawing.Size(100, 50);
+            this.PictureBox_Player.TabIndex = 2;
+            this.PictureBox_Player.TabStop = false;
             // 
             // panel3
             // 
@@ -141,30 +141,30 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.DimGray;
-            this.panel2.Controls.Add(this.cbChannelSet);
+            this.panel2.Controls.Add(this.Combo_ChannelSet);
             this.panel2.Controls.Add(this.btnPlayPause);
-            this.panel2.Controls.Add(this.cbShortName);
+            this.panel2.Controls.Add(this.Combo_ShortName);
             this.panel2.Controls.Add(this.lblPlayerPos);
             this.panel2.Controls.Add(this.lblRecordLength);
             this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.btnAddChannel);
-            this.panel2.Controls.Add(this.tbURL);
+            this.panel2.Controls.Add(this.Button_Rec);
+            this.panel2.Controls.Add(this.TextBox_Url);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 24);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1008, 41);
             this.panel2.TabIndex = 6;
             // 
-            // cbChannelSet
+            // Combo_ChannelSet
             // 
-            this.cbChannelSet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbChannelSet.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbChannelSet.FormattingEnabled = true;
-            this.cbChannelSet.Location = new System.Drawing.Point(149, 4);
-            this.cbChannelSet.Name = "cbChannelSet";
-            this.cbChannelSet.Size = new System.Drawing.Size(211, 28);
-            this.cbChannelSet.TabIndex = 6;
-            this.cbChannelSet.SelectedIndexChanged += new System.EventHandler(this.CbChannelSet_SelectedIndexChanged);
+            this.Combo_ChannelSet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Combo_ChannelSet.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Combo_ChannelSet.FormattingEnabled = true;
+            this.Combo_ChannelSet.Location = new System.Drawing.Point(149, 4);
+            this.Combo_ChannelSet.Name = "cbChannelSet";
+            this.Combo_ChannelSet.Size = new System.Drawing.Size(211, 28);
+            this.Combo_ChannelSet.TabIndex = 6;
+            this.Combo_ChannelSet.SelectedIndexChanged += new System.EventHandler(this.Combo_ChannelSet_SelectedIndexChanged);
             // 
             // lblPlayerPos
             // 
@@ -215,8 +215,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1008, 729);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.PictureBox_Player);
+            this.Controls.Add(this.ListBox_Titles);
             this.Controls.Add(this.flowPanel);
             this.Controls.Add(this.panel3);
             this.DoubleBuffered = true;
@@ -230,7 +230,7 @@
             this.Load += new System.EventHandler(this.RadioZiner_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.RadioZiner_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.RadioZiner_DragEnter);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -243,19 +243,19 @@
 
         #endregion
         private System.Windows.Forms.Button btnPlayPause;
-        private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.TextBox tbURL;
+        private System.Windows.Forms.ListBox ListBox_Titles;
+        private System.Windows.Forms.TextBox TextBox_Url;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnAddChannel;
-        private System.Windows.Forms.ComboBox cbShortName;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button Button_Rec;
+        private System.Windows.Forms.ComboBox Combo_ShortName;
+        private System.Windows.Forms.PictureBox PictureBox_Player;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.FlowLayoutPanel flowPanel;
         private System.Windows.Forms.Label lblPlayerPos;
         private System.Windows.Forms.Label lblRecordLength;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.ComboBox cbChannelSet;
+        private System.Windows.Forms.ComboBox Combo_ChannelSet;
     }
 }
 
