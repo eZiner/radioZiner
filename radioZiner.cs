@@ -21,7 +21,7 @@ namespace radioZiner
         private string channelFolder = "";
 
         private string curChannelName = "";
-        private bool channelSwitched = false;
+        private int channelID = 1;
 
         private static MpvPlayer Player;
 
@@ -52,6 +52,7 @@ namespace radioZiner
             PictureBox_Player.Visible = true;
 
             Combo_ChannelSet.DropDownStyle = ComboBoxStyle.DropDownList;
+            Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void RadioZiner_Load(object sender, EventArgs e)
@@ -97,6 +98,14 @@ namespace radioZiner
             Player.Destroy();
         }
 
+        private void ClearChannelSelect()
+        {
+            foreach (Button c in flowPanel.Controls)
+            {
+                c.BackColor = Color.Black;
+            }
+        }
+
         private void UpdateTitleList(string recShortName)
         {
             if (recShortName == curChannelName)
@@ -111,12 +120,14 @@ namespace radioZiner
 
         private void Button_Rec_Click(object sender, EventArgs e)
         {
-            if (Combo_ShortName.Text != curChannelName)
+            if (curChannelName == "") //Combo_ShortName.Text != curChannelName
             {
                 string url = TextBox_Url.Text;
                 string shortName = Combo_ShortName.Text;
 
-                if ((shortName == "" || !recorders.Keys.Contains(Combo_ShortName.Text)) && url != "")
+                // ToDo: Verify shortName is valid filename
+
+                if (!recorders.Keys.Contains(Combo_ShortName.Text) && url != "")
                 {
                     Recorder r = new Recorder();
                     r.TitleAdded += UpdateTitleList;
@@ -139,7 +150,7 @@ namespace radioZiner
                     flowPanel.Controls.Add(btn);
                 }
             }
-            else if(curChannelName != "")
+            else // if(curChannelName != "")
             {
                 foreach (var c in flowPanel.Controls)
                 {
@@ -153,24 +164,36 @@ namespace radioZiner
                 var r = recorders[curChannelName];
                 recorders.Remove(curChannelName);
                 curChannelName = "";
+                Combo_ShortName.Text = "";
                 r.Stop();
                 Player.CommandV("stop");
                 Button_Rec.Text = "Rec";
             }
+            Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void Button_ChangeChannel_Click(object sender, EventArgs e)
         {
-            channelSwitched = true; // HACK - Avoid Combo_ShortName_SelectedIndexChanged
-            if (curChannelName!="")
+            if (curChannelName != "")
             {
                 recorders[curChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
+                ClearChannelSelect();
             }
-            curChannelName = ((Button)sender).Text;
+
+            Button btn = (Button)sender;
+
+            curChannelName = btn.Text;
+            btn.BackColor = Color.Blue;
+
+            Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
             Combo_ShortName.Text = curChannelName;
+            Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
+
             TextBox_Url.Text = recorders[curChannelName].url;
             UpdateTitleList(curChannelName);
             Button_Rec.Text = "Stop";
+
+            Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void Button_PlayPause_Click(object sender, EventArgs e)
@@ -190,19 +213,16 @@ namespace radioZiner
 
         private void Combo_ShortName_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!channelSwitched) // HACK Ignore event if raised from ChangeChannel_Click
-            {
-                string s = Combo_ShortName.Text;
-                TextBox_Url.Text = channels.Keys.Contains(s) ? channels[s].url : "";
-                Combo_ShortName.Text = s;
-                Player.CommandV("stop");
-                curChannelName = "";
-                PictureBox_Player.Show();
-                ListBox_Titles.Hide();
-                Player.CommandV("loadfile", TextBox_Url.Text, "replace");
-                Button_Rec.Text = "Rec";
-            }
-            channelSwitched = false;
+            string s = Combo_ShortName.Text;
+            TextBox_Url.Text = channels.Keys.Contains(s) ? channels[s].url : "";
+            Player.CommandV("stop");
+
+            curChannelName = "";
+            PictureBox_Player.Show();
+            ListBox_Titles.Hide();
+            Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+            Button_Rec.Text = "Rec";
+            ClearChannelSelect();
         }
 
         private void RadioZiner_DragEnter(object sender, DragEventArgs e)
@@ -221,9 +241,20 @@ namespace radioZiner
         {
             if (e.Data.GetDataPresent(typeof(string)))
             {
+                Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
+
                 string s = (string)e.Data.GetData(typeof(string));
                 TextBox_Url.Text = s;
-                Combo_ShortName.Text = "";
+                Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
+                Combo_ShortName.Text = ""; // "NEW-CHANNEL-" + channelID++.ToString();
+                Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
+
+                curChannelName = "";
+                PictureBox_Player.Show();
+                ListBox_Titles.Hide();
+                Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+                Button_Rec.Text = "Rec";
+                ClearChannelSelect();
             }
         }
 
@@ -233,6 +264,7 @@ namespace radioZiner
             channels = M3u.GetTvgChannels(Path.Combine(channelFolder,s));
 
             Combo_ShortName.Items.Clear();
+            Combo_ShortName.Items.Add("");
             foreach (var c in channels)
             {
                 Combo_ShortName.Items.Add(c.Key);
