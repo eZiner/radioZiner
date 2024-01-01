@@ -110,7 +110,10 @@ namespace radioZiner
                 {
                     var tvgChannel = c.Value;
                     tvgChannel.file = f;
-                    allChannels.Add(c.Key, tvgChannel);
+                    if (!allChannels.Keys.Contains(c.Key))
+                    {
+                        allChannels.Add(c.Key, tvgChannel);
+                    }
                 }
             }
         }
@@ -137,7 +140,7 @@ namespace radioZiner
 
         private void Button_Rec_Click(object sender, EventArgs e)
         {
-            if (curChannelName == "") //Combo_ShortName.Text != curChannelName
+            if (curChannelName == "")
             {
                 string url = TextBox_Url.Text;
                 string shortName = Combo_ShortName.Text;
@@ -152,7 +155,7 @@ namespace radioZiner
                         r.TitleAdded += UpdateTitleList;
                         r.url = url;
                         r.streamingFolder = recordingFolder;
-                        r.shortName = shortName; // != "" ? shortName : (recorders.Count() + 1).ToString();
+                        r.shortName = shortName;
                         r.Record();
 
                         recorders.Add(r.shortName, r);
@@ -181,7 +184,7 @@ namespace radioZiner
                     }
                 }
             }
-            else // if(curChannelName != "")
+            else
             {
                 foreach (var c in flowPanel.Controls)
                 {
@@ -324,7 +327,35 @@ namespace radioZiner
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            if (recorders.ContainsKey(curChannelName) && recorders[curChannelName]?.recordingToFile != "")
+            if (curChannelName=="")
+            {
+                double curPos = Player.GetPropertyDouble("time-pos");
+                if (curPos >= 0)
+                {
+                    TimeSpan tPos = TimeSpan.FromSeconds(curPos);
+                    lblPlayerPos.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                }
+                else
+                {
+                    lblPlayerPos.Text = "--:--:--";
+                }
+                lblRecordLength.Text = "--:--:--";
+
+                double recLen = Player.GetPropertyDouble("time-remaining") + curPos;
+                if (recLen >= 0)
+                {
+                    TimeSpan tPos = TimeSpan.FromSeconds(recLen);
+                    lblRecordLength.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                }
+                else
+                {
+                    lblRecordLength.Text = "--:--:--";
+                }
+                trackBar1.Minimum = 0;
+                trackBar1.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
+                trackBar1.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
+            }
+            else if (recorders.ContainsKey(curChannelName) && recorders[curChannelName]?.recordingToFile != "")
             {
                 if (recorders[curChannelName].hasIcyTitles)
                 {
@@ -339,59 +370,71 @@ namespace radioZiner
 
                 if (Player.GetPropertyString("path") != recorders[curChannelName]?.recordingToFile)
                 {
-                    Console.WriteLine($"Loadfile: {recorders[curChannelName].recordingToFile}");
                     Player.CommandV("loadfile", recorders[curChannelName].recordingToFile, "replace");
                 }
 
-                double pos = Player.GetPropertyDouble("time-pos");
+                double curPos = Player.GetPropertyDouble("time-pos");
+                double lastPos = recorders[curChannelName].lastPlayPos;
+                double recLen = recorders[curChannelName].GetRecordLength();
 
-                TimeSpan tPos = TimeSpan.FromSeconds(pos);
-                lblPlayerPos.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                if (lastPos > 0)
+                {
+                    if (!recorders[curChannelName].hasIcyTitles)
+                    {
+                        Player.SetPropertyBool("pause", true);
+                    }
+                    Player.CommandV("seek", lastPos.ToString(CultureInfo.InvariantCulture), "absolute");
+                    curPos = Player.GetPropertyDouble("time-pos");
+                    if (curPos >= lastPos)
+                    {
+                        recorders[curChannelName].lastPlayPos = 0;
+                        if (!recorders[curChannelName].hasIcyTitles)
+                        {
+                            Player.SetPropertyBool("pause", false);
+                        }
+                    }
+                }
 
-                tPos = TimeSpan.FromSeconds(recorders[curChannelName].GetRecordLength());
-                lblRecordLength.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                if (curPos >= 0)
+                {
+                    TimeSpan tPos = TimeSpan.FromSeconds(curPos);
+                    lblPlayerPos.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                }
+                else
+                {
+                    lblPlayerPos.Text = "--:--:--";
+                }
+
+                if (recLen >= 0)
+                {
+                    TimeSpan tPos = TimeSpan.FromSeconds(recLen);
+                    lblRecordLength.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                }
+                else
+                {
+                    lblRecordLength.Text = "--:--:--";
+                }
+
+                trackBar1.Minimum = 0;
+                trackBar1.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
+                trackBar1.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
 
                 for (int i = ListBox_Titles.Items.Count - 1; i >= 0; i--)
                 {
                     var a = ListBox_Titles.Items[i].ToString().Substring(0, 8).Split(':');
                     double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
-                    if (seconds <= pos)
+                    if (seconds <= curPos)
                     {
                         ListBox_Titles.SelectedIndex = i;
                         break;
                     }
                 }
-
-                try
-                {
-                    trackBar1.Minimum = 0;
-                    trackBar1.Maximum = (int)recorders[curChannelName].GetRecordLength();
-                    double curPos = Player.GetPropertyDouble("time-pos");
-                    double lastPos = recorders[curChannelName].lastPlayPos;
-                    if (lastPos > 0)
-                    {
-                        if (!recorders[curChannelName].hasIcyTitles)
-                        {
-                            Player.SetPropertyBool("pause", true);
-                        }
-                        Player.CommandV("seek", lastPos.ToString(CultureInfo.InvariantCulture), "absolute");
-                        curPos = Player.GetPropertyDouble("time-pos");
-                        if (curPos >= lastPos)
-                        {
-                            recorders[curChannelName].lastPlayPos = 0;
-                            if (!recorders[curChannelName].hasIcyTitles)
-                            {
-                                Player.SetPropertyBool("pause", false);
-                            }
-                        }
-                    }
-                    trackBar1.Value = (int)curPos >= 0 ? (int)curPos : 0;
-                }
-                catch (Exception x)
-                {
-                    Console.WriteLine(x.Message);
-                }
             }
+        }
+
+        private void Button_Mute_Click(object sender, EventArgs e)
+        {
+            Player.SetPropertyBool("mute", !Player.GetPropertyBool("mute"));
         }
     }
 }

@@ -42,6 +42,7 @@
             this.lblRecordLength = new System.Windows.Forms.Label();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.Button_Mute = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -51,8 +52,8 @@
             // TextBox_Url
             // 
             this.TextBox_Url.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextBox_Url.Location = new System.Drawing.Point(671, 8);
-            this.TextBox_Url.Name = "tbURL";
+            this.TextBox_Url.Location = new System.Drawing.Point(734, 8);
+            this.TextBox_Url.Name = "TextBox_Url";
             this.TextBox_Url.Size = new System.Drawing.Size(127, 20);
             this.TextBox_Url.TabIndex = 5;
             // 
@@ -60,7 +61,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(635, 12);
+            this.label2.Location = new System.Drawing.Point(698, 12);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(32, 13);
             this.label2.TabIndex = 4;
@@ -73,8 +74,8 @@
             this.Button_Rec.BackColor = System.Drawing.Color.Maroon;
             this.Button_Rec.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Button_Rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button_Rec.Location = new System.Drawing.Point(806, 4);
-            this.Button_Rec.Name = "btnAddChannel";
+            this.Button_Rec.Location = new System.Drawing.Point(869, 4);
+            this.Button_Rec.Name = "Button_Rec";
             this.Button_Rec.Size = new System.Drawing.Size(55, 28);
             this.Button_Rec.TabIndex = 3;
             this.Button_Rec.Text = "Rec";
@@ -86,8 +87,8 @@
             this.Combo_ShortName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Combo_ShortName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Combo_ShortName.FormattingEnabled = true;
-            this.Combo_ShortName.Location = new System.Drawing.Point(368, 4);
-            this.Combo_ShortName.Name = "cbShortName";
+            this.Combo_ShortName.Location = new System.Drawing.Point(431, 4);
+            this.Combo_ShortName.Name = "Combo_ShortName";
             this.Combo_ShortName.Size = new System.Drawing.Size(263, 28);
             this.Combo_ShortName.TabIndex = 1;
             this.Combo_ShortName.SelectedIndexChanged += new System.EventHandler(this.Combo_ShortName_SelectedIndexChanged);
@@ -115,7 +116,7 @@
             this.ListBox_Titles.FormattingEnabled = true;
             this.ListBox_Titles.ItemHeight = 29;
             this.ListBox_Titles.Location = new System.Drawing.Point(0, 45);
-            this.ListBox_Titles.Name = "listBox1";
+            this.ListBox_Titles.Name = "ListBox_Titles";
             this.ListBox_Titles.Size = new System.Drawing.Size(507, 232);
             this.ListBox_Titles.TabIndex = 1;
             this.ListBox_Titles.Click += new System.EventHandler(this.ListBox_Titles_Click);
@@ -123,7 +124,7 @@
             // PictureBox_Player
             // 
             this.PictureBox_Player.Location = new System.Drawing.Point(592, 156);
-            this.PictureBox_Player.Name = "pictureBox1";
+            this.PictureBox_Player.Name = "PictureBox_Player";
             this.PictureBox_Player.Size = new System.Drawing.Size(100, 50);
             this.PictureBox_Player.TabIndex = 2;
             this.PictureBox_Player.TabStop = false;
@@ -141,6 +142,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.DimGray;
+            this.panel2.Controls.Add(this.Button_Mute);
             this.panel2.Controls.Add(this.Combo_ChannelSet);
             this.panel2.Controls.Add(this.btnPlayPause);
             this.panel2.Controls.Add(this.Combo_ShortName);
@@ -160,8 +162,8 @@
             this.Combo_ChannelSet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Combo_ChannelSet.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Combo_ChannelSet.FormattingEnabled = true;
-            this.Combo_ChannelSet.Location = new System.Drawing.Point(149, 4);
-            this.Combo_ChannelSet.Name = "cbChannelSet";
+            this.Combo_ChannelSet.Location = new System.Drawing.Point(212, 4);
+            this.Combo_ChannelSet.Name = "Combo_ChannelSet";
             this.Combo_ChannelSet.Size = new System.Drawing.Size(211, 28);
             this.Combo_ChannelSet.TabIndex = 6;
             this.Combo_ChannelSet.SelectedIndexChanged += new System.EventHandler(this.Combo_ChannelSet_SelectedIndexChanged);
@@ -207,6 +209,20 @@
             this.flowPanel.Name = "flowPanel";
             this.flowPanel.Size = new System.Drawing.Size(1008, 0);
             this.flowPanel.TabIndex = 2;
+            // 
+            // Button_Mute
+            // 
+            this.Button_Mute.AutoSize = true;
+            this.Button_Mute.BackColor = System.Drawing.Color.Black;
+            this.Button_Mute.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Button_Mute.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Button_Mute.Location = new System.Drawing.Point(147, 5);
+            this.Button_Mute.Name = "Button_Mute";
+            this.Button_Mute.Size = new System.Drawing.Size(58, 28);
+            this.Button_Mute.TabIndex = 7;
+            this.Button_Mute.Text = "Mute";
+            this.Button_Mute.UseVisualStyleBackColor = false;
+            this.Button_Mute.Click += new System.EventHandler(this.Button_Mute_Click);
             // 
             // radioZiner
             // 
@@ -256,6 +272,7 @@
         private System.Windows.Forms.Label lblRecordLength;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.ComboBox Combo_ChannelSet;
+        private System.Windows.Forms.Button Button_Mute;
     }
 }
 
