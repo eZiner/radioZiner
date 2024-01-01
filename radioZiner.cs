@@ -27,6 +27,7 @@ namespace radioZiner
 
         Dictionary<string, Recorder> recorders = new Dictionary<string, Recorder>();
         Dictionary<string, M3u.TvgChannel> channels = new Dictionary<string, M3u.TvgChannel>();
+        Dictionary<string, M3u.TvgChannel> allChannels = new Dictionary<string, M3u.TvgChannel>();
 
         public radioZiner()
         {
@@ -90,12 +91,28 @@ namespace radioZiner
                 Combo_ChannelSet.Items.Add(Path.GetFileName(sFile).Split('.')[0]);
             }
 
-            // Player.SetPropertyBool("mute", true);
+            ReadChannels();
+
+            //Player.SetPropertyBool("mute", true);
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
         {
             Player.Destroy();
+        }
+
+        private void ReadChannels ()
+        {
+            allChannels.Clear();
+            foreach (var f in Directory.GetFiles(channelFolder,"*.m3u"))
+            {
+                foreach (var c in M3u.GetTvgChannels(Path.Combine(channelFolder, f)))
+                {
+                    var tvgChannel = c.Value;
+                    tvgChannel.file = f;
+                    allChannels.Add(c.Key, tvgChannel);
+                }
+            }
         }
 
         private void ClearChannelSelect()
@@ -129,25 +146,39 @@ namespace radioZiner
 
                 if (!recorders.Keys.Contains(Combo_ShortName.Text) && url != "")
                 {
-                    Recorder r = new Recorder();
-                    r.TitleAdded += UpdateTitleList;
-                    r.url = url;
-                    r.streamingFolder = recordingFolder;
-                    r.shortName = shortName != "" ? shortName : (recorders.Count() + 1).ToString();
-                    r.Record();
+                    if (shortName!="")
+                    {
+                        Recorder r = new Recorder();
+                        r.TitleAdded += UpdateTitleList;
+                        r.url = url;
+                        r.streamingFolder = recordingFolder;
+                        r.shortName = shortName; // != "" ? shortName : (recorders.Count() + 1).ToString();
+                        r.Record();
 
-                    recorders.Add(r.shortName, r);
+                        recorders.Add(r.shortName, r);
 
-                    Button btn = new Button();
-                    btn.Text = r.shortName;
-                    btn.Click += Button_ChangeChannel_Click;
-                    btn.Dock = DockStyle.Left;
-                    btn.BackColor = Color.Black;
-                    btn.ForeColor = Color.White;
-                    btn.AutoSize = true;
-                    btn.FlatStyle = FlatStyle.Standard;
+                        Button btn = new Button();
+                        btn.Text = r.shortName;
+                        btn.Click += Button_ChangeChannel_Click;
+                        btn.Dock = DockStyle.Left;
+                        btn.BackColor = Color.Black;
+                        btn.ForeColor = Color.White;
+                        btn.AutoSize = true;
+                        btn.FlatStyle = FlatStyle.Standard;
 
-                    flowPanel.Controls.Add(btn);
+                        flowPanel.Controls.Add(btn);
+
+                        if (!allChannels.Keys.Contains(shortName))
+                        {
+                            M3u.TvgChannel c = new M3u.TvgChannel();
+                            c.id = shortName;
+                            c.url = url;
+                            c.title = shortName;
+                            M3u.AppendChannelToFile(c, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
+                            ReadChannels();
+                            ReadSelectedChannelSet();
+                        }
+                    }
                 }
             }
             else // if(curChannelName != "")
@@ -185,6 +216,15 @@ namespace radioZiner
             curChannelName = btn.Text;
             btn.BackColor = Color.Blue;
 
+            if (!Combo_ShortName.Items.Contains(curChannelName))
+            {
+                if (allChannels.Keys.Contains(curChannelName))
+                {
+                    string sFile = Path.GetFileNameWithoutExtension(allChannels[curChannelName].file);
+                    Combo_ChannelSet.Text = sFile;
+                }
+            }
+
             Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
             Combo_ShortName.Text = curChannelName;
             Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
@@ -209,6 +249,24 @@ namespace radioZiner
                 double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
                 Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
             }
+        }
+
+        private void ReadSelectedChannelSet()
+        {
+            string s = Combo_ChannelSet.SelectedItem.ToString() + ".m3u";
+            channels = M3u.GetTvgChannels(Path.Combine(channelFolder, s));
+
+            Combo_ShortName.Items.Clear();
+            Combo_ShortName.Items.Add("");
+            foreach (var c in channels)
+            {
+                Combo_ShortName.Items.Add(c.Key);
+            }
+        }
+
+        private void Combo_ChannelSet_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ReadSelectedChannelSet();
         }
 
         private void Combo_ShortName_SelectedIndexChanged(object sender, EventArgs e)
@@ -255,19 +313,6 @@ namespace radioZiner
                 Player.CommandV("loadfile", TextBox_Url.Text, "replace");
                 Button_Rec.Text = "Rec";
                 ClearChannelSelect();
-            }
-        }
-
-        private void Combo_ChannelSet_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string s = Combo_ChannelSet.SelectedItem.ToString() + ".m3u";
-            channels = M3u.GetTvgChannels(Path.Combine(channelFolder,s));
-
-            Combo_ShortName.Items.Clear();
-            Combo_ShortName.Items.Add("");
-            foreach (var c in channels)
-            {
-                Combo_ShortName.Items.Add(c.Key);
             }
         }
 

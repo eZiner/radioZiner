@@ -17,6 +17,22 @@ namespace radioZiner
             public string url;
             public string group;
             public string title;
+            public string file;
+        }
+
+        public static void AppendChannelToFile (TvgChannel channel, string file)
+        {
+            List<string> lines = new List<string>();
+
+            lines.Add("#EXTINF:-1 tvg-id=\"" + channel.id
+                     + "\" tvg-logo=\"\" group-title=\"" + channel.group
+                     + "\"," + channel.title);
+
+            lines.Add(channel.url);
+
+            // should make sure last char in file is newline here
+
+            File.AppendAllLines(file, lines);
         }
 
         public static Dictionary<string, TvgChannel> GetTvgChannels(string url)
@@ -98,6 +114,7 @@ namespace radioZiner
                         }
                     }
                 }
+                stream.Close();
             }
             catch (WebException ex)
             {
