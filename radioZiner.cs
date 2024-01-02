@@ -21,12 +21,11 @@ namespace radioZiner
         private string channelFolder = "";
 
         private string curChannelName = "";
-        private int channelID = 1;
 
         private static MpvPlayer Player;
 
         Dictionary<string, Recorder> recorders = new Dictionary<string, Recorder>();
-        Dictionary<string, M3u.TvgChannel> channels = new Dictionary<string, M3u.TvgChannel>();
+        SortedDictionary<string, M3u.TvgChannel> channels = new SortedDictionary<string, M3u.TvgChannel>();
         Dictionary<string, M3u.TvgChannel> allChannels = new Dictionary<string, M3u.TvgChannel>();
 
         private void ExecuteCommand(string cmd, string val = "")
@@ -77,6 +76,37 @@ namespace radioZiner
                     flowPanel.Visible = !flowPanel.Visible;
                     panel3.Visible = !panel3.Visible;
                     break;
+                case "paste":
+                    if (Clipboard.ContainsText())
+                    {
+                        string s = Clipboard.GetText();
+                        if (s.Substring(0, 4).ToLower() == "http")
+                        {
+                            ExecuteCommand("pasteChannel",s);
+                        }
+                        else
+                        {
+                            Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
+                            Combo_ShortName.Text = s;
+                            Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
+                        }
+                    }
+                    break;
+                case "pasteChannel":
+                    TextBox_Url.Text = val;
+                    Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
+                    Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
+                    Combo_ShortName.Text = "";
+                    Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
+                    LabelEnterChannelName.Visible = true;
+
+                    curChannelName = "";
+                    PictureBox_Player.Show();
+                    ListBox_Titles.Hide();
+                    Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+                    Button_Rec.Text = "Rec";
+                    ClearChannelSelect();
+                    break;
                 case "quit":
                     Application.Exit();
                     break;
@@ -89,7 +119,7 @@ namespace radioZiner
             sItem.Tag = itemID;
             sItem.Click += new System.EventHandler(MenuClick);
             sItem.ForeColor = Color.White;
-            sItem.BackColor = Color.Black;
+            sItem.BackColor = Color.DimGray;
             mItem.DropDownItems.Add(sItem);
             return (sItem);
         }
@@ -107,20 +137,32 @@ namespace radioZiner
 
             MenuBar.Renderer = new ToolStripProfessionalRenderer(new CustomMenuColors());
             MenuBar.Dock = DockStyle.Top;
-            MenuBar.ForeColor = Color.LightGray;
-            Controls.Add(MenuBar);
+            MenuBar.ForeColor = Color.White;
+            MenuBar.Font = new Font("Arial", 14.0f);
 
             var mItem = new ToolStripMenuItem("File");
+            AddMenuItem(mItem, "New", "newChannel").ShortcutKeys = Keys.Control | Keys.N;
+            AddMenuItem(mItem, "Quit", "quit").ShortcutKeys = Keys.Control | Keys.Q;
+            MenuBar.Items.Add(mItem);
+
+            mItem = new ToolStripMenuItem("Edit");
+            AddMenuItem(mItem, "Cut", "cutChannel").ShortcutKeys = Keys.Control | Keys.X;
+            AddMenuItem(mItem, "Copy", "copyChannel").ShortcutKeys = Keys.Control | Keys.C;
+            AddMenuItem(mItem, "Paste", "paste").ShortcutKeys = Keys.Control | Keys.V;
+            MenuBar.Items.Add(mItem);
+
+            mItem = new ToolStripMenuItem("View");
             AddMenuItem(mItem, "Controlpanels", "controlBar").ShortcutKeys = Keys.F9;
             AddMenuItem(mItem, "Menubar", "menuBar").ShortcutKeys = Keys.F10;
             AddMenuItem(mItem, "Fullscreen", "fullScreen").ShortcutKeys = Keys.F11;
-            AddMenuItem(mItem, "Pause", "togglePlayerPause").ShortcutKeys = Keys.Control | Keys.Space;
-            AddMenuItem(mItem, "Mute", "togglePlayerMute").ShortcutKeys = Keys.Control | Keys.M;
-            AddMenuItem(mItem, "Quit", "quit").ShortcutKeys = Keys.Control | Keys.Q;
-
             MenuBar.Items.Add(mItem);
 
-            MenuBar.Font = new Font("Arial", 14.0f);
+            mItem = new ToolStripMenuItem("Player");
+            AddMenuItem(mItem, "Pause", "togglePlayerPause").ShortcutKeys = Keys.Control | Keys.Space;
+            AddMenuItem(mItem, "Mute", "togglePlayerMute").ShortcutKeys = Keys.Control | Keys.M;
+            MenuBar.Items.Add(mItem);
+
+            Controls.Add(MenuBar);
 
             mainDir = Properties.Settings.Default.mainDir.Trim();
 
@@ -272,13 +314,16 @@ namespace radioZiner
 
                         flowPanel.Controls.Add(btn);
 
-                        if (!allChannels.Keys.Contains(shortName))
+                        if (!allChannels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "")
                         {
                             M3u.TvgChannel c = new M3u.TvgChannel();
                             c.id = shortName;
                             c.url = url;
                             c.title = shortName;
-                            M3u.AppendChannelToFile(c, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
+                            channels.Add(shortName,c);
+                            //var sortedChannels = new SortedDictionary<string, M3u.TvgChannel>(channels);
+                            M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
+                            //M3u.AppendChannelToFile(c, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
                             ReadChannels();
                             ReadSelectedChannelSet();
                         }
@@ -404,9 +449,13 @@ namespace radioZiner
         {
             if (e.Data.GetDataPresent(typeof(string)))
             {
-                Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
-
                 string s = (string)e.Data.GetData(typeof(string));
+                if (s.Substring(0, 4).ToLower() == "http")
+                {
+                    ExecuteCommand("pasteChannel", s);
+                }
+                
+                Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
                 TextBox_Url.Text = s;
                 Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
                 Combo_ShortName.Text = ""; // "NEW-CHANNEL-" + channelID++.ToString();
@@ -418,6 +467,7 @@ namespace radioZiner
                 Player.CommandV("loadfile", TextBox_Url.Text, "replace");
                 Button_Rec.Text = "Rec";
                 ClearChannelSelect();
+                
             }
         }
 
@@ -532,6 +582,11 @@ namespace radioZiner
                     }
                 }
             }
+        }
+
+        private void LabelEnterChannelName_Click(object sender, EventArgs e)
+        {
+            LabelEnterChannelName.Visible = false;
         }
     }
 }

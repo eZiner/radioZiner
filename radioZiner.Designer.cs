@@ -37,20 +37,21 @@
             this.PictureBox_Player = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.Button_Mute = new System.Windows.Forms.Button();
             this.Combo_ChannelSet = new System.Windows.Forms.ComboBox();
-            this.lblPlayerPos = new System.Windows.Forms.Label();
             this.lblRecordLength = new System.Windows.Forms.Label();
+            this.lblPlayerPos = new System.Windows.Forms.Label();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
+            this.LabelEnterChannelName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // TextBox_Url
@@ -155,6 +156,20 @@
             this.panel2.Size = new System.Drawing.Size(1008, 41);
             this.panel2.TabIndex = 6;
             // 
+            // panel1
+            // 
+            this.panel1.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.panel1.Controls.Add(this.LabelEnterChannelName);
+            this.panel1.Controls.Add(this.Button_Mute);
+            this.panel1.Controls.Add(this.btnPlayPause);
+            this.panel1.Controls.Add(this.Button_Rec);
+            this.panel1.Controls.Add(this.Combo_ShortName);
+            this.panel1.Controls.Add(this.Combo_ChannelSet);
+            this.panel1.Location = new System.Drawing.Point(175, -1);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(667, 38);
+            this.panel1.TabIndex = 7;
+            // 
             // Button_Mute
             // 
             this.Button_Mute.BackColor = System.Drawing.Color.Black;
@@ -178,16 +193,6 @@
             this.Combo_ChannelSet.TabIndex = 3;
             this.Combo_ChannelSet.SelectedIndexChanged += new System.EventHandler(this.Combo_ChannelSet_SelectedIndexChanged);
             // 
-            // lblPlayerPos
-            // 
-            this.lblPlayerPos.AutoSize = true;
-            this.lblPlayerPos.Location = new System.Drawing.Point(3, 8);
-            this.lblPlayerPos.Name = "lblPlayerPos";
-            this.lblPlayerPos.Size = new System.Drawing.Size(80, 24);
-            this.lblPlayerPos.TabIndex = 0;
-            this.lblPlayerPos.Text = "00:00:00";
-            this.lblPlayerPos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // lblRecordLength
             // 
             this.lblRecordLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -198,6 +203,27 @@
             this.lblRecordLength.TabIndex = 0;
             this.lblRecordLength.Text = "00:00:00";
             this.lblRecordLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lblPlayerPos
+            // 
+            this.lblPlayerPos.AutoSize = true;
+            this.lblPlayerPos.Location = new System.Drawing.Point(3, 8);
+            this.lblPlayerPos.Name = "lblPlayerPos";
+            this.lblPlayerPos.Size = new System.Drawing.Size(80, 24);
+            this.lblPlayerPos.TabIndex = 0;
+            this.lblPlayerPos.Text = "00:00:00";
+            this.lblPlayerPos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // panel4
+            // 
+            this.panel4.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.panel4.Controls.Add(this.TextBox_Url);
+            this.panel4.Controls.Add(this.label2);
+            this.panel4.Location = new System.Drawing.Point(845, -4);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(83, 38);
+            this.panel4.TabIndex = 9;
+            this.panel4.Visible = false;
             // 
             // trackBar1
             // 
@@ -220,29 +246,16 @@
             this.flowPanel.Size = new System.Drawing.Size(1008, 0);
             this.flowPanel.TabIndex = 2;
             // 
-            // panel1
+            // LabelEnterChannelName
             // 
-            this.panel1.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.panel1.Controls.Add(this.Button_Mute);
-            this.panel1.Controls.Add(this.btnPlayPause);
-            this.panel1.Controls.Add(this.Button_Rec);
-            this.panel1.Controls.Add(this.Combo_ShortName);
-            this.panel1.Controls.Add(this.Combo_ChannelSet);
-            this.panel1.Location = new System.Drawing.Point(175, -1);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(667, 38);
-            this.panel1.TabIndex = 7;
-            // 
-            // panel4
-            // 
-            this.panel4.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.panel4.Controls.Add(this.TextBox_Url);
-            this.panel4.Controls.Add(this.label2);
-            this.panel4.Location = new System.Drawing.Point(845, -4);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(83, 38);
-            this.panel4.TabIndex = 9;
-            this.panel4.Visible = false;
+            this.LabelEnterChannelName.Location = new System.Drawing.Point(287, 3);
+            this.LabelEnterChannelName.Name = "LabelEnterChannelName";
+            this.LabelEnterChannelName.Size = new System.Drawing.Size(301, 33);
+            this.LabelEnterChannelName.TabIndex = 10;
+            this.LabelEnterChannelName.Text = "Enter channel name here ...";
+            this.LabelEnterChannelName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LabelEnterChannelName.Visible = false;
+            this.LabelEnterChannelName.Click += new System.EventHandler(this.LabelEnterChannelName_Click);
             // 
             // radioZiner
             // 
@@ -259,7 +272,6 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.White;
             this.Margin = new System.Windows.Forms.Padding(6);
-            this.MinimumSize = new System.Drawing.Size(1024, 768);
             this.Name = "radioZiner";
             this.Text = "radioZiner";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RadioZiner_FormClosing);
@@ -271,11 +283,11 @@
             this.panel3.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,6 +311,7 @@
         private System.Windows.Forms.Button Button_Mute;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Label LabelEnterChannelName;
     }
 }
 

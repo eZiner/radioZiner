@@ -17,27 +17,30 @@ namespace radioZiner
             public string url;
             public string group;
             public string title;
+            public string logo;
             public string file;
         }
 
-        public static void AppendChannelToFile (TvgChannel channel, string file)
+        public static void SaveChannelsToFile(SortedDictionary<string, M3u.TvgChannel> channels, string file)
         {
             List<string> lines = new List<string>();
+            lines.Add("#EXTM3U");
+            foreach (var channel in channels)
+            {
+                lines.Add("#EXTINF:-1 tvg-id=\"" + channel.Value.id
+                         + "\" tvg-logo=\"" + channel.Value.logo
+                         + "\" group-title=\"" + channel.Value.group
+                         + "\"," + channel.Value.title);
 
-            lines.Add("#EXTINF:-1 tvg-id=\"" + channel.id
-                     + "\" tvg-logo=\"\" group-title=\"" + channel.group
-                     + "\"," + channel.title);
+                lines.Add(channel.Value.url);
+            }
 
-            lines.Add(channel.url);
-
-            // should make sure last char in file is newline here
-
-            File.AppendAllLines(file, lines);
+            File.WriteAllLines(file, lines);
         }
 
-        public static Dictionary<string, TvgChannel> GetTvgChannels(string url)
+        public static SortedDictionary<string, TvgChannel> GetTvgChannels(string url)
         {
-            Dictionary<string, TvgChannel> channels = new Dictionary<string, TvgChannel>();
+            SortedDictionary<string, TvgChannel> channels = new SortedDictionary<string, TvgChannel>();
 
             try
             {
@@ -57,6 +60,7 @@ namespace radioZiner
                 string tvg_url = "";
                 string tvg_id = "";
                 string tvg_group = "";
+                string tvg_logo = "";
                 string tvg_title = "";
                 string line;
                 string[] a;
@@ -72,13 +76,25 @@ namespace radioZiner
                             a = line.Replace("tvg-id=", "~").Split('~');
                             if (a.Length > 1)
                             {
-                                line = a[1];
-                                a = line.Replace("tvg", "~").Split('~');
+                                //line = a[1];
+                                a = a[1].Replace("tvg", "~").Split('~');
                                 tvg_id = a[0].Replace("\"", "").Trim(' ');
                             }
                             else
                             {
                                 tvg_id = "";
+                            }
+
+                            a = line.Replace("tvg-logo=", "~").Split('~');
+                            if (a.Length > 1)
+                            {
+                                line = a[1];
+                                a = line.Replace("group-", "~").Split('~');
+                                tvg_logo = a[0].Replace("\"", "").Trim(' ');
+                            }
+                            else
+                            {
+                                tvg_logo = "";
                             }
 
                             a = line.Replace("group-title=", "~").Split('~');
@@ -102,6 +118,7 @@ namespace radioZiner
                             var tvg = new TvgChannel();
                             tvg.url = tvg_url;
                             tvg.id = tvg_id;
+                            tvg.logo = tvg_logo;
                             tvg.title = tvg_title;
                             tvg.group = tvg_group;
                             channels.Add(s, tvg);
@@ -109,6 +126,7 @@ namespace radioZiner
 
                             tvg_url = "";
                             tvg_id = "";
+                            tvg_logo = "";
                             tvg_title = "";
                             tvg_group = "";
                         }

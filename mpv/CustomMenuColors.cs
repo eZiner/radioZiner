@@ -10,7 +10,7 @@ namespace radioZiner
 {
     public class CustomMenuColors : ProfessionalColorTable
     {
-        Color BackgroundColor = Color.Black;
+        Color BackgroundColor = Color.DimGray;
         Color ItemBackground = ColorTranslator.FromHtml("#444444");
         Color ItemBorder = ColorTranslator.FromHtml("#cccccc");
 
