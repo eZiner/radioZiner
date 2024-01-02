@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="mpv\CustomMenuColors.cs" />
     <Compile Include="mpv\libmpv.cs" />
     <Compile Include="mpv\M3u.cs" />
     <Compile Include="mpv\Player.cs" />

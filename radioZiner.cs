@@ -29,9 +29,98 @@ namespace radioZiner
         Dictionary<string, M3u.TvgChannel> channels = new Dictionary<string, M3u.TvgChannel>();
         Dictionary<string, M3u.TvgChannel> allChannels = new Dictionary<string, M3u.TvgChannel>();
 
+        private void ExecuteCommand(string cmd, string val = "")
+        {
+            switch (cmd)
+            {
+                case "togglePlayerPause":
+                    if (Player.GetPropertyBool("pause"))
+                    {
+                        btnPlayPause.Text = "⏸️";
+                        Player.SetPropertyBool("pause", false);
+                    }
+                    else
+                    {
+                        btnPlayPause.Text = "▶️";
+                        Player.SetPropertyBool("pause", true);
+                    }
+                    break;
+                case "togglePlayerMute":
+                    if (Player.GetPropertyBool("mute"))
+                    {
+                        Button_Mute.Text = "🔈";
+                        Player.SetPropertyBool("mute", false);
+                    }
+                    else
+                    {
+                        Button_Mute.Text = "🔊";
+                        Player.SetPropertyBool("mute", true);
+                    }
+                    break;
+                case "fullScreen":
+                    if (this.FormBorderStyle != FormBorderStyle.None)
+                    {
+                        this.WindowState = FormWindowState.Normal;
+                        this.FormBorderStyle = FormBorderStyle.None;
+                        this.WindowState = FormWindowState.Maximized;
+                    }
+                    else
+                    {
+                        this.FormBorderStyle = FormBorderStyle.Sizable;
+                        this.WindowState = FormWindowState.Normal;
+                    }
+                    break;
+                case "menuBar":
+                    MenuBar.Visible = !MenuBar.Visible;
+                    break;
+                case "controlBar":
+                    flowPanel.Visible = !flowPanel.Visible;
+                    panel3.Visible = !panel3.Visible;
+                    break;
+                case "quit":
+                    Application.Exit();
+                    break;
+            }
+        }
+
+        private ToolStripMenuItem AddMenuItem(ToolStripMenuItem mItem, String itemText, String itemID)
+        {
+            var sItem = new ToolStripMenuItem(itemText);
+            sItem.Tag = itemID;
+            sItem.Click += new System.EventHandler(MenuClick);
+            sItem.ForeColor = Color.White;
+            sItem.BackColor = Color.Black;
+            mItem.DropDownItems.Add(sItem);
+            return (sItem);
+        }
+
+        private void MenuClick(object sender, EventArgs e)
+        {
+            ExecuteCommand((String)((ToolStripMenuItem)sender).Tag);
+        }
+
+        MenuStrip MenuBar = new MenuStrip();
+
         public radioZiner()
         {
             InitializeComponent();
+
+            MenuBar.Renderer = new ToolStripProfessionalRenderer(new CustomMenuColors());
+            MenuBar.Dock = DockStyle.Top;
+            MenuBar.ForeColor = Color.LightGray;
+            Controls.Add(MenuBar);
+
+            var mItem = new ToolStripMenuItem("File");
+            AddMenuItem(mItem, "Controlpanels", "controlBar").ShortcutKeys = Keys.F9;
+            AddMenuItem(mItem, "Menubar", "menuBar").ShortcutKeys = Keys.F10;
+            AddMenuItem(mItem, "Fullscreen", "fullScreen").ShortcutKeys = Keys.F11;
+            AddMenuItem(mItem, "Pause", "togglePlayerPause").ShortcutKeys = Keys.Control | Keys.Space;
+            AddMenuItem(mItem, "Mute", "togglePlayerMute").ShortcutKeys = Keys.Control | Keys.M;
+            AddMenuItem(mItem, "Quit", "quit").ShortcutKeys = Keys.Control | Keys.Q;
+
+            MenuBar.Items.Add(mItem);
+
+            MenuBar.Font = new Font("Arial", 14.0f);
 
             mainDir = Properties.Settings.Default.mainDir.Trim();
 
@@ -94,6 +183,8 @@ namespace radioZiner
             ReadChannels();
 
             //Player.SetPropertyBool("mute", true);
+            btnPlayPause.Text = "⏸️";
+            Button_Mute.Text = "🔈";
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
@@ -136,6 +227,16 @@ namespace radioZiner
                     ListBox_Titles.Items.Add(t);
                 }
             }
+        }
+
+        private void Button_PlayPause_Click(object sender, EventArgs e)
+        {
+            ExecuteCommand("togglePlayerPause");
+        }
+
+        private void Button_Mute_Click(object sender, EventArgs e)
+        {
+            ExecuteCommand("togglePlayerMute");
         }
 
         private void Button_Rec_Click(object sender, EventArgs e)
@@ -239,11 +340,6 @@ namespace radioZiner
             Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
-        private void Button_PlayPause_Click(object sender, EventArgs e)
-        {
-            Player.SetPropertyBool("pause", !Player.GetPropertyBool("pause"));
-        }
-
         private void ListBox_Titles_Click(object sender, EventArgs e)
         {
             if (ListBox_Titles.SelectedItem != null)
@@ -274,6 +370,12 @@ namespace radioZiner
 
         private void Combo_ShortName_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (curChannelName != "")
+            {
+                recorders[curChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
+                ClearChannelSelect();
+            }
+
             string s = Combo_ShortName.Text;
             TextBox_Url.Text = channels.Keys.Contains(s) ? channels[s].url : "";
             Player.CommandV("stop");
@@ -283,7 +385,7 @@ namespace radioZiner
             ListBox_Titles.Hide();
             Player.CommandV("loadfile", TextBox_Url.Text, "replace");
             Button_Rec.Text = "Rec";
-            ClearChannelSelect();
+            //ClearChannelSelect();
         }
 
         private void RadioZiner_DragEnter(object sender, DragEventArgs e)
@@ -430,11 +532,6 @@ namespace radioZiner
                     }
                 }
             }
-        }
-
-        private void Button_Mute_Click(object sender, EventArgs e)
-        {
-            Player.SetPropertyBool("mute", !Player.GetPropertyBool("mute"));
         }
     }
 }
