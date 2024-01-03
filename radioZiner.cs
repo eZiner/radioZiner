@@ -82,7 +82,11 @@ namespace radioZiner
                         string s = Clipboard.GetText();
                         if (s.Substring(0, 4).ToLower() == "http")
                         {
-                            ExecuteCommand("pasteChannel",s);
+                            ExecuteCommand("pasteURL", s);
+                        }
+                        else if (s.Substring(0, 7).ToLower() == "#extinf")
+                        {
+                            ExecuteCommand("pasteChannel", s);
                         }
                         else
                         {
@@ -92,7 +96,37 @@ namespace radioZiner
                         }
                     }
                     break;
+                case "cutChannel":
+                    if (Combo_ShortName.DropDownStyle == ComboBoxStyle.DropDownList && channels.ContainsKey(Combo_ShortName.Text))
+                    {
+                        ExecuteCommand("copyChannel");
+                        channels.Remove(Combo_ShortName.Text);
+                        M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
+                        ReadChannels();
+                        ReadSelectedChannelSet();
+                    }
+                    break;
+                case "copyChannel":
+                    if (Combo_ShortName.DropDownStyle == ComboBoxStyle.DropDownList && channels.ContainsKey(Combo_ShortName.Text))
+                    {
+                        Clipboard.SetText( M3u.CreateTvgRecord(channels[Combo_ShortName.Text]));
+                    }
+                    break;
                 case "pasteChannel":
+                    if (Combo_ShortName.DropDownStyle == ComboBoxStyle.DropDownList && Combo_ChannelSet.Text != "")
+                    {
+                        //Clipboard.SetText(M3u.CreateTvgRecord(channels[Combo_ShortName.Text]));
+                        M3u.TvgChannel channel = M3u.ParseTvgRecord(val);
+                        if (!allChannels.ContainsKey(channel.id))
+                        {
+                            channels.Add(channel.id, channel);
+                            M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
+                            ReadChannels();
+                            ReadSelectedChannelSet();
+                        }
+                    }
+                    break;
+                case "pasteURL":
                     TextBox_Url.Text = val;
                     Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
                     Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
@@ -283,6 +317,10 @@ namespace radioZiner
 
         private void Button_Rec_Click(object sender, EventArgs e)
         {
+            if (Combo_ShortName.DropDownStyle != ComboBoxStyle.DropDownList)
+            {
+                return;
+            }
             if (curChannelName == "")
             {
                 string url = TextBox_Url.Text;
@@ -321,9 +359,7 @@ namespace radioZiner
                             c.url = url;
                             c.title = shortName;
                             channels.Add(shortName,c);
-                            //var sortedChannels = new SortedDictionary<string, M3u.TvgChannel>(channels);
                             M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
-                            //M3u.AppendChannelToFile(c, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
                             ReadChannels();
                             ReadSelectedChannelSet();
                         }
@@ -349,7 +385,6 @@ namespace radioZiner
                 Player.CommandV("stop");
                 Button_Rec.Text = "Rec";
             }
-            Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void Button_ChangeChannel_Click(object sender, EventArgs e)
@@ -452,7 +487,7 @@ namespace radioZiner
                 string s = (string)e.Data.GetData(typeof(string));
                 if (s.Substring(0, 4).ToLower() == "http")
                 {
-                    ExecuteCommand("pasteChannel", s);
+                    ExecuteCommand("pasteURL", s);
                 }
                 
                 Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
@@ -587,6 +622,39 @@ namespace radioZiner
         private void LabelEnterChannelName_Click(object sender, EventArgs e)
         {
             LabelEnterChannelName.Visible = false;
+        }
+
+        private void Combo_ShortName_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (Combo_ShortName.DropDownStyle == ComboBoxStyle.DropDownList)
+                {
+                    Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
+                }
+                else
+                {
+                    string url = TextBox_Url.Text;
+                    string shortName = Combo_ShortName.Text;
+                    if (!allChannels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "")
+                    {
+                        M3u.TvgChannel c = new M3u.TvgChannel();
+                        c.id = shortName;
+                        c.url = url;
+                        c.title = shortName;
+                        channels.Add(shortName, c);
+                        M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
+                        ReadChannels();
+                        ReadSelectedChannelSet();
+                        Combo_ShortName.SelectedItem = shortName;
+                        Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
+                    }
+                }
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
+            }
         }
     }
 }

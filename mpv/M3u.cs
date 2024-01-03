@@ -21,18 +21,70 @@ namespace radioZiner
             public string file;
         }
 
+        public static TvgChannel ParseTvgRecord (string sRecord)
+        {
+            var tvg = new TvgChannel();
+            var lines = sRecord.Split('\n');
+
+            var line = lines[0].Trim();
+
+            var a = line.Replace("tvg-id=", "~").Split('~');
+
+            if (a.Length > 1)
+            {
+                a = a[1].Replace("tvg", "~").Split('~');
+                tvg.id = a[0].Replace("\"", "").Trim(' ');
+            }
+
+            a = line.Replace("tvg-logo=", "~").Split('~');
+            if (a.Length > 1)
+            {
+                line = a[1];
+                a = line.Replace("group-", "~").Split('~');
+                tvg.logo = a[0].Replace("\"", "").Trim(' ');
+            }
+
+            a = line.Replace("group-title=", "~").Split('~');
+            if (a.Length > 1)
+            {
+                line = a[1];
+                a = line.Replace("\",", "~").Split('~');
+                tvg.group = a[0].Replace("\"", "").Trim(' ');
+                tvg.title = (a.Length > 1) ? a[1] : line;
+            }
+
+            if (lines.Length > 1)
+            {
+                line = lines[1];
+                if (line.Substring(0, 4).ToLower() == "http")
+                {
+                    tvg.url = line;
+                }
+            }
+
+            return tvg;
+        }
+
+        public static string CreateTvgRecord (TvgChannel channel)
+        {
+            return
+            (
+                "#EXTINF:-1 tvg-id=\"" + channel.id
+                + "\" tvg-logo=\"" + channel.logo
+                + "\" group-title=\"" + channel.group
+                + "\"," + channel.title
+                + Environment.NewLine
+                + channel.url
+            );
+        }
+
         public static void SaveChannelsToFile(SortedDictionary<string, M3u.TvgChannel> channels, string file)
         {
             List<string> lines = new List<string>();
             lines.Add("#EXTM3U");
             foreach (var channel in channels)
             {
-                lines.Add("#EXTINF:-1 tvg-id=\"" + channel.Value.id
-                         + "\" tvg-logo=\"" + channel.Value.logo
-                         + "\" group-title=\"" + channel.Value.group
-                         + "\"," + channel.Value.title);
-
-                lines.Add(channel.Value.url);
+                lines.Add(CreateTvgRecord(channel.Value));
             }
 
             File.WriteAllLines(file, lines);
@@ -57,15 +109,9 @@ namespace radioZiner
                 }
 
                 StreamReader reader = new StreamReader(stream, Encoding.GetEncoding("UTF-8"));
-                string tvg_url = "";
-                string tvg_id = "";
-                string tvg_group = "";
-                string tvg_logo = "";
-                string tvg_title = "";
-                string line;
-                string[] a;
 
-                int idc = 0;
+                string line;
+                string lines = "";
                 while ((line = reader.ReadLine()) != null)
                 {
                     line = line.Trim(' ');
@@ -73,62 +119,13 @@ namespace radioZiner
                     {
                         if (line.Substring(0, 7) == "#EXTINF")
                         {
-                            a = line.Replace("tvg-id=", "~").Split('~');
-                            if (a.Length > 1)
-                            {
-                                //line = a[1];
-                                a = a[1].Replace("tvg", "~").Split('~');
-                                tvg_id = a[0].Replace("\"", "").Trim(' ');
-                            }
-                            else
-                            {
-                                tvg_id = "";
-                            }
-
-                            a = line.Replace("tvg-logo=", "~").Split('~');
-                            if (a.Length > 1)
-                            {
-                                line = a[1];
-                                a = line.Replace("group-", "~").Split('~');
-                                tvg_logo = a[0].Replace("\"", "").Trim(' ');
-                            }
-                            else
-                            {
-                                tvg_logo = "";
-                            }
-
-                            a = line.Replace("group-title=", "~").Split('~');
-                            if (a.Length > 1)
-                            {
-                                line = a[1];
-                                a = line.Replace("\",", "~").Split('~');
-                                tvg_group = a[0].Replace("\"", "").Trim(' ');
-                                tvg_title = (a.Length > 1) ? a[1] : line;
-                            }
-                            else
-                            {
-                                tvg_title = "";
-                                tvg_group = "";
-                            }
+                            lines = line + Environment.NewLine;
                         }
                         else if (line.Substring(0, 4).ToLower() == "http")
                         {
-                            tvg_url = line;
-                            string s = tvg_id.Trim() == "" ? "-" + idc + "-" : tvg_id;
-                            var tvg = new TvgChannel();
-                            tvg.url = tvg_url;
-                            tvg.id = tvg_id;
-                            tvg.logo = tvg_logo;
-                            tvg.title = tvg_title;
-                            tvg.group = tvg_group;
-                            channels.Add(s, tvg);
-                            idc++;
-
-                            tvg_url = "";
-                            tvg_id = "";
-                            tvg_logo = "";
-                            tvg_title = "";
-                            tvg_group = "";
+                            lines += line;
+                            TvgChannel tvg = ParseTvgRecord(lines);
+                            channels.Add(tvg.id, tvg);
                         }
                     }
                 }
