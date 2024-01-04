@@ -24,7 +24,7 @@ namespace radioZiner
         public static TvgChannel ParseTvgRecord (string sRecord)
         {
             var tvg = new TvgChannel();
-            var lines = sRecord.Split('\n');
+            var lines = sRecord.Replace('~','_').Split('\n');
 
             var line = lines[0].Trim();
 
@@ -94,9 +94,10 @@ namespace radioZiner
         {
             SortedDictionary<string, TvgChannel> channels = new SortedDictionary<string, TvgChannel>();
 
+            Stream stream = null;
+
             try
             {
-                Stream stream;
 
                 if (url.StartsWith("http"))
                 {
@@ -129,7 +130,6 @@ namespace radioZiner
                         }
                     }
                 }
-                stream.Close();
             }
             catch (WebException ex)
             {
@@ -139,6 +139,10 @@ namespace radioZiner
             catch (Exception ex)
             {
                 Console.WriteLine("AddTvgChannels: " + url + " " + ex.Message);
+            }
+            finally
+            {
+                stream?.Close();
             }
             return channels;
         }

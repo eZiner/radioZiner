@@ -39,14 +39,16 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.LabelEnterChannelName = new System.Windows.Forms.Label();
+            this.TextBox_ShortName = new System.Windows.Forms.TextBox();
             this.Button_Mute = new System.Windows.Forms.Button();
             this.Combo_ChannelSet = new System.Windows.Forms.ComboBox();
             this.lblRecordLength = new System.Windows.Forms.Label();
             this.lblPlayerPos = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.LabelEnterGroupName = new System.Windows.Forms.Label();
+            this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.TextBox_ChannelSet = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -162,7 +164,9 @@
             // 
             this.panel1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.panel1.Controls.Add(this.LabelEnterGroupName);
+            this.panel1.Controls.Add(this.TextBox_ChannelSet);
             this.panel1.Controls.Add(this.LabelEnterChannelName);
+            this.panel1.Controls.Add(this.TextBox_ShortName);
             this.panel1.Controls.Add(this.Button_Mute);
             this.panel1.Controls.Add(this.btnPlayPause);
             this.panel1.Controls.Add(this.Button_Rec);
@@ -175,7 +179,7 @@
             // 
             // LabelEnterChannelName
             // 
-            this.LabelEnterChannelName.Location = new System.Drawing.Point(290, 3);
+            this.LabelEnterChannelName.Location = new System.Drawing.Point(287, 3);
             this.LabelEnterChannelName.Name = "LabelEnterChannelName";
             this.LabelEnterChannelName.Size = new System.Drawing.Size(290, 33);
             this.LabelEnterChannelName.TabIndex = 10;
@@ -183,6 +187,14 @@
             this.LabelEnterChannelName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.LabelEnterChannelName.Visible = false;
             this.LabelEnterChannelName.Click += new System.EventHandler(this.LabelEnterChannelName_Click);
+            // 
+            // TextBox_ShortName
+            // 
+            this.TextBox_ShortName.Location = new System.Drawing.Point(291, 6);
+            this.TextBox_ShortName.Name = "TextBox_ShortName";
+            this.TextBox_ShortName.Size = new System.Drawing.Size(286, 29);
+            this.TextBox_ShortName.TabIndex = 12;
+            this.TextBox_ShortName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_ShortName_KeyDown);
             // 
             // Button_Mute
             // 
@@ -206,6 +218,7 @@
             this.Combo_ChannelSet.Size = new System.Drawing.Size(192, 28);
             this.Combo_ChannelSet.TabIndex = 3;
             this.Combo_ChannelSet.SelectedIndexChanged += new System.EventHandler(this.Combo_ChannelSet_SelectedIndexChanged);
+            this.Combo_ChannelSet.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Combo_ChannelSet_KeyDown);
             // 
             // lblRecordLength
             // 
@@ -251,6 +264,18 @@
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.TrackBar1_Scroll);
             // 
+            // LabelEnterGroupName
+            // 
+            this.LabelEnterGroupName.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LabelEnterGroupName.Location = new System.Drawing.Point(89, 0);
+            this.LabelEnterGroupName.Name = "LabelEnterGroupName";
+            this.LabelEnterGroupName.Size = new System.Drawing.Size(196, 33);
+            this.LabelEnterGroupName.TabIndex = 11;
+            this.LabelEnterGroupName.Text = "New group name ...";
+            this.LabelEnterGroupName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LabelEnterGroupName.Visible = false;
+            this.LabelEnterGroupName.Click += new System.EventHandler(this.LabelEnterGroupName_Click);
+            // 
             // flowPanel
             // 
             this.flowPanel.AutoSize = true;
@@ -260,16 +285,14 @@
             this.flowPanel.Size = new System.Drawing.Size(1008, 0);
             this.flowPanel.TabIndex = 2;
             // 
-            // LabelEnterGroupName
+            // TextBox_ChannelSet
             // 
-            this.LabelEnterGroupName.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelEnterGroupName.Location = new System.Drawing.Point(89, 2);
-            this.LabelEnterGroupName.Name = "LabelEnterGroupName";
-            this.LabelEnterGroupName.Size = new System.Drawing.Size(196, 33);
-            this.LabelEnterGroupName.TabIndex = 11;
-            this.LabelEnterGroupName.Text = "New group name ...";
-            this.LabelEnterGroupName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.LabelEnterGroupName.Visible = false;
+            this.TextBox_ChannelSet.Location = new System.Drawing.Point(93, 5);
+            this.TextBox_ChannelSet.Name = "TextBox_ChannelSet";
+            this.TextBox_ChannelSet.Size = new System.Drawing.Size(192, 29);
+            this.TextBox_ChannelSet.TabIndex = 12;
+            this.TextBox_ChannelSet.Visible = false;
+            this.TextBox_ChannelSet.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_ChannelSet_KeyDown);
             // 
             // radioZiner
             // 
@@ -327,6 +350,8 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Label LabelEnterChannelName;
         private System.Windows.Forms.Label LabelEnterGroupName;
+        private System.Windows.Forms.TextBox TextBox_ShortName;
+        private System.Windows.Forms.TextBox TextBox_ChannelSet;
     }
 }
 
