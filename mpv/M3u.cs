@@ -56,7 +56,7 @@ namespace radioZiner
             if (lines.Length > 1)
             {
                 line = lines[1];
-                if (line.Substring(0, 4).ToLower() == "http")
+                if (line.Substring(0, 1).ToLower() != "#")
                 {
                     tvg.url = line;
                 }
@@ -122,11 +122,15 @@ namespace radioZiner
                         {
                             lines = line + Environment.NewLine;
                         }
-                        else if (line.Substring(0, 4).ToLower() == "http")
+                        else if (line.Substring(0, 1).ToLower() != "#")
                         {
                             lines += line;
                             TvgChannel tvg = ParseTvgRecord(lines);
-                            channels.Add(tvg.id, tvg);
+                            //Console.WriteLine("tvg.id: " + tvg.id);
+                            if (tvg.id!="" && !channels.ContainsKey(tvg.id))
+                            {
+                                channels.Add(tvg.id, tvg);
+                            }
                         }
                     }
                 }

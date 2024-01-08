@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -30,6 +32,14 @@ namespace radioZiner
 
         private void ExecuteCommand(string cmd, string val = "")
         {
+            {
+                var a = cmd.Split('|');
+                if (a.Count() > 1)
+                {
+                    cmd = a[0];
+                    val = a[1];
+                }
+            }
             switch (cmd)
             {
                 case "togglePlayerPause":
@@ -54,6 +64,16 @@ namespace radioZiner
                     {
                         Button_Mute.Text = "🔊";
                         Player.SetPropertyBool("mute", true);
+                    }
+                    break;
+                case "seek":
+                    if (val.StartsWith("+") || val.StartsWith("-"))
+                    {
+                        Player.CommandV("seek", val, "exact");
+                    }
+                    else
+                    {
+                        Player.CommandV("seek", val, "absolute", "exact");
                     }
                     break;
                 case "fullScreen":
@@ -81,19 +101,28 @@ namespace radioZiner
                     {
                         TextBox_ShortName.Paste();
                     }
-                    else
+                    else if (TextBox_ChannelSet.Visible)
                     {
-                        if (Clipboard.ContainsText())
+                        TextBox_ChannelSet.Paste();
+                    }
+                    else if (Clipboard.ContainsText())
+                    {
+                        string s = Clipboard.GetText();
+                        if (s.Substring(0, 4).ToLower() == "http" || File.Exists(s) || Directory.Exists(s))
                         {
-                            string s = Clipboard.GetText();
-                            if (s.Substring(0, 4).ToLower() == "http")
-                            {
-                                ExecuteCommand("pasteURL", s);
-                            }
-                            else if (s.Substring(0, 7).ToLower() == "#extinf")
-                            {
-                                ExecuteCommand("pasteChannel", s);
-                            }
+                            ExecuteCommand("pasteURL", s);
+                        }
+                        else if (s.Substring(0, 7).ToLower() == "#extinf")
+                        {
+                            ExecuteCommand("pasteChannel", s);
+                        }
+                    }
+                    else if (Clipboard.ContainsFileDropList())
+                    {
+                        var a = Clipboard.GetFileDropList();
+                        if (a.Count > 0)
+                        {
+                            ExecuteCommand("pasteURL", a[0]);
                         }
                     }
                     break;
@@ -101,6 +130,10 @@ namespace radioZiner
                     if (TextBox_ShortName.Visible)
                     {
                         TextBox_ShortName.Cut();
+                    }
+                    else if (TextBox_ChannelSet.Visible)
+                    {
+                        TextBox_ChannelSet.Cut();
                     }
                     else
                     {
@@ -112,6 +145,10 @@ namespace radioZiner
                     {
                         TextBox_ShortName.Copy();
                     }
+                    else if (TextBox_ChannelSet.Visible)
+                    {
+                        TextBox_ChannelSet.Copy();
+                    }
                     else
                     {
                         ExecuteCommand("copyChannel");
@@ -120,11 +157,22 @@ namespace radioZiner
                 case "cutChannel":
                     if (channels.ContainsKey(Combo_ShortName.Text))
                     {
+                        int selIndex = Combo_ShortName.SelectedIndex;
                         ExecuteCommand("copyChannel");
                         channels.Remove(Combo_ShortName.Text);
                         M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
                         ReadChannels();
                         ReadSelectedChannelSet();
+
+                        if (selIndex >= Combo_ShortName.Items.Count)
+                        {
+                            selIndex--;
+                        }
+
+                        if (selIndex >= 0)
+                        {
+                            Combo_ShortName.SelectedIndex = selIndex;
+                        }
                     }
                     break;
                 case "copyChannel":
@@ -138,12 +186,12 @@ namespace radioZiner
                     {
                         M3u.TvgChannel channel = M3u.ParseTvgRecord(val);
 
-                        for (var (i,s) = (1, channel.id); allChannels.ContainsKey(channel.id) && i < 10; i++)
+                        for (var (i,s) = (1, channel.id); channels.ContainsKey(channel.id) && i < 10; i++) //allChannels
                         {
                             channel.id = s + " (" + i + ")";
                         }
 
-                        if (!allChannels.ContainsKey(channel.id))
+                        if (!channels.ContainsKey(channel.id)) //allChannels
                         {
                             channels.Add(channel.id, channel);
                             M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
@@ -165,15 +213,40 @@ namespace radioZiner
                     Player.CommandV("loadfile", TextBox_Url.Text, "replace");
                     Button_Rec.Text = "Rec";
                     ClearChannelSelect();
+                    TextBox_ShortName.Focus();
                     break;
                 case "new":
                     TextBox_ChannelSet.Text = "";
                     LabelEnterGroupName.Show();
                     TextBox_ChannelSet.Show();
                     LabelEnterGroupName.BringToFront();
+                    TextBox_ChannelSet.Focus();
+                    break;
+                case "delete":
+                    if (Combo_ChannelSet.Text!="")
+                    {
+                        string channelSetFile = Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u");
+                        if (File.Exists(channelSetFile))
+                        {
+                            DialogResult dr = MessageBox.Show("Delete Channel List \"" + Combo_ChannelSet.Text +  "\"?",
+                                                  "Delete Channel List", MessageBoxButtons.YesNo);
+                            switch (dr)
+                            {
+                                case DialogResult.Yes:
+                                    File.Delete(channelSetFile);
+                                    ReadChannelSets();
+                                    break;
+                                case DialogResult.No:
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+                case "homeDir":
+                    Process.Start("explorer.exe" , mainDir);
                     break;
                 case "quit":
-                    Application.Exit();
+                    Application.Exit(); // Process.Start("explorer.exe" , @"C:\Users");
                     break;
             }
         }
@@ -206,7 +279,9 @@ namespace radioZiner
             MenuBar.Font = new Font("Arial", 14.0f);
 
             var mItem = new ToolStripMenuItem("File");
+            AddMenuItem(mItem, "Home", "homeDir").ShortcutKeys = Keys.Control | Keys.H;
             AddMenuItem(mItem, "New", "new").ShortcutKeys = Keys.Control | Keys.N;
+            AddMenuItem(mItem, "Delete", "delete").ShortcutKeys = Keys.Control | Keys.D;
             AddMenuItem(mItem, "Quit", "quit").ShortcutKeys = Keys.Control | Keys.Q;
             MenuBar.Items.Add(mItem);
 
@@ -225,6 +300,10 @@ namespace radioZiner
             mItem = new ToolStripMenuItem("Player");
             AddMenuItem(mItem, "Pause", "togglePlayerPause").ShortcutKeys = Keys.Control | Keys.Space;
             AddMenuItem(mItem, "Mute", "togglePlayerMute").ShortcutKeys = Keys.Control | Keys.M;
+            AddMenuItem(mItem, "- 1 Sec", "seek|-1").ShortcutKeys = Keys.Control | Keys.Left;
+            AddMenuItem(mItem, "+ 1 Sec", "seek|+1").ShortcutKeys = Keys.Control | Keys.Right;
+            AddMenuItem(mItem, "- 1 Min", "seek|-60").ShortcutKeys = Keys.Shift | Keys.Control | Keys.Left;
+            AddMenuItem(mItem, "+ 1 Min", "seek|+60").ShortcutKeys = Keys.Shift | Keys.Control | Keys.Right;
             MenuBar.Items.Add(mItem);
 
             Controls.Add(MenuBar);
@@ -251,6 +330,11 @@ namespace radioZiner
             Combo_ChannelSet.DropDownStyle = ComboBoxStyle.DropDownList;
             Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
             TextBox_ShortName.Hide();
+
+            PictureBox_Player.MouseWheel += new MouseEventHandler(MouseWheelHandler);
+            ListBox_Titles.MouseWheel += new MouseEventHandler(MouseWheelHandler);
+            PictureBox_Player.MouseClick += new MouseEventHandler(PictureBox_Player_MouseClick);
+            ListBox_Titles.MouseDown += new MouseEventHandler(ListBox_Titles_Click);
         }
 
         private void RadioZiner_Load(object sender, EventArgs e)
@@ -355,8 +439,7 @@ namespace radioZiner
 
         private bool UserEntersData ()
         {
-            //return (Combo_ShortName.DropDownStyle != ComboBoxStyle.DropDownList);
-            return (TextBox_ShortName.Visible);
+            return (TextBox_ShortName.Visible || TextBox_ChannelSet.Visible);
         }
 
         private void Button_Rec_Click(object sender, EventArgs e)
@@ -396,7 +479,7 @@ namespace radioZiner
 
                         flowPanel.Controls.Add(btn);
 
-                        if (!allChannels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "")
+                        if (!channels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "") //allChannels
                         {
                             M3u.TvgChannel c = new M3u.TvgChannel();
                             c.id = shortName;
@@ -465,13 +548,25 @@ namespace radioZiner
             TextBox_ShortName.Hide();
         }
 
-        private void ListBox_Titles_Click(object sender, EventArgs e)
+        private void ListBox_Titles_Click(object sender, MouseEventArgs e)
         {
-            if (ListBox_Titles.SelectedItem != null)
+            switch (e.Button)
             {
-                var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
-                double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
-                Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+                case MouseButtons.Left:
+                    if (ListBox_Titles.SelectedItem != null)
+                    {
+                        var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
+                        double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
+                        Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+                    }
+                    break;
+
+                case MouseButtons.Middle:
+                    break;
+
+                case MouseButtons.Right:
+                    ExecuteCommand("togglePlayerPause");
+                    break;
             }
         }
 
@@ -481,7 +576,7 @@ namespace radioZiner
             channels = M3u.GetTvgChannels(Path.Combine(channelFolder, s));
 
             Combo_ShortName.Items.Clear();
-            Combo_ShortName.Items.Add("");
+            //Combo_ShortName.Items.Add("");
             foreach (var c in channels)
             {
                 Combo_ShortName.Items.Add(c.Key);
@@ -515,7 +610,7 @@ namespace radioZiner
 
         private void RadioZiner_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(string)))
+            if (e.Data.GetDataPresent(typeof(string)) || e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 e.Effect = DragDropEffects.Copy;
             }
@@ -533,25 +628,31 @@ namespace radioZiner
                 if (s.Substring(0, 4).ToLower() == "http")
                 {
                     ExecuteCommand("pasteURL", s);
+
+                    LabelEnterChannelName.Show();
+                    TextBox_ShortName.Text = "";
+                    TextBox_ShortName.Show();
+                    LabelEnterChannelName.BringToFront();
+                    TextBox_Url.Text = s;
+                    Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
+                    Combo_ShortName.Text = "";
+                    Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
+
+                    curChannelName = "";
+                    PictureBox_Player.Show();
+                    ListBox_Titles.Hide();
+                    Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+                    Button_Rec.Text = "Rec";
+                    ClearChannelSelect();
                 }
-
-                //Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDown;
-                LabelEnterChannelName.Show();
-                TextBox_ShortName.Text = "";
-                TextBox_ShortName.Show();
-                LabelEnterChannelName.BringToFront();
-                TextBox_Url.Text = s;
-                Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
-                Combo_ShortName.Text = ""; // "NEW-CHANNEL-" + channelID++.ToString();
-                Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
-
-                curChannelName = "";
-                PictureBox_Player.Show();
-                ListBox_Titles.Hide();
-                Player.CommandV("loadfile", TextBox_Url.Text, "replace");
-                Button_Rec.Text = "Rec";
-                ClearChannelSelect();
-                
+            }
+            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var a =  (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (a.Count() > 0)
+                {
+                    ExecuteCommand("pasteURL", a[0]);
+                }
             }
         }
 
@@ -693,13 +794,14 @@ namespace radioZiner
         private string oldShortName = "";
 
         private void TextBox_ShortName_KeyDown(object sender, KeyEventArgs e)
-        {           
+        {
+            LabelEnterChannelName.Hide();
             if (e.KeyCode == Keys.Enter)
             {
                 string url = TextBox_Url.Text;
                 string shortName = ReplaceInvalidChars(TextBox_ShortName.Text);
 
-                if (!allChannels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "")
+                if (!channels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "") //allChannels
                 {
                     M3u.TvgChannel c = new M3u.TvgChannel();
                     c.id = shortName;
@@ -732,7 +834,8 @@ namespace radioZiner
 
         private void TextBox_ChannelSet_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            LabelEnterGroupName.Hide();
+            if (e.KeyCode == Keys.Enter && TextBox_ChannelSet.Text != "")
             {
                 string channelSetFile = Path.Combine(channelFolder, ReplaceInvalidChars(TextBox_ChannelSet.Text) + ".m3u");
                 if (File.Exists(channelSetFile))
@@ -796,6 +899,69 @@ namespace radioZiner
         {
             LabelEnterGroupName.Visible = false;
             TextBox_ChannelSet.Focus();
+        }
+
+
+        private void PictureBox_Player_MouseClick(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    break;
+
+                case MouseButtons.Middle:
+                    break;
+
+                case MouseButtons.Right:
+                    ExecuteCommand("togglePlayerPause");
+                    break;
+            }
+            PictureBox_Player.Focus();
+        }
+
+        public void MouseWheelHandler(object sender, MouseEventArgs e)
+        {
+            ((HandledMouseEventArgs)e).Handled = true;
+            if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
+            {
+                if (e.Delta > 0)
+                {
+                    if (Player.GetPropertyBool("pause"))
+                    {
+                        Player.CommandV("frame-step");
+                        return;
+                    }
+
+                    Player.CommandV("seek", "3", "relative");
+                }
+                else if (Player.GetPropertyBool("pause"))
+                {
+                    Player.CommandV("frame-back-step");
+                }
+                else
+                {
+                    Player.CommandV("seek", "-3", "relative");
+                }
+            }
+            else if (e.Delta > 0)
+            {
+                if (Player.GetPropertyBool("pause"))
+                {
+                    Player.CommandV("seek", "1", "relative", "exact");
+                }
+                else
+                {
+                    Player.CommandV("seek", "5", "relative");
+                }
+            }
+            else if (Player.GetPropertyBool("pause"))
+            {
+                Player.CommandV("seek", "-1", "relative", "exact");
+            }
+            else
+            {
+                Player.CommandV("seek", "-5", "relative");
+            }
         }
     }
 }

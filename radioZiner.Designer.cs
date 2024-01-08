@@ -38,6 +38,8 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.LabelEnterGroupName = new System.Windows.Forms.Label();
+            this.TextBox_ChannelSet = new System.Windows.Forms.TextBox();
             this.LabelEnterChannelName = new System.Windows.Forms.Label();
             this.TextBox_ShortName = new System.Windows.Forms.TextBox();
             this.Button_Mute = new System.Windows.Forms.Button();
@@ -46,9 +48,7 @@
             this.lblPlayerPos = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.LabelEnterGroupName = new System.Windows.Forms.Label();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.TextBox_ChannelSet = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -127,7 +127,6 @@
             this.ListBox_Titles.Name = "ListBox_Titles";
             this.ListBox_Titles.Size = new System.Drawing.Size(507, 232);
             this.ListBox_Titles.TabIndex = 7;
-            this.ListBox_Titles.Click += new System.EventHandler(this.ListBox_Titles_Click);
             // 
             // PictureBox_Player
             // 
@@ -176,6 +175,27 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(667, 38);
             this.panel1.TabIndex = 7;
+            // 
+            // LabelEnterGroupName
+            // 
+            this.LabelEnterGroupName.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LabelEnterGroupName.Location = new System.Drawing.Point(89, 0);
+            this.LabelEnterGroupName.Name = "LabelEnterGroupName";
+            this.LabelEnterGroupName.Size = new System.Drawing.Size(196, 33);
+            this.LabelEnterGroupName.TabIndex = 11;
+            this.LabelEnterGroupName.Text = "New group name ...";
+            this.LabelEnterGroupName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LabelEnterGroupName.Visible = false;
+            this.LabelEnterGroupName.Click += new System.EventHandler(this.LabelEnterGroupName_Click);
+            // 
+            // TextBox_ChannelSet
+            // 
+            this.TextBox_ChannelSet.Location = new System.Drawing.Point(93, 5);
+            this.TextBox_ChannelSet.Name = "TextBox_ChannelSet";
+            this.TextBox_ChannelSet.Size = new System.Drawing.Size(192, 29);
+            this.TextBox_ChannelSet.TabIndex = 12;
+            this.TextBox_ChannelSet.Visible = false;
+            this.TextBox_ChannelSet.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_ChannelSet_KeyDown);
             // 
             // LabelEnterChannelName
             // 
@@ -264,18 +284,6 @@
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.TrackBar1_Scroll);
             // 
-            // LabelEnterGroupName
-            // 
-            this.LabelEnterGroupName.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelEnterGroupName.Location = new System.Drawing.Point(89, 0);
-            this.LabelEnterGroupName.Name = "LabelEnterGroupName";
-            this.LabelEnterGroupName.Size = new System.Drawing.Size(196, 33);
-            this.LabelEnterGroupName.TabIndex = 11;
-            this.LabelEnterGroupName.Text = "New group name ...";
-            this.LabelEnterGroupName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.LabelEnterGroupName.Visible = false;
-            this.LabelEnterGroupName.Click += new System.EventHandler(this.LabelEnterGroupName_Click);
-            // 
             // flowPanel
             // 
             this.flowPanel.AutoSize = true;
@@ -284,15 +292,6 @@
             this.flowPanel.Name = "flowPanel";
             this.flowPanel.Size = new System.Drawing.Size(1008, 0);
             this.flowPanel.TabIndex = 2;
-            // 
-            // TextBox_ChannelSet
-            // 
-            this.TextBox_ChannelSet.Location = new System.Drawing.Point(93, 5);
-            this.TextBox_ChannelSet.Name = "TextBox_ChannelSet";
-            this.TextBox_ChannelSet.Size = new System.Drawing.Size(192, 29);
-            this.TextBox_ChannelSet.TabIndex = 12;
-            this.TextBox_ChannelSet.Visible = false;
-            this.TextBox_ChannelSet.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_ChannelSet_KeyDown);
             // 
             // radioZiner
             // 
