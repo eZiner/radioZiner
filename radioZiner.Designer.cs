@@ -127,6 +127,10 @@
             this.ListBox_Titles.Name = "ListBox_Titles";
             this.ListBox_Titles.Size = new System.Drawing.Size(507, 232);
             this.ListBox_Titles.TabIndex = 7;
+            this.ListBox_Titles.Click += new System.EventHandler(this.ListBox_Titles_Click);
+            this.ListBox_Titles.SelectedIndexChanged += new System.EventHandler(this.ListBox_Titles_SelectedIndexChanged);
+            this.ListBox_Titles.SelectedValueChanged += new System.EventHandler(this.ListBox_Titles_SelectedValueChanged);
+            this.ListBox_Titles.DoubleClick += new System.EventHandler(this.ListBox_Titles_DoubleClick);
             // 
             // PictureBox_Player
             // 
@@ -135,6 +139,7 @@
             this.PictureBox_Player.Size = new System.Drawing.Size(100, 50);
             this.PictureBox_Player.TabIndex = 2;
             this.PictureBox_Player.TabStop = false;
+            this.PictureBox_Player.DoubleClick += new System.EventHandler(this.ListBox_Titles_DoubleClick);
             // 
             // panel3
             // 

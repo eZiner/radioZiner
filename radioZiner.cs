@@ -548,17 +548,22 @@ namespace radioZiner
             TextBox_ShortName.Hide();
         }
 
+        int selTitleIndex = -1;
+
         private void ListBox_Titles_Click(object sender, MouseEventArgs e)
         {
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    if (ListBox_Titles.SelectedItem != null)
+                    
+                    if (ListBox_Titles.SelectedItem != null && ListBox_Titles.SelectedIndex != selTitleIndex)
                     {
                         var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
                         double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
                         Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+                        selTitleIndex = ListBox_Titles.SelectedIndex;
                     }
+                    
                     break;
 
                 case MouseButtons.Middle:
@@ -962,6 +967,43 @@ namespace radioZiner
             {
                 Player.CommandV("seek", "-5", "relative");
             }
+        }
+
+        private void ListBox_Titles_DoubleClick(object sender, EventArgs e)
+        {
+            ExecuteCommand("fullScreen");
+            if (this.FormBorderStyle == FormBorderStyle.None)
+            {
+                MenuBar.Visible = false;
+                flowPanel.Visible = false;
+                panel3.Visible = false;
+            }
+            else
+            {
+                MenuBar.Visible = true;
+                flowPanel.Visible = true;
+                panel3.Visible = true;
+            }
+        }
+
+        private void ListBox_Titles_Click(object sender, EventArgs e)
+        {
+            /*
+            if (ListBox_Titles.SelectedItem != null)
+            {
+                var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
+                double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
+                Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+            }
+            */
+        }
+
+        private void ListBox_Titles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void ListBox_Titles_SelectedValueChanged(object sender, EventArgs e)
+        {
         }
     }
 }
