@@ -30,6 +30,9 @@ namespace radioZiner
         SortedDictionary<string, M3u.TvgChannel> channels = new SortedDictionary<string, M3u.TvgChannel>();
         Dictionary<string, M3u.TvgChannel> allChannels = new Dictionary<string, M3u.TvgChannel>();
 
+        private int extRecorder = 0;
+        private VideoRecorder videoRecorder;
+
         private void ExecuteCommand(string cmd, string val = "")
         {
             {
@@ -335,6 +338,7 @@ namespace radioZiner
             ListBox_Titles.MouseWheel += new MouseEventHandler(MouseWheelHandler);
             PictureBox_Player.MouseClick += new MouseEventHandler(PictureBox_Player_MouseClick);
             ListBox_Titles.MouseDown += new MouseEventHandler(ListBox_Titles_Click);
+
         }
 
         private void RadioZiner_Load(object sender, EventArgs e)
@@ -374,11 +378,20 @@ namespace radioZiner
             //Player.SetPropertyBool("mute", true);
             btnPlayPause.Text = "⏸️";
             Button_Mute.Text = "🔈";
+
+            if (extRecorder>0)
+            {
+                videoRecorder = new VideoRecorder(recordingFolder);
+            }
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
         {
             Player.Destroy();
+            if (extRecorder > 0)
+            {
+                videoRecorder.StopAllRecordings();
+            }
         }
 
         private void ReadChannelSets()
@@ -464,6 +477,7 @@ namespace radioZiner
                         r.url = url;
                         r.streamingFolder = recordingFolder;
                         r.shortName = shortName;
+                        r.extRecorder = extRecorder;
                         r.Record();
 
                         recorders.Add(r.shortName, r);
@@ -490,11 +504,21 @@ namespace radioZiner
                             ReadChannels();
                             ReadSelectedChannelSet();
                         }
+
+                        if (extRecorder > 0)
+                        {
+                            videoRecorder.StartRecording(channels[shortName]);
+                        }
                     }
                 }
             }
             else
             {
+                if (extRecorder > 0)
+                {
+                    videoRecorder.StopRecording(curChannelName);
+                }
+
                 foreach (var c in flowPanel.Controls)
                 {
                     if (c is Button button && button.Text == curChannelName)

@@ -29,6 +29,8 @@ namespace radioZiner
 
         public bool hasIcyTitles = false;
 
+        public int extRecorder = 0;
+
         public Recorder()
         {
             Player.Init(pictureBox.Handle);
@@ -56,8 +58,6 @@ namespace radioZiner
             stopped = true;
         }
 
-
-
         public void Record()
         {
             if (streamingFolder != "")
@@ -72,9 +72,12 @@ namespace radioZiner
                     recordStartTime.Minute,
                     recordStartTime.Second
                 );
-                recordingToFile = Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".mkv");
+                recordingToFile = Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".mkv"); //.mkv
                 Player.SetPropertyBool("mute", true);
-                Player.SetPropertyString("stream-record", recordingToFile);
+                if (extRecorder==0)
+                {
+                    Player.SetPropertyString("stream-record", recordingToFile);
+                }
                 Player.CommandV("loadfile", url, "replace");
                 ChkStreamTimer.Start();
             }
