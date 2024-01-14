@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace radioZiner
 {
-    public class StreamRecorder : EventArgs
+    public class StreamRecorder
     {
         public int streamerProgram = 0; // 0=ffmpeg 1=streamLink
         public string transCode = " -c copy";

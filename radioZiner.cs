@@ -26,7 +26,7 @@ namespace radioZiner
 
         private static MpvPlayer Player;
 
-        Dictionary<string, Recorder> recorders = new Dictionary<string, Recorder>();
+        Dictionary<string, RadioRecorder> recorders = new Dictionary<string, RadioRecorder>();
         SortedDictionary<string, M3u.TvgChannel> channels = new SortedDictionary<string, M3u.TvgChannel>();
         Dictionary<string, M3u.TvgChannel> allChannels = new Dictionary<string, M3u.TvgChannel>();
 
@@ -379,19 +379,13 @@ namespace radioZiner
             btnPlayPause.Text = "⏸️";
             Button_Mute.Text = "🔈";
 
-            if (extRecorder>0)
-            {
-                videoRecorder = new VideoRecorder(recordingFolder);
-            }
+            videoRecorder = new VideoRecorder(recordingFolder);
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
         {
             Player.Destroy();
-            if (extRecorder > 0)
-            {
-                videoRecorder.StopAllRecordings();
-            }
+            videoRecorder.StopAllRecordings();
         }
 
         private void ReadChannelSets()
@@ -472,12 +466,12 @@ namespace radioZiner
                 {
                     if (shortName!="")
                     {
-                        Recorder r = new Recorder();
+                        RadioRecorder r = new RadioRecorder();
                         r.TitleAdded += UpdateTitleList;
                         r.url = url;
                         r.streamingFolder = recordingFolder;
                         r.shortName = shortName;
-                        r.extRecorder = extRecorder;
+                        r.extRecorder = shortName.EndsWith("@") ? 1 : extRecorder;
                         r.Record();
 
                         recorders.Add(r.shortName, r);
@@ -505,7 +499,7 @@ namespace radioZiner
                             ReadSelectedChannelSet();
                         }
 
-                        if (extRecorder > 0)
+                        if (r.extRecorder > 0)
                         {
                             videoRecorder.StartRecording(channels[shortName]);
                         }
@@ -514,10 +508,7 @@ namespace radioZiner
             }
             else
             {
-                if (extRecorder > 0)
-                {
-                    videoRecorder.StopRecording(curChannelName);
-                }
+                videoRecorder.StopRecording(curChannelName);
 
                 foreach (var c in flowPanel.Controls)
                 {

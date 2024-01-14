@@ -47,15 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="mpv\ConsoleUtil.cs" />
-    <Compile Include="mpv\CustomMenuColors.cs" />
+    <Compile Include="recorder\ConsoleUtil.cs" />
+    <Compile Include="gui\CustomMenuColors.cs" />
     <Compile Include="mpv\libmpv.cs" />
-    <Compile Include="mpv\M3u.cs" />
+    <Compile Include="recorder\M3u.cs" />
     <Compile Include="mpv\Player.cs" />
-    <Compile Include="mpv\Recorder.cs" />
-    <Compile Include="mpv\StreamChecker.cs" />
-    <Compile Include="mpv\StreamRecorder.cs" />
-    <Compile Include="mpv\VideoRecorder.cs" />
+    <Compile Include="recorder\RadioRecorder.cs" />
+    <Compile Include="recorder\StreamChecker.cs" />
+    <Compile Include="recorder\StreamRecorder.cs" />
+    <Compile Include="recorder\VideoRecorder.cs" />
     <Compile Include="radioZiner.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -90,5 +90,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace radioZiner
 {
-    public class Recorder
+    public class RadioRecorder
     {
         public string streamingFolder = "";
         public DateTime recordStartTime = DateTime.Now;
@@ -31,14 +31,14 @@ namespace radioZiner
 
         public int extRecorder = 0;
 
-        public Recorder()
+        public RadioRecorder()
         {
             Player.Init(pictureBox.Handle);
             ChkStreamTimer.Interval = 1000;
             ChkStreamTimer.Tick += new System.EventHandler(ChkStreamTimer_Tick);
         }
 
-        ~Recorder()
+        ~RadioRecorder()
         {
             if (!stopped)
             {
@@ -72,7 +72,7 @@ namespace radioZiner
                     recordStartTime.Minute,
                     recordStartTime.Second
                 );
-                recordingToFile = Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".mkv"); //.mkv
+                recordingToFile = Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".ts"); //.mkv
                 Player.SetPropertyBool("mute", true);
                 if (extRecorder==0)
                 {

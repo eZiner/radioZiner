@@ -29,7 +29,7 @@ namespace radioZiner
             StreamRecorder rec = null;
             if (!recordings.ContainsKey(channel.id))
             {
-                string fileName = Path.Combine(recordingPath, channel.id + "_" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".mkv"); //.mkv
+                string fileName = Path.Combine(recordingPath, channel.id + "_" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".ts"); //.mkv
                 rec = new StreamRecorder(fileName);
                 BeforeRecordingAdded?.Invoke(rec, EventArgs.Empty);
                 recordings.Add(channel.id, rec);
