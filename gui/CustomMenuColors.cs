@@ -10,14 +10,15 @@ namespace radioZiner
 {
     public class CustomMenuColors : ProfessionalColorTable
     {
-        Color BackgroundColor = Color.DimGray;
+        Color BackgroundColor = ColorTranslator.FromHtml("#111111");
+        Color DropdownBorder = ColorTranslator.FromHtml("#444444");
         Color ItemBackground = ColorTranslator.FromHtml("#444444");
         Color ItemBorder = ColorTranslator.FromHtml("#cccccc");
 
 
-        public override Color ImageMarginGradientBegin { get { return BackgroundColor; } }
-        public override Color ImageMarginGradientEnd { get { return BackgroundColor; } }
-        public override Color ImageMarginGradientMiddle { get { return BackgroundColor; } }
+        public override Color ImageMarginGradientBegin { get { return DropdownBorder; } }
+        public override Color ImageMarginGradientEnd { get { return DropdownBorder; } }
+        public override Color ImageMarginGradientMiddle { get { return DropdownBorder; } }
 
         public override Color MenuStripGradientBegin { get { return BackgroundColor; } }
         public override Color MenuStripGradientEnd { get { return BackgroundColor; } }
@@ -37,6 +38,6 @@ namespace radioZiner
         public override Color OverflowButtonGradientEnd { get { return ItemBackground; } }
         public override Color OverflowButtonGradientMiddle { get { return ItemBackground; } }
 
-        public override Color ToolStripDropDownBackground { get { return BackgroundColor; } }
+        public override Color ToolStripDropDownBackground { get { return DropdownBorder; } }
     }
 }

@@ -47,14 +47,12 @@
             this.lblRecordLength = new System.Windows.Forms.Label();
             this.lblPlayerPos = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // TextBox_Url
@@ -144,7 +142,6 @@
             // panel3
             // 
             this.panel3.Controls.Add(this.panel2);
-            this.panel3.Controls.Add(this.trackBar1);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(0, 664);
             this.panel3.Name = "panel3";
@@ -153,7 +150,7 @@
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.DimGray;
+            this.panel2.BackColor = System.Drawing.Color.Black;
             this.panel2.Controls.Add(this.panel1);
             this.panel2.Controls.Add(this.lblRecordLength);
             this.panel2.Controls.Add(this.lblPlayerPos);
@@ -249,9 +246,10 @@
             // 
             this.lblRecordLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblRecordLength.AutoSize = true;
-            this.lblRecordLength.Location = new System.Drawing.Point(925, 8);
+            this.lblRecordLength.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblRecordLength.Location = new System.Drawing.Point(884, 5);
             this.lblRecordLength.Name = "lblRecordLength";
-            this.lblRecordLength.Size = new System.Drawing.Size(80, 24);
+            this.lblRecordLength.Size = new System.Drawing.Size(120, 31);
             this.lblRecordLength.TabIndex = 0;
             this.lblRecordLength.Text = "00:00:00";
             this.lblRecordLength.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -259,9 +257,10 @@
             // lblPlayerPos
             // 
             this.lblPlayerPos.AutoSize = true;
-            this.lblPlayerPos.Location = new System.Drawing.Point(3, 8);
+            this.lblPlayerPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayerPos.Location = new System.Drawing.Point(3, 5);
             this.lblPlayerPos.Name = "lblPlayerPos";
-            this.lblPlayerPos.Size = new System.Drawing.Size(80, 24);
+            this.lblPlayerPos.Size = new System.Drawing.Size(120, 31);
             this.lblPlayerPos.TabIndex = 0;
             this.lblPlayerPos.Text = "00:00:00";
             this.lblPlayerPos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -276,18 +275,6 @@
             this.panel4.Size = new System.Drawing.Size(83, 38);
             this.panel4.TabIndex = 9;
             this.panel4.Visible = false;
-            // 
-            // trackBar1
-            // 
-            this.trackBar1.BackColor = System.Drawing.Color.DimGray;
-            this.trackBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackBar1.Location = new System.Drawing.Point(0, 0);
-            this.trackBar1.Maximum = 7200;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(1008, 65);
-            this.trackBar1.TabIndex = 6;
-            this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.trackBar1.Scroll += new System.EventHandler(this.TrackBar1_Scroll);
             // 
             // flowPanel
             // 
@@ -321,14 +308,12 @@
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.RadioZiner_DragEnter);
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).EndInit();
             this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -343,7 +328,6 @@
         private System.Windows.Forms.ComboBox Combo_ShortName;
         private System.Windows.Forms.PictureBox PictureBox_Player;
         private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.FlowLayoutPanel flowPanel;
         private System.Windows.Forms.Label lblPlayerPos;
         private System.Windows.Forms.Label lblRecordLength;

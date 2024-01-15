@@ -272,6 +272,8 @@ namespace radioZiner
 
         MenuStrip MenuBar = new MenuStrip();
 
+        private ColorSlider.ColorSlider slider;
+
         public radioZiner()
         {
             InitializeComponent();
@@ -326,6 +328,7 @@ namespace radioZiner
 
             ListBox_Titles.Dock = DockStyle.Fill;
             ListBox_Titles.Visible = false;
+            ListBox_Titles.BackColor = ColorTranslator.FromHtml("#000000");
 
             PictureBox_Player.Dock = DockStyle.Fill;
             PictureBox_Player.Visible = true;
@@ -380,6 +383,51 @@ namespace radioZiner
             Button_Mute.Text = "🔈";
 
             videoRecorder = new VideoRecorder(recordingFolder);
+
+            slider = new ColorSlider.ColorSlider
+            {
+                Dock = DockStyle.Top,
+                Visible = true,
+                ForeColor = Color.Red,
+                BackColor = Color.Black,
+                ElapsedInnerColor = Color.Red,
+                ElapsedPenColorTop = Color.Red,
+                ElapsedPenColorBottom = Color.Red,
+                ThumbInnerColor = Color.Red,
+                ThumbOuterColor = Color.Red,
+                ThumbPenColor = Color.Red,
+                TickStyle = TickStyle.None,
+
+                ThumbRoundRectSize = new Size(0, 0),
+                ThumbSize = new Size(1, 10),
+                Width = panel3.Width,
+                Height = 20,
+                MouseWheelBarPartitions = 1000,
+
+                SmallChange = 10,
+                LargeChange = 60
+            };
+            slider.Scroll += Slider_Scroll;
+            slider.MouseWheel += Slider_MouseWheel;
+            slider.ValueChanged += Slider_ValueChanged;
+
+            panel3.Controls.Add(slider);
+        }
+
+        private void Slider_ValueChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void Slider_MouseWheel(object sender, EventArgs e)
+        {
+            int seconds = Convert.ToInt32(((ColorSlider.ColorSlider)sender).Value);
+            Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+        }
+
+        private void Slider_Scroll(object sender, EventArgs e)
+        {
+            int seconds = Convert.ToInt32(((ColorSlider.ColorSlider)sender).Value);
+            Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
@@ -676,12 +724,6 @@ namespace radioZiner
             }
         }
 
-        private void TrackBar1_Scroll(object sender, EventArgs e)
-        {
-            int seconds = trackBar1.Value;
-            Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
-        }
-
         private void Timer1_Tick(object sender, EventArgs e)
         {
             if (curChannelName=="")
@@ -708,9 +750,10 @@ namespace radioZiner
                 {
                     lblRecordLength.Text = "--:--:--";
                 }
-                trackBar1.Minimum = 0;
-                trackBar1.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
-                trackBar1.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
+
+                slider.Minimum = 0;
+                slider.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
+                slider.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
             }
             else if (recorders.ContainsKey(curChannelName) && recorders[curChannelName]?.recordingToFile != "")
             {
@@ -772,9 +815,9 @@ namespace radioZiner
                     lblRecordLength.Text = "--:--:--";
                 }
 
-                trackBar1.Minimum = 0;
-                trackBar1.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
-                trackBar1.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
+                slider.Minimum = 0;
+                slider.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
+                slider.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
 
                 for (int i = ListBox_Titles.Items.Count - 1; i >= 0; i--)
                 {

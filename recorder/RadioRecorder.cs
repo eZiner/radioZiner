@@ -18,6 +18,7 @@ namespace radioZiner
         public string url = "";
         public string recordingToFile = "";
         public double lastPlayPos = 0;
+        public double recLength = 0;
 
         public PictureBox pictureBox = new PictureBox();
         private MpvPlayer Player { get; } = new MpvPlayer();
@@ -85,7 +86,8 @@ namespace radioZiner
 
         public double GetRecordLength ()
         {
-            return (Player.GetPropertyDouble("time-pos"));
+            double l = shortName.EndsWith("@") ? recLength : Player.GetPropertyDouble("time-pos");
+            return (l);
         }
 
         public List<string> icyTitles = new List<string>();
@@ -124,6 +126,7 @@ namespace radioZiner
 
         private void ChkStreamTimer_Tick(object sender, EventArgs e)
         {
+            recLength++;
             if (streamingFolder != "" && Player.GetPropertyString("path").StartsWith("http"))
             {
                 if (AddTitle(Player.GetPropertyDouble("time-pos", false), Player.GetPropertyString("media-title")))
