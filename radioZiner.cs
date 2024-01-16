@@ -20,6 +20,7 @@ namespace radioZiner
     {
         private string mainDir = "";
         private string recordingFolder = "";
+        private string exportFolder = "";
         private string channelFolder = "";
 
         private string curChannelName = "";
@@ -217,6 +218,23 @@ namespace radioZiner
                     Button_Rec.Text = "Rec";
                     ClearChannelSelect();
                     TextBox_ShortName.Focus();
+
+                    if (Directory.Exists(val))
+                    {
+                        var allowedExtensions = new[] { ".mp4", ".mp3", ".aac", ".ts"};
+                        foreach (var s in Directory.EnumerateFiles(val, "*.*", System.IO.SearchOption.AllDirectories).OrderBy(file => new FileInfo(file).CreationTime).Where(file => allowedExtensions.Any(file.ToLower().EndsWith)))
+                        {
+                            Console.WriteLine(s.Substring(val.Length+1));
+                        }
+                    }
+
+                    if (File.Exists(val))
+                    {
+                        Label_StartTime.Text = "00:00:00";
+                        Label_EndTime.Text = "00:00:00";
+                        TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(val);
+                        Combo_ExportFileExtension.Text = ".mp4";
+                    }
                     break;
                 case "new":
                     TextBox_ChannelSet.Text = "";
@@ -337,6 +355,11 @@ namespace radioZiner
             Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
             TextBox_ShortName.Hide();
 
+            panel3.Controls.Add(panel5);
+            panel5.Location = panel1.Location;
+            panel5.BringToFront();
+
+
             PictureBox_Player.MouseWheel += new MouseEventHandler(MouseWheelHandler);
             ListBox_Titles.MouseWheel += new MouseEventHandler(MouseWheelHandler);
             PictureBox_Player.MouseClick += new MouseEventHandler(PictureBox_Player_MouseClick);
@@ -366,6 +389,12 @@ namespace radioZiner
             if (!Directory.Exists(recordingFolder))
             {
                 Directory.CreateDirectory(recordingFolder);
+            }
+
+            exportFolder = Path.Combine(mainDir, "exports");
+            if (!Directory.Exists(exportFolder))
+            {
+                Directory.CreateDirectory(exportFolder);
             }
 
             channelFolder = Path.Combine(mainDir, "channels");
@@ -607,8 +636,19 @@ namespace radioZiner
             UpdateTitleList(curChannelName);
             Button_Rec.Text = "Stop";
 
-            //Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
             TextBox_ShortName.Hide();
+
+            Label_StartTime.Text = "00:00:00";
+            Label_EndTime.Text = "00:00:00";
+            TextBox_ExportFileName.Text = curChannelName;
+            if (recorders[curChannelName].hasIcyTitles)
+            {
+                Combo_ExportFileExtension.Text = ".mp3";
+            }
+            else
+            {
+                Combo_ExportFileExtension.Text = ".mp4";
+            }
         }
 
         int selTitleIndex = -1;
@@ -619,12 +659,31 @@ namespace radioZiner
             {
                 case MouseButtons.Left:
                     
-                    if (ListBox_Titles.SelectedItem != null && ListBox_Titles.SelectedIndex != selTitleIndex)
+                    if (ListBox_Titles.SelectedItem != null)
                     {
-                        var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
-                        double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
-                        Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
-                        selTitleIndex = ListBox_Titles.SelectedIndex;
+                        if (ListBox_Titles.SelectedIndex != selTitleIndex)
+                        {
+                            var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
+                            double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
+                            Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+                            selTitleIndex = ListBox_Titles.SelectedIndex;
+
+                        }
+                        if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+                        {
+                            Label_StartTime.Text = ListBox_Titles.SelectedItem.ToString().Substring(0, 8);
+                            TextBox_ExportFileName.Text = ListBox_Titles.SelectedItem.ToString().Substring(11);
+                            Combo_ExportFileExtension.Text = ".mp3";
+                            int index = ListBox_Titles.SelectedIndex + 1;
+                            if (index < ListBox_Titles.Items.Count)
+                            {
+                                Label_EndTime.Text = ListBox_Titles.Items[index].ToString().Substring(0, 8);
+                            }
+                            else
+                            {
+                                Label_EndTime.Text = lblRecordLength.Text;
+                            }
+                        }
                     }
                     
                     break;
@@ -1062,6 +1121,91 @@ namespace radioZiner
 
         private void ListBox_Titles_SelectedValueChanged(object sender, EventArgs e)
         {
+        }
+
+        private void Button_Toggle_Channels_Export_Click(object sender, EventArgs e)
+        {
+            if (panel1.Visible)
+            {
+                var curStream = Player.GetPropertyString("path");
+                if (curStream!="" && !curStream.StartsWith("http"))
+                {
+                    panel1.Visible = false;
+                    panel5.Visible = true;
+                    Button_Toggle_Channels_Export.Text = "Channels";
+                    /*
+                    if (curChannelName=="")
+                    {
+                        Label_StartTime.Text = "00:00:00";
+                        Label_EndTime.Text = "00:00:00";
+                        TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(curStream);
+                        Combo_ExportFileExtension.Text = ".mp4";
+                    }
+                    */
+                }
+            }
+            else
+            {
+                panel1.Visible = true;
+                panel5.Visible = false;
+                Button_Toggle_Channels_Export.Text = "Export";
+            }
+        }
+
+        private void Button_ExportSave_Click(object sender, EventArgs e)
+        {
+            string ExportFileName = ReplaceInvalidChars(TextBox_ExportFileName.Text);
+            string ExportFileExtension = ReplaceInvalidChars(Combo_ExportFileExtension.Text);
+            string destFile = Path.Combine(exportFolder, ExportFileName + ExportFileExtension);
+
+            int i = 1;
+            while (File.Exists(destFile) && i<100)
+            {
+                destFile = Path.Combine(exportFolder, ReplaceInvalidChars(ExportFileName + " (" + i + ")" + ExportFileExtension));
+                i++;
+            }
+
+            string param = "-ss "
+                         + Label_StartTime.Text
+                         + " -to "
+                         + Label_EndTime.Text
+                         + " -i \""
+                         + Player.GetPropertyString("path")
+                         + "\" -c copy \""
+                         + destFile
+                         + "\"";
+
+            string ffMpegExeFile = Application.StartupPath + @"\ffmpeg.exe";
+
+            ConsoleUtil.StartProgram(ffMpegExeFile, param);
+        }
+
+        private void Label_StartTime_Click(object sender, EventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                Label_StartTime.Text = lblPlayerPos.Text;
+            }
+            else
+            {
+                var a = Label_StartTime.Text.Split(':');
+                var secs = (Convert.ToInt32(a[0]) * 3600 + Convert.ToInt32(a[1]) * 60 + Convert.ToInt32(a[2])).ToString();
+                Player.CommandV("seek", secs, "absolute", "exact");
+            }
+        }
+
+        private void Label_EndTime_Click(object sender, EventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                Label_EndTime.Text = lblPlayerPos.Text;
+            }
+            else
+            {
+                var a = Label_EndTime.Text.Split(':');
+                var secs = (Convert.ToInt32(a[0]) * 3600 + Convert.ToInt32(a[1]) * 60 + Convert.ToInt32(a[2])).ToString();
+                Player.CommandV("seek", secs, "absolute", "exact");
+            }
         }
     }
 }
