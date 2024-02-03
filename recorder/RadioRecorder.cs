@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace radioZiner
 {
@@ -98,6 +99,59 @@ namespace radioZiner
         {
             icyTitles.Clear();
             icyPosTitles.Clear();
+        }
+
+        public void DeleteTitle(string pos, string title)
+        {
+            ChkStreamTimer.Enabled = false;
+
+            foreach (var line in icyPosTitles)
+            {
+                if (line == pos + title) // " - " + 
+                {
+                    icyTitles.Remove(title);
+                    icyPosTitles.Remove(line);
+                    break;
+                }
+            }
+
+            if (streamingFolder != "" && Player.GetPropertyString("path").StartsWith("http"))
+            {
+                File.WriteAllLines(Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".txt"), icyPosTitles);
+                TitleAdded?.Invoke(shortName);
+            }
+
+            ChkStreamTimer.Enabled = true;
+
+            if (!(icyTitles.Count() > 1))
+            {
+                hasIcyTitles = false;
+            }
+        }
+
+        public void AddTitle(string pos, string title = "", string delim = " - ")
+        {
+            if (title != "")
+            {
+                ChkStreamTimer.Enabled = false;
+                icyTitles.Add(title);
+                string sPosTitle = pos + delim + title;
+                icyPosTitles.Add(sPosTitle);
+                icyPosTitles.Sort();
+
+                if (streamingFolder != "" && Player.GetPropertyString("path").StartsWith("http"))
+                {
+                    File.WriteAllLines(Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".txt"), icyPosTitles);
+                    TitleAdded?.Invoke(shortName);
+                }
+
+                ChkStreamTimer.Enabled = true;
+            }
+
+            if (icyTitles.Count() > 1)
+            {
+                hasIcyTitles = true;
+            }
         }
 
         private bool AddTitle(double pos, string title = "")

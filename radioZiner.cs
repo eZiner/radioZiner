@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Threading;
+using System.Text.RegularExpressions;
+
+using Timer = System.Windows.Forms.Timer;
 
 namespace radioZiner
 {
@@ -22,17 +21,32 @@ namespace radioZiner
         private string recordingFolder = "";
         private string exportFolder = "";
         private string channelFolder = "";
+        private string streamFolder = "";
 
-        private string curChannelName = "";
+        private string curRecChannelName = "";
+        private string CurSource = "";
 
         private static MpvPlayer Player;
 
         Dictionary<string, RadioRecorder> recorders = new Dictionary<string, RadioRecorder>();
         SortedDictionary<string, M3u.TvgChannel> channels = new SortedDictionary<string, M3u.TvgChannel>();
         Dictionary<string, M3u.TvgChannel> allChannels = new Dictionary<string, M3u.TvgChannel>();
+        SortedDictionary<string, M3u.TvgChannel> allStreams = new SortedDictionary<string, M3u.TvgChannel>();
+        SortedDictionary<string, string> TvgGroups = new SortedDictionary<string, string>();
+        SortedDictionary<string, string> TvgCountries = new SortedDictionary<string, string>();
+
+        //SortedDictionary<string, M3u.TvgChannel> RadioChannels = new SortedDictionary<string, M3u.TvgChannel>();
 
         private int extRecorder = 0;
         private VideoRecorder videoRecorder;
+
+        private string curChannelName = "";
+
+        private void setChannelName (string s)
+        {
+            curChannelName = s;
+            TextBox_ShortName.Text = s;
+        }
 
         private void ExecuteCommand(string cmd, string val = "")
         {
@@ -93,69 +107,72 @@ namespace radioZiner
                         this.WindowState = FormWindowState.Normal;
                     }
                     break;
+                case "titleList":
+                    Toggle_ListBox_Titles();
+                    break;
+                case "fileBrowser":
+                    Toggle_ListBox_Files();
+                    break;
                 case "menuBar":
                     MenuBar.Visible = !MenuBar.Visible;
                     break;
                 case "controlBar":
-                    flowPanel.Visible = !flowPanel.Visible;
+                    FlowPanel_Recording_Buttons.Visible = !FlowPanel_Recording_Buttons.Visible;
                     panel3.Visible = !panel3.Visible;
                     break;
+                case "toggleControls":
+                    ToggleControls();
+                    break;
                 case "paste":
-                    if (TextBox_ShortName.Visible)
                     {
-                        TextBox_ShortName.Paste();
-                    }
-                    else if (TextBox_ChannelSet.Visible)
-                    {
-                        TextBox_ChannelSet.Paste();
-                    }
-                    else if (Clipboard.ContainsText())
-                    {
-                        string s = Clipboard.GetText();
-                        if (s.Substring(0, 4).ToLower() == "http" || File.Exists(s) || Directory.Exists(s))
+                        if (this.ActiveControl is TextBox box)
                         {
-                            ExecuteCommand("pasteURL", s);
+                            box.Paste();
                         }
-                        else if (s.Substring(0, 7).ToLower() == "#extinf")
+                        else if (Clipboard.ContainsText())
                         {
-                            ExecuteCommand("pasteChannel", s);
+                            string s = Clipboard.GetText();
+                            if (s.Length > 4 && s.Substring(0, 4).ToLower() == "http" || File.Exists(s) || Directory.Exists(s))
+                            {
+                                ExecuteCommand("pasteURL", s);
+                            }
+                            else if (s.Length > 7 && s.Substring(0, 7).ToLower() == "#extinf")
+                            {
+                                ExecuteCommand("pasteChannel", s);
+                            }
                         }
-                    }
-                    else if (Clipboard.ContainsFileDropList())
-                    {
-                        var a = Clipboard.GetFileDropList();
-                        if (a.Count > 0)
+                        else if (Clipboard.ContainsFileDropList())
                         {
-                            ExecuteCommand("pasteURL", a[0]);
+                            var a = Clipboard.GetFileDropList();
+                            if (a.Count > 0)
+                            {
+                                ExecuteCommand("pasteURL", a[0]);
+                            }
                         }
                     }
                     break;
                 case "cut":
-                    if (TextBox_ShortName.Visible)
                     {
-                        TextBox_ShortName.Cut();
-                    }
-                    else if (TextBox_ChannelSet.Visible)
-                    {
-                        TextBox_ChannelSet.Cut();
-                    }
-                    else
-                    {
-                        ExecuteCommand("cutChannel");
+                        if (this.ActiveControl is TextBox box)
+                        {
+                            box.Cut();
+                        }
+                        else
+                        {
+                            ExecuteCommand("cutChannel");
+                        }
                     }
                     break;
                 case "copy":
-                    if (TextBox_ShortName.Visible)
                     {
-                        TextBox_ShortName.Copy();
-                    }
-                    else if (TextBox_ChannelSet.Visible)
-                    {
-                        TextBox_ChannelSet.Copy();
-                    }
-                    else
-                    {
-                        ExecuteCommand("copyChannel");
+                        if (this.ActiveControl is TextBox box)
+                        {
+                            box.Copy();
+                        }
+                        else
+                        {
+                            ExecuteCommand("copyChannel");
+                        }
                     }
                     break;
                 case "cutChannel":
@@ -190,12 +207,12 @@ namespace radioZiner
                     {
                         M3u.TvgChannel channel = M3u.ParseTvgRecord(val);
 
-                        for (var (i,s) = (1, channel.id); channels.ContainsKey(channel.id) && i < 10; i++) //allChannels
+                        for (var (i,s) = (1, channel.id); channels.ContainsKey(channel.id) && i < 10; i++)
                         {
                             channel.id = s + " (" + i + ")";
                         }
 
-                        if (!channels.ContainsKey(channel.id)) //allChannels
+                        if (!channels.ContainsKey(channel.id))
                         {
                             channels.Add(channel.id, channel);
                             M3u.SaveChannelsToFile(channels, Path.Combine(channelFolder, Combo_ChannelSet.Text + ".m3u"));
@@ -206,14 +223,14 @@ namespace radioZiner
                     break;
                 case "pasteURL":
                     TextBox_Url.Text = val;
-                    TextBox_ShortName.Text = "";
-                    LabelEnterChannelName.Show();
-                    TextBox_ShortName.Show();
-                    LabelEnterChannelName.BringToFront();
+                    setChannelName("NEW CHANNEL");
+                    CurSource = "live";
+                    icyTitles.Clear();
+                    icyPosTitles.Clear();
+                    ListBox_Titles.Items.Clear();
 
-                    curChannelName = "";
-                    PictureBox_Player.Show();
-                    ListBox_Titles.Hide();
+                    curRecChannelName = "";
+
                     Player.CommandV("loadfile", TextBox_Url.Text, "replace");
                     Button_Rec.Text = "Rec";
                     ClearChannelSelect();
@@ -221,20 +238,10 @@ namespace radioZiner
 
                     if (Directory.Exists(val))
                     {
-                        var allowedExtensions = new[] { ".mp4", ".mp3", ".aac", ".ts"};
-                        foreach (var s in Directory.EnumerateFiles(val, "*.*", System.IO.SearchOption.AllDirectories).OrderBy(file => new FileInfo(file).CreationTime).Where(file => allowedExtensions.Any(file.ToLower().EndsWith)))
-                        {
-                            Console.WriteLine(s.Substring(val.Length+1));
-                        }
+                        ListBox_Files_LoadFromDir(val);
                     }
 
-                    if (File.Exists(val))
-                    {
-                        Label_StartTime.Text = "00:00:00";
-                        Label_EndTime.Text = "00:00:00";
-                        TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(val);
-                        Combo_ExportFileExtension.Text = ".mp4";
-                    }
+                    ListBox_Titles_LoadFromFile(val);
                     break;
                 case "new":
                     TextBox_ChannelSet.Text = "";
@@ -267,7 +274,7 @@ namespace radioZiner
                     Process.Start("explorer.exe" , mainDir);
                     break;
                 case "quit":
-                    Application.Exit(); // Process.Start("explorer.exe" , @"C:\Users");
+                    Application.Exit();
                     break;
             }
         }
@@ -290,7 +297,7 @@ namespace radioZiner
 
         MenuStrip MenuBar = new MenuStrip();
 
-        private ColorSlider.ColorSlider slider;
+        private ColorSlider slider;
 
         public radioZiner()
         {
@@ -315,9 +322,12 @@ namespace radioZiner
             MenuBar.Items.Add(mItem);
 
             mItem = new ToolStripMenuItem("View");
+            AddMenuItem(mItem, "Titles", "titleList").ShortcutKeys = Keys.F7;
+            AddMenuItem(mItem, "Files", "fileBrowser").ShortcutKeys = Keys.F8;
             AddMenuItem(mItem, "Controlpanels", "controlBar").ShortcutKeys = Keys.F9;
             AddMenuItem(mItem, "Menubar", "menuBar").ShortcutKeys = Keys.F10;
             AddMenuItem(mItem, "Fullscreen", "fullScreen").ShortcutKeys = Keys.F11;
+            AddMenuItem(mItem, "Hide All", "toggleControls").ShortcutKeys = Keys.F12;
             MenuBar.Items.Add(mItem);
 
             mItem = new ToolStripMenuItem("Player");
@@ -353,28 +363,45 @@ namespace radioZiner
 
             Combo_ChannelSet.DropDownStyle = ComboBoxStyle.DropDownList;
             Combo_ShortName.DropDownStyle = ComboBoxStyle.DropDownList;
-            TextBox_ShortName.Hide();
 
             panel3.Controls.Add(panel5);
+            panel3.Controls.Add(panel8);
+
             panel5.Location = panel1.Location;
             panel5.BringToFront();
 
+            panel8.Location = panel1.Location;
+            panel8.BringToFront();
 
             PictureBox_Player.MouseWheel += new MouseEventHandler(MouseWheelHandler);
+            Label_PlayerPos.MouseWheel += new MouseEventHandler(MouseWheelHandler);
+            Label_PlayerPosFrac.MouseWheel += new MouseEventHandler(MouseWheelTicHandler);
             ListBox_Titles.MouseWheel += new MouseEventHandler(MouseWheelHandler);
             PictureBox_Player.MouseClick += new MouseEventHandler(PictureBox_Player_MouseClick);
             ListBox_Titles.MouseDown += new MouseEventHandler(ListBox_Titles_Click);
 
+            TextBox_ShortName.Multiline = true;
+            TextBox_ShortName.MinimumSize = new Size(0, 40);
+            TextBox_ShortName.Size = new Size(TextBox_ShortName.Size.Width, 40);
+            TextBox_ShortName.Multiline = false;
+
+            TextBox_SearchFilter.Multiline = true;
+            TextBox_SearchFilter.MinimumSize = new Size(0, 25);
+            TextBox_SearchFilter.Size = new Size(TextBox_SearchFilter.Size.Width, 25);
+            TextBox_SearchFilter.Multiline = false;
         }
 
-        private void RadioZiner_Load(object sender, EventArgs e)
+        Timer timer1 = new System.Windows.Forms.Timer();
+
+        private async void RadioZiner_Load(object sender, EventArgs e)
         {
-            Timer timer1 = new Timer();
+            Panel_Files_Show();
             timer1.Enabled = true;
             timer1.Interval = 1000;
             timer1.Tick += new EventHandler(Timer1_Tick);
 
             Player.Init(PictureBox_Player.Handle);
+            Player.SetPropertyBool("deinterlace", true);
 
             if (mainDir == "")
             {
@@ -403,17 +430,18 @@ namespace radioZiner
                 Directory.CreateDirectory(channelFolder);
             }
 
-            ReadChannelSets();
+            streamFolder = Path.Combine(mainDir, "streams");
+            if (!Directory.Exists(streamFolder))
+            {
+                Directory.CreateDirectory(streamFolder);
+            }
 
-            ReadChannels();
-
-            //Player.SetPropertyBool("mute", true);
             btnPlayPause.Text = "⏸️";
             Button_Mute.Text = "🔈";
 
             videoRecorder = new VideoRecorder(recordingFolder);
 
-            slider = new ColorSlider.ColorSlider
+            slider = new ColorSlider
             {
                 Dock = DockStyle.Top,
                 Visible = true,
@@ -441,6 +469,16 @@ namespace radioZiner
             slider.ValueChanged += Slider_ValueChanged;
 
             panel3.Controls.Add(slider);
+
+            await Task.Delay(100);
+            ReadChannelSets();
+            await Task.Delay(100);
+            ReadChannels();
+            await Task.Delay(100);
+
+            
+            await ReadStreams();
+            Set_SearchButton_Text();
         }
 
         private void Slider_ValueChanged(object sender, EventArgs e)
@@ -449,13 +487,13 @@ namespace radioZiner
 
         private void Slider_MouseWheel(object sender, EventArgs e)
         {
-            int seconds = Convert.ToInt32(((ColorSlider.ColorSlider)sender).Value);
+            int seconds = Convert.ToInt32(((ColorSlider)sender).Value);
             Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
         }
 
         private void Slider_Scroll(object sender, EventArgs e)
         {
-            int seconds = Convert.ToInt32(((ColorSlider.ColorSlider)sender).Value);
+            int seconds = Convert.ToInt32(((ColorSlider)sender).Value);
             Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
         }
 
@@ -471,6 +509,135 @@ namespace radioZiner
             foreach (var sFile in Directory.GetFiles(channelFolder, "*.m3u"))
             {
                 Combo_ChannelSet.Items.Add(Path.GetFileName(sFile).Split('.')[0]);
+            }
+        }
+
+        private char[] trimChars = new char[] { ' ', '\'', '#', '[', ']', '(', ')', '{', '}' };
+
+        private async Task ReadSqlDump (string fPath)
+        {
+            Console.WriteLine("Load ...");
+
+            Dictionary<string, List<string>> sqlDump = SqlDumpReader.Convert(fPath);
+
+            Dispatcher dispatcherUI = Dispatcher.CurrentDispatcher;
+            Label_Status.Text = "Milliseconds: ";
+            var watch = Stopwatch.StartNew();
+            List<Task> tasks = new List<Task>();
+
+            int ListCounter = 0;
+
+            if (sqlDump.Keys.Contains("Station"))
+            {
+                Console.WriteLine("Radiostations: " + sqlDump["Station"].Count);
+
+                foreach (var station in sqlDump["Station"])
+                {
+
+                    var _allStreams = allStreams;
+
+                    var _trimChars = trimChars;
+
+                    ListCounter++;
+                    if (ListCounter % 100 == 0)
+                    {
+                        await Task.Delay(1);
+                    }
+
+                    var t = Task.Run
+                        (() =>
+                        {
+                            dispatcherUI.BeginInvoke
+                            (new Action
+                                (() =>
+                                {
+                                    M3u.TvgChannel c = new M3u.TvgChannel();
+                                    using (var streamRdr = new StringReader(station.Replace(@"\'", "~!")))
+                                    {
+                                        char[] trimChars = new char[] { ' ', '\'', '#', '[', ']', '(', ')', '{', '}' };
+                                        var csvReader = new CsvReader(streamRdr, ",");
+                                        csvReader.Read();
+
+                                        string name = csvReader[1].Trim(trimChars).Replace("~!", "´").Replace("\\\"", "\'").Replace('.', '_');
+                                        string country = csvReader[23].ToLower().Trim();
+                                        if (country == "gb")
+                                        {
+                                            country = "uk";
+                                        }
+
+                                        c.id = name + "." + country;
+                                        c.url = csvReader[2];
+                                        c.group = ".rdb " + csvReader[8].Trim('\'').Replace("~!", "´").Replace("\\\"", "\'");
+                                        c.country = country;
+                                    }
+
+                                    if (!allStreams.ContainsKey(c.id))
+                                    {
+                                        allStreams.Add(c.id, c);
+                                    }
+
+                                    if (!Combo_FilterCountry.Items.Contains(c.country))
+                                    {
+                                        Combo_FilterCountry.Items.Add(c.country);
+                                    }
+                                }
+                                )
+                            , null
+                            );
+                        }
+                        );
+                    tasks.Add(t);
+                }
+                try
+                {
+                    await Task.Factory.ContinueWhenAll
+                         (tasks.ToArray()
+                            , result =>
+                            {
+                                var time = watch.ElapsedMilliseconds;
+                                dispatcherUI.BeginInvoke
+                              (new Action
+                                    (() =>
+                                    {
+                                        Label_Status.Text += time.ToString();
+                                    }
+                                     )
+                               );
+                            }
+                        );
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                Console.WriteLine("... loaded");
+            }
+        }
+
+        private async Task ReadStreams()
+        {
+            if (allStreams.Count() == 0)
+            {
+                
+                foreach (var f in Directory.GetFiles(streamFolder, "*.m3u"))
+                {
+                    foreach (var c in M3u.GetTvgChannels(Path.Combine(streamFolder, f), out TvgGroups, out TvgCountries))
+                    {
+                        var tvgChannel = c.Value;
+                        tvgChannel.file = f;
+                        tvgChannel.group = ".tvg " + tvgChannel.group;
+                        if (!allStreams.Keys.Contains(c.Key))
+                        {
+                            allStreams.Add(c.Key, tvgChannel);
+                        }
+                    }
+                }
+                
+                
+                foreach (var f in Directory.GetFiles(streamFolder, "*.sql"))
+                {
+                    await ReadSqlDump(Path.Combine(streamFolder, f));
+                }
             }
         }
 
@@ -493,15 +660,21 @@ namespace radioZiner
 
         private void ClearChannelSelect()
         {
-            foreach (Button c in flowPanel.Controls)
+            foreach (Button c in FlowPanel_Recording_Buttons.Controls)
             {
                 c.BackColor = Color.Black;
             }
+            foreach (Button c in FlowPanel_FileStream_Buttons.Controls)
+            {
+                c.BackColor = Color.Black;
+            }
+            Combo_ShortName.BackColor = Color.Black;
+
         }
 
         private void UpdateTitleList(string recShortName)
         {
-            if (recShortName == curChannelName)
+            if (recShortName == curRecChannelName)
             {
                 ListBox_Titles.Items.Clear();
                 foreach (var t in recorders[recShortName].icyPosTitles)
@@ -521,25 +694,14 @@ namespace radioZiner
             ExecuteCommand("togglePlayerMute");
         }
 
-        private bool UserEntersData ()
-        {
-            return (TextBox_ShortName.Visible || TextBox_ChannelSet.Visible);
-        }
-
         private void Button_Rec_Click(object sender, EventArgs e)
         {
-            if (UserEntersData())
-            {
-                return;
-            }
-            if (curChannelName == "")
+            if (curRecChannelName == "")
             {
                 string url = TextBox_Url.Text;
-                string shortName = Combo_ShortName.Text;
+                string shortName = ReplaceInvalidChars (TextBox_ShortName.Text);
 
-                // ToDo: Verify shortName is valid filename
-
-                if (!recorders.Keys.Contains(Combo_ShortName.Text) && url != "")
+                if (!recorders.Keys.Contains(shortName) && url != "")
                 {
                     if (shortName!="")
                     {
@@ -562,9 +724,9 @@ namespace radioZiner
                         btn.AutoSize = true;
                         btn.FlatStyle = FlatStyle.Standard;
 
-                        flowPanel.Controls.Add(btn);
+                        FlowPanel_Recording_Buttons.Controls.Add(btn);
 
-                        if (!channels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "") //allChannels
+                        if (!allChannels.Keys.Contains(shortName) && Combo_ChannelSet.Text != "") //allChannels
                         {
                             M3u.TvgChannel c = new M3u.TvgChannel();
                             c.id = shortName;
@@ -585,20 +747,20 @@ namespace radioZiner
             }
             else
             {
-                videoRecorder.StopRecording(curChannelName);
+                videoRecorder.StopRecording(curRecChannelName);
 
-                foreach (var c in flowPanel.Controls)
+                foreach (var c in FlowPanel_Recording_Buttons.Controls)
                 {
-                    if (c is Button button && button.Text == curChannelName)
+                    if (c is Button button && button.Text == curRecChannelName)
                     {
-                        flowPanel.Controls.Remove(button);
+                        FlowPanel_Recording_Buttons.Controls.Remove(button);
                         break;
                     }
                 }
                 ListBox_Titles.Items.Clear();
-                var r = recorders[curChannelName];
-                recorders.Remove(curChannelName);
-                curChannelName = "";
+                var r = recorders[curRecChannelName];
+                recorders.Remove(curRecChannelName);
+                curRecChannelName = "";
                 Combo_ShortName.Text = "";
                 r.Stop();
                 Player.CommandV("stop");
@@ -608,40 +770,46 @@ namespace radioZiner
 
         private void Button_ChangeChannel_Click(object sender, EventArgs e)
         {
-            if (curChannelName != "")
+            ClearChannelSelect();
+            if (curRecChannelName != "")
             {
-                recorders[curChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
-                ClearChannelSelect();
+                recorders[curRecChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
             }
 
             Button btn = (Button)sender;
 
-            curChannelName = btn.Text;
+            curRecChannelName = btn.Text;
             btn.BackColor = Color.Blue;
 
-            if (!Combo_ShortName.Items.Contains(curChannelName))
+            if (!Combo_ShortName.Items.Contains(curRecChannelName))
             {
-                if (allChannels.Keys.Contains(curChannelName))
+                if (allChannels.Keys.Contains(curRecChannelName))
                 {
-                    string sFile = Path.GetFileNameWithoutExtension(allChannels[curChannelName].file);
+                    string sFile = Path.GetFileNameWithoutExtension(allChannels[curRecChannelName].file);
                     Combo_ChannelSet.Text = sFile;
                 }
             }
 
             Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
-            Combo_ShortName.Text = curChannelName;
+            Combo_ShortName.Text = curRecChannelName;
             Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
 
-            TextBox_Url.Text = recorders[curChannelName].url;
-            UpdateTitleList(curChannelName);
+            CurSource = "timeshift";
+            icyTitles.Clear();
+            icyPosTitles.Clear();
+            ListBox_Titles.Items.Clear();
+            UpdateTitleList(curRecChannelName);
+
+            TextBox_Url.Text = recorders[curRecChannelName].url;
             Button_Rec.Text = "Stop";
 
-            TextBox_ShortName.Hide();
+            setChannelName(curRecChannelName);
 
             Label_StartTime.Text = "00:00:00";
             Label_EndTime.Text = "00:00:00";
-            TextBox_ExportFileName.Text = curChannelName;
-            if (recorders[curChannelName].hasIcyTitles)
+            TextBox_ExportFileName.Text = curRecChannelName;
+            // ToDo - hasIcyTitles is not pricise - should check for video steam instead
+            if (recorders[curRecChannelName].hasIcyTitles)
             {
                 Combo_ExportFileExtension.Text = ".mp3";
             }
@@ -649,9 +817,101 @@ namespace radioZiner
             {
                 Combo_ExportFileExtension.Text = ".mp4";
             }
+
+            Panel_Files_Hide();
         }
 
-        int selTitleIndex = -1;
+        private void ListBox_Titles_SaveToFile(string sTitlesFile)
+        {
+            if (File.Exists(sTitlesFile))
+            {
+                string fName = sTitlesFile;
+                int pos = sTitlesFile.LastIndexOf('.');
+                if (pos >= 0)
+                {
+                    fName = fName.Substring(0, pos);
+                }
+                fName += ".txt";
+                List<string> titles = new List<string>();
+                foreach (var item in ListBox_Titles.Items)
+                {
+                    titles.Add((string)item);
+                }
+                File.WriteAllLines(fName, titles);
+            }
+        }
+
+        private readonly Regex Rgx_TitlePos = new Regex(@"(?<hours>[0-9][0-9]):(?<minutes>[0-5][0-9]):(?<seconds>[0-5][0-9])((\s)|(.(?<milliseconds>[0-9]{3})))");
+
+        private string TitlePos2TimeString (string line)
+        {
+            Match m = Rgx_TitlePos.Match(line);
+            if (m.Success)
+            {
+                string s = m.Groups["hours"].Value + ":" + m.Groups["minutes"].Value + ":" + m.Groups["seconds"].Value;
+                if (m.Groups["milliseconds"].Value != "")
+                {
+                    s += "." + m.Groups["milliseconds"].Value;
+                }
+                return s;
+            }
+            return "";
+        }
+       
+        private string TitlePos2secs(string line)
+        {
+            Match m = Rgx_TitlePos.Match(line);
+            if (m.Success)
+            {
+                int i = int.Parse(m.Groups["hours"].Value) * 3600;
+                i += int.Parse(m.Groups["minutes"].Value) * 60;
+                i += int.Parse(m.Groups["seconds"].Value);
+
+                string s = i.ToString();
+                if (m.Groups["milliseconds"].Value != "")
+                {
+                    s += "."  + m.Groups["milliseconds"].Value;
+                }
+                return s;
+            }
+            return "";
+        }
+
+        private void ListBox_Titles_LoadFromFile(string sTitlesFile)
+        {
+            if (File.Exists(sTitlesFile))
+            {
+                string fName = sTitlesFile;
+
+                int pos = sTitlesFile.LastIndexOf('.');
+                if (pos >= 0)
+                {
+                    fName = fName.Substring(0, pos);
+                }
+                fName += ".txt";
+                ListBox_Titles.Items.Clear();
+                if (File.Exists(fName))
+                {
+                    foreach (var line in File.ReadAllLines(fName))
+                    {
+                        if (Rgx_TitlePos.IsMatch(line))
+                        {
+                            ListBox_Titles.Items.Add(line);
+                        }
+                    }
+                }
+
+                Label_TitleTime.Text = "00:00:00";
+                Label_TitleTimeFrac.Text = ".000";
+                Label_StartTime.Text = "00:00:00";
+                Label_StartTimeFrac.Text = ".000";
+                Label_EndTime.Text = "00:00:00";
+                Label_EndTimeFrac.Text = ".000";
+
+                TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(sTitlesFile);
+                Combo_ExportFileExtension.Text = ".mp4";
+            }
+        }
 
         private void ListBox_Titles_Click(object sender, MouseEventArgs e)
         {
@@ -661,34 +921,63 @@ namespace radioZiner
                     
                     if (ListBox_Titles.SelectedItem != null)
                     {
-                        if (ListBox_Titles.SelectedIndex != selTitleIndex)
-                        {
-                            var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
-                            double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
-                            Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
-                            selTitleIndex = ListBox_Titles.SelectedIndex;
-
-                        }
                         if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
                         {
-                            Label_StartTime.Text = ListBox_Titles.SelectedItem.ToString().Substring(0, 8);
-                            TextBox_ExportFileName.Text = ListBox_Titles.SelectedItem.ToString().Substring(11);
-                            Combo_ExportFileExtension.Text = ".mp3";
-                            int index = ListBox_Titles.SelectedIndex + 1;
-                            if (index < ListBox_Titles.Items.Count)
+                            string sPos = TitlePos2TimeString(ListBox_Titles.SelectedItem.ToString());
+                            if (sPos!="")
                             {
-                                Label_EndTime.Text = ListBox_Titles.Items[index].ToString().Substring(0, 8);
-                            }
-                            else
-                            {
-                                Label_EndTime.Text = lblRecordLength.Text;
+                                var a = sPos.Split('.');
+                                Label_TitleTime.Text = a[0];
+                                if (a.Count()>1)
+                                {
+                                    Label_TitleTimeFrac.Text = "." + a[1];
+                                }
+                                else
+                                {
+                                    Label_TitleTimeFrac.Text = ".000";
+                                }
+                                
+                                TextBox_TitleEdit.Text = ListBox_Titles.SelectedItem.ToString().Substring(sPos.Length);
+
+                                Label_StartTime.Text = Label_TitleTime.Text;
+                                Label_StartTimeFrac.Text = Label_TitleTimeFrac.Text;
+                                TextBox_ExportFileName.Text = TextBox_TitleEdit.Text;
+                                Combo_ExportFileExtension.Text = ".mp3";
+                                int index = ListBox_Titles.SelectedIndex + 1;
+                                if (index < ListBox_Titles.Items.Count)
+                                {
+                                    sPos = TitlePos2TimeString(ListBox_Titles.Items[index].ToString());
+                                    if (sPos != "")
+                                    {
+                                        a = sPos.Split('.');
+                                        Label_EndTime.Text = a[0];
+                                        if (a.Count() > 1)
+                                        {
+                                            Label_EndTimeFrac.Text = "." + a[1];
+                                        }
+                                        else
+                                        {
+                                            Label_EndTimeFrac.Text = ".000";
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Label_EndTime.Text = Label_RecLen.Text;
+                                    Label_EndTimeFrac.Text = ".000";
+                                }
                             }
                         }
+                        else
+                        {
+                            Player.CommandV("seek", TitlePos2secs(ListBox_Titles.SelectedItem.ToString()), "absolute"); // seconds.ToString(CultureInfo.InvariantCulture) + ".260"
+                        }
                     }
-                    
+
                     break;
 
                 case MouseButtons.Middle:
+                    ExecuteCommand("titleList");
                     break;
 
                 case MouseButtons.Right:
@@ -703,7 +992,6 @@ namespace radioZiner
             channels = M3u.GetTvgChannels(Path.Combine(channelFolder, s));
 
             Combo_ShortName.Items.Clear();
-            //Combo_ShortName.Items.Add("");
             foreach (var c in channels)
             {
                 Combo_ShortName.Items.Add(c.Key);
@@ -713,26 +1001,131 @@ namespace radioZiner
         private void Combo_ChannelSet_SelectedIndexChanged(object sender, EventArgs e)
         {
             ReadSelectedChannelSet();
+            PictureBox_Player.Focus();
+        }
+
+        private void ListBox_Files_LoadFromDir(string val, string source = "files")
+        {
+            if (!Directory.Exists(val))
+            {
+                return;
+            }
+            ListView listView;
+            switch (source)
+            {
+                case "recordings":
+                    listView = ListView_Recordings;
+                    break;
+                case "exports":
+                    listView = ListView_Exports;
+                    break;
+                default:
+                    listView = ListView_Files;
+                    break;
+
+            }
+            listView.Clear();
+            listView.Columns.Add("Filename", 450, HorizontalAlignment.Left);
+            listView.Tag = val;
+
+
+            var allowedExtensions = new[] { ".mp4", ".mp3", ".aac", ".ts", ".avi", ".mpg", ".mpeg",  ".mkv"};
+            foreach (var sFile in Directory.EnumerateFiles(val, "*.*",
+                System.IO.SearchOption.AllDirectories)
+                .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
+                .OrderByDescending(file => new FileInfo(file).CreationTime)
+                )
+            {
+                ListViewItem lvItem = new ListViewItem(sFile.Substring(val.Length + (val.EndsWith("\\") ? 0 : 1)), 0);
+                lvItem.SubItems.Add("Test");
+                lvItem.Tag = new M3u.TvgChannel();
+                listView.Items.Add(lvItem);
+            }
+
+            Panel_Files_Show();
+
+        }
+
+        private static ListViewItem ListBox_Streams_AddFiltered (M3u.TvgChannel channel, string country, List<string> words)
+        {
+            if (!words.All(w => (channel.group + " " + channel.id).ToLower().Contains(w)))
+            {
+                return null;
+            }
+            if (country == "" || channel.id.ToLower().Contains("." + country.ToLower()))
+            {
+                var a = channel.id.Split('.'); // was Key
+                ListViewItem lvItem = new ListViewItem(a[0], 0);
+                lvItem.SubItems.Add(a.Count() > 1 ? "." + a[1] : "");
+                lvItem.SubItems.Add(channel.group);
+                lvItem.Tag = channel;
+                return lvItem;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private void ListBox_Files_LoadFromChannels()
+        {
+            ListView_Files.Clear();
+            ListView_Files.Columns.Add("Filename", 450, HorizontalAlignment.Left);
+            ListView_Files.Tag = "channels";
+            foreach (var channel in allChannels)
+            {
+                if (!channel.Value.url.StartsWith("http"))
+                {
+                    string channelKey = channel.Key;
+                    if (!File.Exists(channel.Value.url))
+                    {
+                        channelKey = "[" + channelKey + "]";
+                    }
+
+                    ListViewItem lvItem = new ListViewItem(channelKey, 0);
+                    lvItem.SubItems.Add("Test");
+                    lvItem.Tag = channel.Value;
+                    ListView_Files.Items.Add(lvItem);
+                }
+            }
+
+            Panel_Files_Show();
+
         }
 
         private void Combo_ShortName_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (curChannelName != "")
+            ClearChannelSelect();
+            Combo_ShortName.BackColor = Color.Blue;
+            if (curRecChannelName != "")
             {
-                recorders[curChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
-                ClearChannelSelect();
+                recorders[curRecChannelName].lastPlayPos = Player.GetPropertyDouble("time-pos");
             }
 
             string s = Combo_ShortName.Text;
             TextBox_Url.Text = channels.Keys.Contains(s) ? channels[s].url : "";
             Player.CommandV("stop");
 
-            curChannelName = "";
-            PictureBox_Player.Show();
-            ListBox_Titles.Hide();
-            Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+            curRecChannelName = "";
+
             Button_Rec.Text = "Rec";
-            //ClearChannelSelect();
+
+            if (Directory.Exists(TextBox_Url.Text))
+            {
+                ListBox_Files_LoadFromDir(TextBox_Url.Text);
+            }
+            else
+            {
+                Panel_Files_Hide();
+                Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+                setChannelName(s);
+                CurSource = "live";
+                icyTitles.Clear();
+                icyPosTitles.Clear();
+                ListBox_Titles.Items.Clear();
+            }
+
+            PictureBox_Player.Focus();
         }
 
         private void RadioZiner_DragEnter(object sender, DragEventArgs e)
@@ -752,22 +1145,23 @@ namespace radioZiner
             if (e.Data.GetDataPresent(typeof(string)))
             {
                 string s = (string)e.Data.GetData(typeof(string));
-                if (s.Substring(0, 4).ToLower() == "http")
+                if (s.Length>4 && s.Substring(0, 4).ToLower() == "http")
                 {
                     ExecuteCommand("pasteURL", s);
 
-                    LabelEnterChannelName.Show();
-                    TextBox_ShortName.Text = "";
-                    TextBox_ShortName.Show();
-                    LabelEnterChannelName.BringToFront();
+                    setChannelName("NEW CHANNEL");
+                    CurSource = "live";
+                    icyTitles.Clear();
+                    icyPosTitles.Clear();
+                    ListBox_Titles.Items.Clear();
+
                     TextBox_Url.Text = s;
                     Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
                     Combo_ShortName.Text = "";
                     Combo_ShortName.SelectedIndexChanged += Combo_ShortName_SelectedIndexChanged;
 
-                    curChannelName = "";
-                    PictureBox_Player.Show();
-                    ListBox_Titles.Hide();
+                    curRecChannelName = "";
+
                     Player.CommandV("loadfile", TextBox_Url.Text, "replace");
                     Button_Rec.Text = "Rec";
                     ClearChannelSelect();
@@ -783,129 +1177,166 @@ namespace radioZiner
             }
         }
 
+        private static string GetFormatedPlayerPos (double pos)
+        {
+
+            if (pos >= 0)
+            {
+                TimeSpan tPos = TimeSpan.FromSeconds(pos);
+                return string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+            }
+            else
+            {
+                return "--:--:--";
+            }
+        }
+
+        private static string GetPlayerPosFractionalPart(double pos, int digits = 3)
+        {
+
+            if (pos >= 0)
+            {
+                pos = pos - Math.Truncate(pos);
+                string formatString = "{0:0." + "".PadRight(digits, '0') + "}";
+                string s = String.Format(formatString, pos).TrimStart('0').TrimStart('1').TrimStart('.').TrimStart(',');
+                return "." + s;
+            }
+            else
+            {
+                return "-.-";
+            }
+        }
+
+        private static void UpdateSlider (ColorSlider slider, double min, double max, double val)
+        {
+            slider.Minimum = 0;
+            slider.Maximum = (int)max > 0 ? (int)max : 7200;
+            slider.Value = (int)val > 0 && (int)val <= max ? (int)val : 0;
+        }
+
+        private void UpdateTitlesPos (double pos)
+        {
+            for (int i = ListBox_Titles.Items.Count - 1; i >= 0; i--)
+            {
+                var a = ListBox_Titles.Items[i].ToString().Substring(0, 8).Split(':');
+                double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
+                if (seconds <= pos)
+                {
+                    ListBox_Titles.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        private void SeekToLastRecorderPos ()
+        {
+            double lastPos = recorders[curRecChannelName].lastPlayPos;
+            if (lastPos > 0)
+            {
+                if (!recorders[curRecChannelName].hasIcyTitles)
+                {
+                    Player.SetPropertyBool("pause", true);
+                }
+                Player.CommandV("seek", lastPos.ToString(CultureInfo.InvariantCulture), "absolute");
+                double pos = Player.GetPropertyDouble("time-pos");
+                if (pos >= lastPos)
+                {
+                    recorders[curRecChannelName].lastPlayPos = 0;
+                    if (!recorders[curRecChannelName].hasIcyTitles)
+                    {
+                        Player.SetPropertyBool("pause", false);
+                    }
+                }
+            }
+        }
+
+
+        private List<string> icyTitles = new List<string>();
+        private List<string> icyPosTitles = new List<string>();
+        private bool hasIcyTitles = false;
+
+        private bool UpdateTitles()
+        {
+            bool changed = false;
+            double pos = Player.GetPropertyDouble("time-pos", false);
+            string title = Player.GetPropertyString("media-title");
+            if (title != "" && !icyTitles.Contains(title))
+            {
+                icyTitles.Add(title);
+                TimeSpan tPos = TimeSpan.FromSeconds(pos);
+                string sPos = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
+                string sPosTitle = sPos + " - " + title;
+                icyPosTitles.Add(sPosTitle);
+
+                icyPosTitles.Sort();
+
+                ListBox_Titles.Items.Clear();
+                foreach (var s in icyPosTitles)
+                {
+                    ListBox_Titles.Items.Add(s);
+                }
+                changed = true;
+            }
+
+            if (icyTitles.Count() > 1)
+            {
+                hasIcyTitles = true;
+            }
+
+            return (changed);
+        }
+
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            if (curChannelName=="")
+            if (Player.GetPropertyString("video-codec") != "")
+            {
+                ListBox_Titles.Dock = DockStyle.Top;
+                ListBox_Titles.Height = 250;
+                PictureBox_Player.Show();
+                PictureBox_Player.BringToFront();
+            }
+            else if (Player.GetPropertyString("audio-codec") != "")
+            {
+                ListBox_Titles.Dock = DockStyle.Fill;
+                PictureBox_Player.Hide();
+                ListBox_Titles_Show();
+            }
+
+            if (curRecChannelName=="")
             {
                 double curPos = Player.GetPropertyDouble("time-pos");
-                if (curPos >= 0)
-                {
-                    TimeSpan tPos = TimeSpan.FromSeconds(curPos);
-                    lblPlayerPos.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
-                }
-                else
-                {
-                    lblPlayerPos.Text = "--:--:--";
-                }
-                lblRecordLength.Text = "--:--:--";
-
                 double recLen = Player.GetPropertyDouble("time-remaining") + curPos;
-                if (recLen >= 0)
-                {
-                    TimeSpan tPos = TimeSpan.FromSeconds(recLen);
-                    lblRecordLength.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
-                }
-                else
-                {
-                    lblRecordLength.Text = "--:--:--";
-                }
 
-                slider.Minimum = 0;
-                slider.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
-                slider.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
+                Label_PlayerPos.Text = GetFormatedPlayerPos(curPos);
+                Label_PlayerPosFrac.Text = GetPlayerPosFractionalPart(curPos);
+                Label_RecLen.Text = GetFormatedPlayerPos(recLen);
+
+                UpdateSlider(slider, 0, recLen, curPos);
+                if (CurSource == "live")
+                {
+                    UpdateTitles();
+                }
+                UpdateTitlesPos(curPos);
             }
-            else if (recorders.ContainsKey(curChannelName) && recorders[curChannelName]?.recordingToFile != "")
+            else if (recorders.ContainsKey(curRecChannelName) && recorders[curRecChannelName]?.recordingToFile != "")
             {
-                if (recorders[curChannelName].hasIcyTitles)
+                if (Player.GetPropertyString("path") != recorders[curRecChannelName]?.recordingToFile)
                 {
-                    if (!ListBox_Titles.Visible) ListBox_Titles.Show();
-                    if (PictureBox_Player.Visible) PictureBox_Player.Hide();
-                }
-                else
-                {
-                    if (!PictureBox_Player.Visible) PictureBox_Player.Show();
-                    if (ListBox_Titles.Visible) ListBox_Titles.Hide();
-                }
-
-                if (Player.GetPropertyString("path") != recorders[curChannelName]?.recordingToFile)
-                {
-                    Player.CommandV("loadfile", recorders[curChannelName].recordingToFile, "replace");
+                    Player.CommandV("loadfile", recorders[curRecChannelName].recordingToFile, "replace");
                 }
 
                 double curPos = Player.GetPropertyDouble("time-pos");
-                double lastPos = recorders[curChannelName].lastPlayPos;
-                double recLen = recorders[curChannelName].GetRecordLength();
+                double recLen = recorders[curRecChannelName].GetRecordLength();
 
-                if (lastPos > 0)
-                {
-                    if (!recorders[curChannelName].hasIcyTitles)
-                    {
-                        Player.SetPropertyBool("pause", true);
-                    }
-                    Player.CommandV("seek", lastPos.ToString(CultureInfo.InvariantCulture), "absolute");
-                    curPos = Player.GetPropertyDouble("time-pos");
-                    if (curPos >= lastPos)
-                    {
-                        recorders[curChannelName].lastPlayPos = 0;
-                        if (!recorders[curChannelName].hasIcyTitles)
-                        {
-                            Player.SetPropertyBool("pause", false);
-                        }
-                    }
-                }
+                UpdateSlider(slider, 0, recLen, curPos);
+                UpdateTitlesPos(curPos);
 
-                if (curPos >= 0)
-                {
-                    TimeSpan tPos = TimeSpan.FromSeconds(curPos);
-                    lblPlayerPos.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
-                }
-                else
-                {
-                    lblPlayerPos.Text = "--:--:--";
-                }
+                Label_PlayerPos.Text = GetFormatedPlayerPos(curPos);
+                Label_PlayerPosFrac.Text = GetPlayerPosFractionalPart(curPos);
+                Label_RecLen.Text = GetFormatedPlayerPos(recLen);
 
-                if (recLen >= 0)
-                {
-                    TimeSpan tPos = TimeSpan.FromSeconds(recLen);
-                    lblRecordLength.Text = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
-                }
-                else
-                {
-                    lblRecordLength.Text = "--:--:--";
-                }
-
-                slider.Minimum = 0;
-                slider.Maximum = (int)recLen > 0 ? (int)recLen : 7200;
-                slider.Value = (int)curPos > 0 && (int)curPos <= recLen ? (int)curPos : 0;
-
-                for (int i = ListBox_Titles.Items.Count - 1; i >= 0; i--)
-                {
-                    var a = ListBox_Titles.Items[i].ToString().Substring(0, 8).Split(':');
-                    double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
-                    if (seconds <= curPos)
-                    {
-                        ListBox_Titles.SelectedIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void LabelEnterChannelName_Click(object sender, EventArgs e)
-        {
-            LabelEnterChannelName.Visible = false;
-            TextBox_ShortName.Focus();
-        }
-
-        private void Combo_ShortName_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter && Combo_ShortName.Text!="")
-            {
-                oldShortName = Combo_ShortName.Text;
-                TextBox_ShortName.Text = oldShortName;
-                TextBox_ShortName.Show();
-                TextBox_ShortName.Focus();
-            }
+                SeekToLastRecorderPos();
+           }
         }
 
         public string ReplaceInvalidChars(string filename)
@@ -917,7 +1348,6 @@ namespace radioZiner
 
         private void TextBox_ShortName_KeyDown(object sender, KeyEventArgs e)
         {
-            LabelEnterChannelName.Hide();
             if (e.KeyCode == Keys.Enter)
             {
                 string url = TextBox_Url.Text;
@@ -939,15 +1369,13 @@ namespace radioZiner
                     ReadChannels();
                     ReadSelectedChannelSet();
                     Combo_ShortName.SelectedItem = shortName;
-                    TextBox_ShortName.Hide();
                 }
                 e.SuppressKeyPress = true;
             }
             else if (e.KeyCode == Keys.Escape)
             {
-                TextBox_ShortName.Text = "";
-                oldShortName = "";
-                TextBox_ShortName.Hide();
+                TextBox_ShortName.Text = curChannelName;
+                oldShortName = curChannelName;
                 e.SuppressKeyPress = true;
             }
         }
@@ -1032,6 +1460,7 @@ namespace radioZiner
                     break;
 
                 case MouseButtons.Middle:
+                    ExecuteCommand("titleList");
                     break;
 
                 case MouseButtons.Right:
@@ -1041,8 +1470,43 @@ namespace radioZiner
             PictureBox_Player.Focus();
         }
 
+        public void MouseWheelTicHandler(object sender, MouseEventArgs e)
+        {
+            ((HandledMouseEventArgs)e).Handled = true;
+            if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
+            {
+                if (e.Delta > 0)
+                {
+                    Player.CommandV("seek", "0.01", "relative");
+                }
+                else
+                {
+                    Player.CommandV("seek", "-0.01", "relative");
+                }
+            }
+            else
+            {
+                if (e.Delta > 0)
+                {
+                    Player.CommandV("seek", "0.1", "relative");
+                }
+                else
+                {
+                    Player.CommandV("seek", "-0.1", "relative");
+                }
+            }
+        }
+
         public void MouseWheelHandler(object sender, MouseEventArgs e)
         {
+            if (Player.GetPropertyString("video-codec") != "" && !(sender is PictureBox))
+            {
+                return;
+            }
+            if (e.Location.X > ListBox_Titles.Width - 100 && !(sender is PictureBox))
+            {
+                return;
+            }
             ((HandledMouseEventArgs)e).Handled = true;
             if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
             {
@@ -1050,7 +1514,14 @@ namespace radioZiner
                 {
                     if (Player.GetPropertyBool("pause"))
                     {
-                        Player.CommandV("frame-step");
+                        if (Player.GetPropertyString("video-codec") != "")
+                        {
+                            Player.CommandV("frame-step");
+                        }
+                        else
+                        {
+                            Player.CommandV("seek", "0.1", "relative");
+                        }
                         return;
                     }
 
@@ -1058,7 +1529,14 @@ namespace radioZiner
                 }
                 else if (Player.GetPropertyBool("pause"))
                 {
-                    Player.CommandV("frame-back-step");
+                    if (Player.GetPropertyString("video-codec") != "")
+                    {
+                        Player.CommandV("frame-back-step");
+                    }
+                    else
+                    {
+                        Player.CommandV("seek", "-0.1", "relative");
+                    }
                 }
                 else
                 {
@@ -1086,70 +1564,42 @@ namespace radioZiner
             }
         }
 
+        private bool controlsVisible = true;
+        private void ToggleControls(int setState = -1)
+        {
+            bool setVisible = controlsVisible;
+            if (setState>=0)
+            {
+                setVisible = setState == 1;
+            }
+            if (setVisible)
+            {
+                controlsVisible = false;
+                MenuBar.Visible = false;
+                FlowPanel_Recording_Buttons.Visible = false;
+                panel3.Visible = false;
+                panel4.Visible = false;
+                TextBox_Url.Visible = false;
+                panel6.Hide();
+                Panel_Files_Hide();
+            }
+            else
+            {
+                controlsVisible = true;
+                MenuBar.Visible = true;
+                FlowPanel_Recording_Buttons.Visible = true;
+                panel3.Visible = true;
+                panel4.Visible = true;
+                TextBox_Url.Visible = true;
+                panel6.Show();
+            }
+        }
+
         private void ListBox_Titles_DoubleClick(object sender, EventArgs e)
         {
             ExecuteCommand("fullScreen");
-            if (this.FormBorderStyle == FormBorderStyle.None)
-            {
-                MenuBar.Visible = false;
-                flowPanel.Visible = false;
-                panel3.Visible = false;
-            }
-            else
-            {
-                MenuBar.Visible = true;
-                flowPanel.Visible = true;
-                panel3.Visible = true;
-            }
-        }
 
-        private void ListBox_Titles_Click(object sender, EventArgs e)
-        {
-            /*
-            if (ListBox_Titles.SelectedItem != null)
-            {
-                var a = ListBox_Titles.SelectedItem.ToString().Substring(0, 8).Split(':');
-                double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
-                Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
-            }
-            */
-        }
-
-        private void ListBox_Titles_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void ListBox_Titles_SelectedValueChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void Button_Toggle_Channels_Export_Click(object sender, EventArgs e)
-        {
-            if (panel1.Visible)
-            {
-                var curStream = Player.GetPropertyString("path");
-                if (curStream!="" && !curStream.StartsWith("http"))
-                {
-                    panel1.Visible = false;
-                    panel5.Visible = true;
-                    Button_Toggle_Channels_Export.Text = "Channels";
-                    /*
-                    if (curChannelName=="")
-                    {
-                        Label_StartTime.Text = "00:00:00";
-                        Label_EndTime.Text = "00:00:00";
-                        TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(curStream);
-                        Combo_ExportFileExtension.Text = ".mp4";
-                    }
-                    */
-                }
-            }
-            else
-            {
-                panel1.Visible = true;
-                panel5.Visible = false;
-                Button_Toggle_Channels_Export.Text = "Export";
-            }
+            ToggleControls(FormBorderStyle == FormBorderStyle.None ? 1 : 0);
         }
 
         private void Button_ExportSave_Click(object sender, EventArgs e)
@@ -1166,9 +1616,9 @@ namespace radioZiner
             }
 
             string param = "-ss "
-                         + Label_StartTime.Text
+                         + Label_StartTime.Text + Label_StartTimeFrac.Text
                          + " -to "
-                         + Label_EndTime.Text
+                         + Label_EndTime.Text + Label_EndTimeFrac.Text
                          + " -i \""
                          + Player.GetPropertyString("path")
                          + "\" -c copy \""
@@ -1184,13 +1634,25 @@ namespace radioZiner
         {
             if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
             {
-                Label_StartTime.Text = lblPlayerPos.Text;
+                Label_StartTime.Text = Label_PlayerPos.Text;
+                Label_StartTimeFrac.Text = Label_PlayerPosFrac.Text;
             }
             else
             {
-                var a = Label_StartTime.Text.Split(':');
-                var secs = (Convert.ToInt32(a[0]) * 3600 + Convert.ToInt32(a[1]) * 60 + Convert.ToInt32(a[2])).ToString();
-                Player.CommandV("seek", secs, "absolute", "exact");
+                Player.CommandV("seek", TitlePos2secs(Label_StartTime.Text + Label_StartTimeFrac.Text), "absolute", "exact");
+            }
+        }
+
+        private void Label_TitleTime_Click(object sender, EventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                Label_TitleTime.Text = Label_PlayerPos.Text;
+                Label_TitleTimeFrac.Text = Label_PlayerPosFrac.Text;
+            }
+            else
+            {
+                Player.CommandV("seek", TitlePos2secs(Label_TitleTime.Text + Label_TitleTimeFrac.Text), "absolute", "exact");
             }
         }
 
@@ -1198,13 +1660,499 @@ namespace radioZiner
         {
             if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
             {
-                Label_EndTime.Text = lblPlayerPos.Text;
+                Label_EndTime.Text = Label_PlayerPos.Text;
+                Label_EndTimeFrac.Text = Label_PlayerPosFrac.Text;
             }
             else
             {
-                var a = Label_EndTime.Text.Split(':');
-                var secs = (Convert.ToInt32(a[0]) * 3600 + Convert.ToInt32(a[1]) * 60 + Convert.ToInt32(a[2])).ToString();
-                Player.CommandV("seek", secs, "absolute", "exact");
+                Player.CommandV("seek", TitlePos2secs(Label_EndTime.Text + Label_EndTimeFrac.Text), "absolute", "exact");
+            }
+        }
+
+        private void Panel_Files_Hide ()
+        {
+            Panel_Files.Hide();
+            Label_Toggle_ListBox_Files.Text = "▷";
+        }
+
+        private void Panel_Files_Show()
+        {
+            Panel_Files.Show();
+            Label_Toggle_ListBox_Files.Text = "▼";
+        }
+
+        private void ListBox_Titles_Hide()
+        {
+            PictureBox_Player.Show();
+            ListBox_Titles.Hide();
+            Label_Toggle_ListBox_Titles.Text = "◁";
+        }
+
+        private void ListBox_Titles_Show()
+        {
+            ListBox_Titles.Show();
+            Label_Toggle_ListBox_Titles.Text = "▼";
+        }
+
+        private void Select_ListFiles_Button (string sButton = "")
+        {
+            foreach (Control control in FlowPanel_FileStream_Buttons.Controls)
+            {
+                if (control is Button)
+                {
+                    if (control.Tag.ToString() == sButton)
+                    {
+                        control.ForeColor = Color.Orange;
+                    }
+                    else
+                    {
+                        control.ForeColor = Color.White;
+                    }
+                }
+            }
+        }
+
+        private void Button_ListFiles_Click(object sender, EventArgs e)
+        {
+            string sButton = ((Button)sender).Tag.ToString();
+            switch (sButton)
+            {
+                case "streams":
+                    Panel_StreamFilter.Show();
+
+                    ListView_Streams.Show();
+                    ListView_Recordings.Hide();
+                    ListView_Exports.Hide();
+                    ListView_Files.Hide();
+                    break;
+                case "recordings":
+                    Panel_StreamFilter.Hide();
+
+                    ListView_Streams.Hide();
+                    ListView_Recordings.Show();
+                    ListView_Exports.Hide();
+                    ListView_Files.Hide();
+                    if (ListView_Recordings.Items.Count == 0 || Panel_Files.Visible && ((Button)sender).ForeColor == Color.Orange)
+                    {
+                        ListBox_Files_LoadFromDir(recordingFolder, "recordings");
+                    }
+                    break;
+                case "exports":
+                    Panel_StreamFilter.Hide();
+
+                    ListView_Streams.Hide();
+                    ListView_Recordings.Hide();
+                    ListView_Exports.Show();
+                    ListView_Files.Hide();
+                    if (ListView_Exports.Items.Count == 0 || Panel_Files.Visible && ((Button)sender).ForeColor == Color.Orange)
+                    {
+                        ListBox_Files_LoadFromDir(exportFolder, "exports");
+                    }
+                    break;
+                case "files":
+                    Panel_StreamFilter.Hide();
+
+                    ListView_Streams.Hide();
+                    ListView_Recordings.Hide();
+                    ListView_Exports.Hide();
+                    ListView_Files.Show();
+                    if (ListView_Files.Items.Count == 0 || Panel_Files.Visible && ((Button)sender).ForeColor == Color.Orange)
+                    {
+                        ListBox_Files_LoadFromChannels();
+                    }
+                    break;
+            }
+            Select_ListFiles_Button(sButton);
+            Panel_Files_Show();
+        }
+
+        private void Toggle_ListBox_Files ()
+        {
+            if (Panel_Files.Visible)
+            {
+                Panel_Files_Hide();
+            }
+            else
+            {
+                Panel_Files_Show();
+            }
+        }
+
+        private void Toggle_ListBox_Titles()
+        {
+            if (ListBox_Titles.Visible)
+            {
+                ListBox_Titles_Hide();
+            }
+            else
+            {
+                ListBox_Titles_Show();
+            }
+        }
+
+        private void Label_Toggle_ListBox_Files_Click(object sender, EventArgs e)
+        {
+            Toggle_ListBox_Files();
+        }
+
+        private void Label_Toggle_ListBox_Titles_Click(object sender, EventArgs e)
+        {
+            Toggle_ListBox_Titles();
+        }
+
+        private void Combo_FilterCountry_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private bool ListView_Url_Changed (ListView listView)
+        {
+            if (listView.SelectedItems.Count == 0)
+            {
+                return false;
+            }
+            M3u.TvgChannel item = (M3u.TvgChannel)(listView.SelectedItems[0].Tag);
+
+            string sTag = listView.Tag.ToString();
+            string selectedItem = listView.SelectedItems[0].Text;//item.id.ToString();
+            string sUrl = "";
+            string sTitle = "";
+
+            switch (sTag)
+            {
+                case "channels":
+                    CurSource = "file";
+                    string sFile = allChannels[selectedItem.Trim('[').Trim(']')].url;
+                    if (selectedItem.StartsWith("[") && selectedItem.EndsWith("]"))
+                    {
+                        ListBox_Files_LoadFromDir(sFile);
+                        return false;
+                    }
+                    else
+                    {
+                        sUrl = sFile;
+                    }
+                    sTitle = ReplaceInvalidChars(selectedItem);
+                    break;
+                case "streams":
+                    CurSource = "live";
+                    sUrl = item.url;
+                    sTitle = item.id;
+                    break;
+                default:
+                    CurSource = "file";
+                    sUrl = Path.Combine(sTag, selectedItem);
+                    sTitle = ReplaceInvalidChars(selectedItem);
+                    break;
+            }
+
+            TextBox_Url.Text = sUrl;
+            setChannelName(sTitle);
+            icyTitles.Clear();
+            icyPosTitles.Clear();
+            ListBox_Titles.Items.Clear();
+
+            curRecChannelName = "";
+
+            Player.CommandV("loadfile", TextBox_Url.Text, "replace");
+            Button_Rec.Text = "Rec";
+
+            ListBox_Titles_LoadFromFile(sUrl);
+            return true;
+        }
+
+        private void ListView_Streams_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            if (ListView_Url_Changed(listView))
+            {
+                ClearChannelSelect();
+                Button_ListStreams.BackColor = Color.Blue;
+            }
+        }
+
+
+        private void ListView_Recordings_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            if (ListView_Url_Changed(listView))
+            {
+                ClearChannelSelect();
+                Button_ListRecordings.BackColor = Color.Blue;
+            }
+        }
+
+        private void ListView_Exports_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            if (ListView_Url_Changed(listView))
+            {
+                ClearChannelSelect();
+                Button_ListExports.BackColor = Color.Blue;
+            }
+        }
+
+        private void ListView_Files_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            if (ListView_Url_Changed(listView))
+            {
+                ClearChannelSelect();
+                Button_ListFiles.BackColor = Color.Blue;
+            }
+        }
+
+        private void ShowCounter(string s)
+        {
+            LabelCounter.Text = s;
+        }
+
+        private async void Search()
+        {
+            CancelSearch = false;
+            Searching = true;
+            Set_SearchButton_Text();
+            ListView_Streams.Clear();
+            ListView_Streams.Columns.Add("Streams", 150, HorizontalAlignment.Left);
+            ListView_Streams.Columns.Add("Ctry", 35, HorizontalAlignment.Left);
+            ListView_Streams.Columns.Add("Src Tags", 150, HorizontalAlignment.Left);
+            ListView_Streams.Tag = "streams";
+            int ListCounter = 0;
+            int LoopCounter = 0;
+            LabelCounter.Text = "";
+            Dispatcher dispatcherUI = Dispatcher.CurrentDispatcher;
+            Label_Status.Text = "Milliseconds: ";
+            var watch = Stopwatch.StartNew();
+            List<Task> tasks = new List<Task>();
+
+            string country = Combo_FilterCountry.Text;
+            List<string> words = new List<string>();
+            words.AddRange(TextBox_SearchFilter.Text.ToLower().Split(' '));
+
+
+            foreach (var c in allStreams)
+            {
+                if (CancelSearch)
+                {
+                    break;
+                }
+                M3u.TvgChannel channel = c.Value;
+
+                var lvItem = ListBox_Streams_AddFiltered(channel, country, words);
+
+                LoopCounter++;
+                if (LoopCounter % 1000 == 0)
+                {
+                    await Task.Delay(1);
+                }
+                if (lvItem != null)
+                {
+                    ListCounter++;
+                    if (ListCounter % 20 == 0)
+                    {
+                        await Task.Delay(1);
+                    }
+
+                    var t = Task.Run
+                    (() =>
+                        {
+                            dispatcherUI.BeginInvoke
+                            (new Action
+                                 (() =>
+                                 {
+                                     ListView_Streams.Columns[0].Text = "Streams (" + ListCounter + ")";
+                                     ListView_Streams.Items.Add(lvItem);
+                                 }
+                                 )
+                             , null
+                            );
+                        }
+                    );
+                    tasks.Add(t);
+                }
+            }
+
+            try
+            {
+                await Task.Factory.ContinueWhenAll
+                     (tasks.ToArray()
+                        , result =>
+                        {
+                            var time = watch.ElapsedMilliseconds;
+                            dispatcherUI.BeginInvoke
+                          (new Action
+                                (() =>
+                                {
+                                    ShowCounter(ListCounter.ToString());
+                                    Label_Status.Text += time.ToString();
+                                    ListView_Streams.Columns[0].Text = "Channels (" + ListCounter + ")";
+                                    if (CancelSearch)
+                                    {
+                                        ListView_Streams.Clear();
+                                    }
+                                    Searching = false;
+                                    Set_SearchButton_Text();
+                                }
+                                 )
+                           );
+                        }
+                    );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                if (CancelSearch)
+                {
+                    ListView_Streams.Clear();
+                }
+                Searching = false;
+                Set_SearchButton_Text();
+            }
+        }
+
+        private bool CancelSearch = false;
+        private bool Searching = false;
+
+        private void Set_SearchButton_Text ()
+        {
+            Button_StreamSearch.Enabled = true;
+
+            if (Searching)
+            {
+                Button_StreamSearch.Text = "Cancel";
+            }
+            else
+            {
+                Button_StreamSearch.Text = "Search";
+            }
+        }
+
+        private void Button_StreamSearch_Click(object sender, EventArgs e)
+        {
+            if (Searching)
+            {
+                CancelSearch = true;
+            }
+            else
+            {
+                Search();
+            }
+        }
+
+        private void Button_Channels_Click(object sender, EventArgs e)
+        {
+            Button_Channels.ForeColor = Color.Orange;
+            Button_Export.ForeColor = Color.White;
+            Button_Title.ForeColor = Color.White;
+            panel1.Visible = true;
+            panel5.Visible = false;
+            panel8.Visible = false;
+        }
+
+        private void Button_Export_Click(object sender, EventArgs e)
+        {
+            Button_Channels.ForeColor = Color.White;
+            Button_Export.ForeColor = Color.Orange;
+            Button_Title.ForeColor = Color.White;
+            panel1.Visible = false;
+            panel5.Visible = true;
+            panel8.Visible = false;
+        }
+
+        private void Button_Title_Click(object sender, EventArgs e)
+        {
+            Button_Channels.ForeColor = Color.White;
+            Button_Export.ForeColor = Color.White;
+            Button_Title.ForeColor = Color.Orange;
+            panel1.Visible = false;
+            panel5.Visible = false;
+            panel8.Visible = true;
+        }
+
+        public void DeleteTitle(string pos, string title)
+        {
+            timer1.Enabled = false;
+
+            ListBox_Titles.Items.Remove(pos + title);
+            ListBox_Titles_SaveToFile(TextBox_Url.Text);
+
+            timer1.Enabled = true;
+        }
+
+        public void AddTitle(string pos, string title = "")
+        {
+            timer1.Enabled = false;
+
+            ListBox_Titles.Items.Add(pos + title);
+            ListBox_Titles_SaveToFile(TextBox_Url.Text);
+
+            timer1.Enabled = true;
+        }
+
+        private void Button_TitleAdd_Click(object sender, EventArgs e)
+        {
+            if (curRecChannelName != "" && recorders.ContainsKey(curRecChannelName))
+            {
+                recorders[curRecChannelName].AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text, "");
+            }
+            else
+            {
+                AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text);
+            }
+        }
+
+        private void Button_Title_Delete_Click(object sender, EventArgs e)
+        {
+            if (curRecChannelName != "" && recorders.ContainsKey(curRecChannelName))
+            {
+                recorders[curRecChannelName].DeleteTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text);
+                recorders[curRecChannelName].DeleteTitle(Label_TitleTime.Text, TextBox_TitleEdit.Text);
+            }
+            else
+            {
+                DeleteTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text);
+                DeleteTitle(Label_TitleTime.Text, TextBox_TitleEdit.Text);
+            }
+        }
+
+        private async void TextBox_SearchFilter_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                CancelSearch = true;
+                if (Button_StreamSearch.Enabled)
+                {
+                    while (Searching)
+                    {
+                        await Task.Delay(1);
+                    }
+                    Search();
+                }
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                e.SuppressKeyPress = true;
+                CancelSearch = true;
+            }
+        }
+
+        private async void TextBox_SearchFilter_TextChanged(object sender, EventArgs e)
+        {
+            CancelSearch = true;
+            if (Button_StreamSearch.Enabled && TextBox_SearchFilter.Text.Length > 1)
+            {
+                while (Searching)
+                {
+                    await Task.Delay(1);
+                }
+                if (TextBox_SearchFilter.Text.Length > 1)
+                {
+                    Search();
+                }
+                else
+                {
+                    CancelSearch = true;
+                }
             }
         }
     }

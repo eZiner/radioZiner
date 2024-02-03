@@ -16,6 +16,7 @@ namespace radioZiner
             public string id;
             public string url;
             public string group;
+            public string country;
             public string title;
             public string logo;
             public string file;
@@ -24,16 +25,21 @@ namespace radioZiner
         public static TvgChannel ParseTvgRecord (string sRecord)
         {
             var tvg = new TvgChannel();
-            var lines = sRecord.Replace('~','_').Split('\n');
+            var lines = sRecord.Split('\n');
 
-            var line = lines[0].Trim();
+            var line = lines[0].Replace('~', '_').Trim();
 
             var a = line.Replace("tvg-id=", "~").Split('~');
 
             if (a.Length > 1)
             {
                 a = a[1].Replace("tvg", "~").Split('~');
-                tvg.id = a[0].Replace("\"", "").Trim(' ');
+                tvg.id = a[0].Replace("\"", "").Trim();
+                a = tvg.id.Split('.');
+                if (a.Count() > 0)
+                {
+                    tvg.country = a[a.Count() - 1];
+                }
             }
 
             a = line.Replace("tvg-logo=", "~").Split('~');
@@ -41,7 +47,7 @@ namespace radioZiner
             {
                 line = a[1];
                 a = line.Replace("group-", "~").Split('~');
-                tvg.logo = a[0].Replace("\"", "").Trim(' ');
+                tvg.logo = a[0].Replace("\"", "").Trim();
             }
 
             a = line.Replace("group-title=", "~").Split('~');
@@ -49,7 +55,7 @@ namespace radioZiner
             {
                 line = a[1];
                 a = line.Replace("\",", "~").Split('~');
-                tvg.group = a[0].Replace("\"", "").Trim(' ');
+                tvg.group = a[0].Split(' ')[0].Replace("\"", "").Trim();
                 tvg.title = (a.Length > 1) ? a[1] : line;
             }
 
@@ -92,8 +98,24 @@ namespace radioZiner
 
         public static SortedDictionary<string, TvgChannel> GetTvgChannels(string url)
         {
+            SortedDictionary<string, string> groups = null;
+            SortedDictionary<string, string> countries = null;
+            return GetTvgChannels(url, out groups, out countries, false, false);
+        }
+
+        public static SortedDictionary<string, TvgChannel> GetTvgChannels(
+            string url,
+            out SortedDictionary<string, string> groups,
+            out SortedDictionary<string, string> countries,
+            bool getGroups = true,
+            bool getCountries = true)
+        {
             SortedDictionary<string, TvgChannel> channels = new SortedDictionary<string, TvgChannel>();
 
+            
+            countries = new SortedDictionary<string, string>();
+            groups = new SortedDictionary<string, string>();
+            
             Stream stream = null;
 
             try
@@ -130,6 +152,32 @@ namespace radioZiner
                             if (tvg.id!="" && !channels.ContainsKey(tvg.id))
                             {
                                 channels.Add(tvg.id, tvg);
+
+                                if (getGroups && tvg.group!="")
+                                {
+                                    var a = tvg.group.Split(';');
+                                    foreach(var s in a)
+                                    {
+                                        if (!groups.ContainsKey(s))
+                                        {
+                                            groups.Add(s, s);
+                                        }
+                                    }
+                                }
+
+                                if (getCountries)
+                                {
+                                    var a = tvg.id.Split('.');
+                                    if (a.Count() > 0)
+                                    {
+                                        string country = a[a.Count() - 1];
+                                        if (country != "" && !countries.ContainsKey(country))
+                                        {
+                                            countries.Add(country, country);
+                                            //Console.WriteLine(country);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

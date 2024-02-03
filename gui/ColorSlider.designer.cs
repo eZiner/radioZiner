@@ -1,4 +1,4 @@
-﻿namespace ColorSlider
+﻿namespace radioZiner
 {
     partial class ColorSlider
     {

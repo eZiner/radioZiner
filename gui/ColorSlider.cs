@@ -41,7 +41,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace ColorSlider
+namespace radioZiner
 {
     /* Original code from Michal Brylka on Code Project
     * see https://www.codeproject.com/Articles/17395/Owner-drawn-trackbar-slider
