@@ -22,7 +22,7 @@ namespace radioZiner
         public double recLength = 0;
 
         public PictureBox pictureBox = new PictureBox();
-        private MpvPlayer Player { get; } = new MpvPlayer();
+        public MpvPlayer Player { get; } = new MpvPlayer();
         private Timer ChkStreamTimer = new Timer();
         public delegate void TitleAddedEvent(string s);
         public event TitleAddedEvent TitleAdded;

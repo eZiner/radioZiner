@@ -438,6 +438,7 @@ namespace radioZiner
 
             btnPlayPause.Text = "⏸️";
             Button_Mute.Text = "🔈";
+            Combo_ExportFileExtension.Text = ".mp4";
 
             videoRecorder = new VideoRecorder(recordingFolder);
 
@@ -808,14 +809,14 @@ namespace radioZiner
             Label_StartTime.Text = "00:00:00";
             Label_EndTime.Text = "00:00:00";
             TextBox_ExportFileName.Text = curRecChannelName;
-            // ToDo - hasIcyTitles is not pricise - should check for video steam instead
-            if (recorders[curRecChannelName].hasIcyTitles)
+            
+            if (recorders[curRecChannelName].Player.GetPropertyString("video-codec") != "")
             {
-                Combo_ExportFileExtension.Text = ".mp3";
+                Combo_ExportFileExtension.Text = ".mp4";
             }
             else
             {
-                Combo_ExportFileExtension.Text = ".mp4";
+                Combo_ExportFileExtension.Text = ".mp3";
             }
 
             Panel_Files_Hide();
@@ -942,7 +943,16 @@ namespace radioZiner
                                 Label_StartTime.Text = Label_TitleTime.Text;
                                 Label_StartTimeFrac.Text = Label_TitleTimeFrac.Text;
                                 TextBox_ExportFileName.Text = TextBox_TitleEdit.Text;
-                                Combo_ExportFileExtension.Text = ".mp3";
+
+                                if (Player.GetPropertyString("video-codec") != "")
+                                {
+                                    Combo_ExportFileExtension.Text = ".mp4";
+                                }
+                                else
+                                {
+                                    Combo_ExportFileExtension.Text = ".mp3";
+                                }
+                                
                                 int index = ListBox_Titles.SelectedIndex + 1;
                                 if (index < ListBox_Titles.Items.Count)
                                 {

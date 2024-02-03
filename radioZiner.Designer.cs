@@ -545,6 +545,7 @@
             this.Combo_ExportFileExtension.Items.AddRange(new object[] {
             ".mp4",
             ".mp3",
+            ".aac",
             ".ts"});
             this.Combo_ExportFileExtension.Location = new System.Drawing.Point(371, 7);
             this.Combo_ExportFileExtension.Name = "Combo_ExportFileExtension";
