@@ -395,21 +395,30 @@ namespace radioZiner
 
         private async void RadioZiner_Load(object sender, EventArgs e)
         {
-            Panel_Files_Show();
-            timer1.Enabled = true;
-            timer1.Interval = 1000;
-            timer1.Tick += new EventHandler(Timer1_Tick);
-
-            Player.Init(PictureBox_Player.Handle);
-            Player.SetPropertyBool("deinterlace", true);
-
             if (mainDir == "")
             {
                 mainDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "radioZiner");
                 if (!Directory.Exists(mainDir))
                 {
-                    Directory.CreateDirectory(mainDir);
+                    DialogResult dr = MessageBox.Show("Create new streaming directory in \"" + mainDir + "\"?",
+                                          "No streaming directory", MessageBoxButtons.YesNo);
+                    switch (dr)
+                    {
+                        case DialogResult.Yes:
+                            Directory.CreateDirectory(mainDir);
+                            break;
+                        case DialogResult.No:
+                            Application.Exit();
+                            return;
+                    }
                 }
+            }
+            else if (!Directory.Exists(mainDir))
+            {
+                DialogResult dr = MessageBox.Show("Directory \"" + mainDir + "\" not found.",
+                                      "No valid streaming directory", MessageBoxButtons.OK);
+                Application.Exit();
+                return;
             }
 
             recordingFolder = Path.Combine(mainDir, "recordings");
@@ -435,6 +444,14 @@ namespace radioZiner
             {
                 Directory.CreateDirectory(streamFolder);
             }
+
+            Panel_Files_Show();
+            timer1.Enabled = true;
+            timer1.Interval = 1000;
+            timer1.Tick += new EventHandler(Timer1_Tick);
+
+            Player.Init(PictureBox_Player.Handle);
+            Player.SetPropertyBool("deinterlace", true);
 
             btnPlayPause.Text = "⏸️";
             Button_Mute.Text = "🔈";
@@ -500,8 +517,8 @@ namespace radioZiner
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Player.Destroy();
-            videoRecorder.StopAllRecordings();
+            Player?.Destroy();
+            videoRecorder?.StopAllRecordings();
         }
 
         private void ReadChannelSets()
@@ -1039,7 +1056,7 @@ namespace radioZiner
             listView.Tag = val;
 
 
-            var allowedExtensions = new[] { ".mp4", ".mp3", ".aac", ".ts", ".avi", ".mpg", ".mpeg",  ".mkv"};
+            var allowedExtensions = new[] { ".mp4", ".mp3", ".aac", ".ts", ".avi", ".mpg", ".mpeg",  ".mkv", ".vob", ".wmv", ".flv"};
             foreach (var sFile in Directory.EnumerateFiles(val, "*.*",
                 System.IO.SearchOption.AllDirectories)
                 .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
