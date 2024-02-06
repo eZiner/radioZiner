@@ -40,13 +40,13 @@
             this.TextBox_ChannelSet = new System.Windows.Forms.TextBox();
             this.Combo_ChannelSet = new System.Windows.Forms.ComboBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.Button_Mute = new System.Windows.Forms.Button();
             this.Label_PlayerPosFrac = new System.Windows.Forms.Label();
             this.Button_Title = new System.Windows.Forms.Button();
             this.Button_Export = new System.Windows.Forms.Button();
             this.Button_Channels = new System.Windows.Forms.Button();
             this.Label_RecLen = new System.Windows.Forms.Label();
             this.Label_PlayerPos = new System.Windows.Forms.Label();
-            this.Button_Mute = new System.Windows.Forms.Button();
             this.TextBox_ShortName = new System.Windows.Forms.TextBox();
             this.LabelEnterChannelName = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
@@ -87,11 +87,12 @@
             this.TextBox_TitleEdit = new System.Windows.Forms.TextBox();
             this.Label_TitleTime = new System.Windows.Forms.Label();
             this.Button_Title_Add = new System.Windows.Forms.Button();
+            this.panel9 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
-            this.panel4.SuspendLayout();
             this.panel7.SuspendLayout();
             this.panel5.SuspendLayout();
             this.Panel_Files.SuspendLayout();
@@ -99,6 +100,7 @@
             this.panel6.SuspendLayout();
             this.FlowPanel_FileStream_Buttons.SuspendLayout();
             this.panel8.SuspendLayout();
+            this.panel9.SuspendLayout();
             this.SuspendLayout();
             // 
             // TextBox_Url
@@ -108,10 +110,10 @@
             this.TextBox_Url.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.TextBox_Url.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
             this.TextBox_Url.ForeColor = System.Drawing.Color.Gray;
-            this.TextBox_Url.Location = new System.Drawing.Point(0, 28);
+            this.TextBox_Url.Location = new System.Drawing.Point(3, 26);
             this.TextBox_Url.Name = "TextBox_Url";
             this.TextBox_Url.ReadOnly = true;
-            this.TextBox_Url.Size = new System.Drawing.Size(608, 15);
+            this.TextBox_Url.Size = new System.Drawing.Size(491, 15);
             this.TextBox_Url.TabIndex = 0;
             this.TextBox_Url.TabStop = false;
             this.TextBox_Url.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -165,9 +167,9 @@
             this.ListBox_Titles.ForeColor = System.Drawing.Color.White;
             this.ListBox_Titles.FormattingEnabled = true;
             this.ListBox_Titles.ItemHeight = 29;
-            this.ListBox_Titles.Location = new System.Drawing.Point(452, 81);
+            this.ListBox_Titles.Location = new System.Drawing.Point(412, 140);
             this.ListBox_Titles.Name = "ListBox_Titles";
-            this.ListBox_Titles.Size = new System.Drawing.Size(473, 203);
+            this.ListBox_Titles.Size = new System.Drawing.Size(363, 87);
             this.ListBox_Titles.Sorted = true;
             this.ListBox_Titles.TabIndex = 7;
             this.ListBox_Titles.DoubleClick += new System.EventHandler(this.ListBox_Titles_DoubleClick);
@@ -187,9 +189,9 @@
             this.panel3.Controls.Add(this.panel1);
             this.panel3.Controls.Add(this.panel2);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(0, 664);
+            this.panel3.Location = new System.Drawing.Point(0, 659);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1008, 65);
+            this.panel3.Size = new System.Drawing.Size(1008, 70);
             this.panel3.TabIndex = 3;
             // 
             // panel1
@@ -200,7 +202,7 @@
             this.panel1.Controls.Add(this.Combo_ChannelSet);
             this.panel1.Controls.Add(this.Combo_ShortName);
             this.panel1.Controls.Add(this.Button_Rec);
-            this.panel1.Location = new System.Drawing.Point(338, 21);
+            this.panel1.Location = new System.Drawing.Point(340, 29);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(518, 38);
             this.panel1.TabIndex = 7;
@@ -245,24 +247,38 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.Black;
+            this.panel2.Controls.Add(this.Button_Mute);
             this.panel2.Controls.Add(this.Label_PlayerPosFrac);
             this.panel2.Controls.Add(this.Button_Title);
             this.panel2.Controls.Add(this.Button_Export);
             this.panel2.Controls.Add(this.Button_Channels);
             this.panel2.Controls.Add(this.Label_RecLen);
             this.panel2.Controls.Add(this.Label_PlayerPos);
-            this.panel2.Controls.Add(this.Button_Mute);
             this.panel2.Controls.Add(this.btnPlayPause);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Location = new System.Drawing.Point(0, 30);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1008, 40);
             this.panel2.TabIndex = 6;
             // 
+            // Button_Mute
+            // 
+            this.Button_Mute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Button_Mute.BackColor = System.Drawing.Color.Black;
+            this.Button_Mute.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Button_Mute.Location = new System.Drawing.Point(970, 0);
+            this.Button_Mute.Margin = new System.Windows.Forms.Padding(0);
+            this.Button_Mute.Name = "Button_Mute";
+            this.Button_Mute.Size = new System.Drawing.Size(38, 40);
+            this.Button_Mute.TabIndex = 0;
+            this.Button_Mute.TabStop = false;
+            this.Button_Mute.UseVisualStyleBackColor = false;
+            this.Button_Mute.Click += new System.EventHandler(this.Button_Mute_Click);
+            // 
             // Label_PlayerPosFrac
             // 
             this.Label_PlayerPosFrac.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_PlayerPosFrac.Location = new System.Drawing.Point(42, 21);
+            this.Label_PlayerPosFrac.Location = new System.Drawing.Point(42, 23);
             this.Label_PlayerPosFrac.Margin = new System.Windows.Forms.Padding(0, 7, 0, 0);
             this.Label_PlayerPosFrac.Name = "Label_PlayerPosFrac";
             this.Label_PlayerPosFrac.Size = new System.Drawing.Size(109, 16);
@@ -276,7 +292,7 @@
             this.Button_Title.BackColor = System.Drawing.Color.Black;
             this.Button_Title.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Button_Title.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button_Title.Location = new System.Drawing.Point(288, 3);
+            this.Button_Title.Location = new System.Drawing.Point(288, 6);
             this.Button_Title.Name = "Button_Title";
             this.Button_Title.Size = new System.Drawing.Size(50, 28);
             this.Button_Title.TabIndex = 8;
@@ -290,7 +306,7 @@
             this.Button_Export.BackColor = System.Drawing.Color.Black;
             this.Button_Export.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Button_Export.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button_Export.Location = new System.Drawing.Point(231, 3);
+            this.Button_Export.Location = new System.Drawing.Point(231, 6);
             this.Button_Export.Name = "Button_Export";
             this.Button_Export.Size = new System.Drawing.Size(55, 28);
             this.Button_Export.TabIndex = 7;
@@ -305,7 +321,7 @@
             this.Button_Channels.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Button_Channels.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Button_Channels.ForeColor = System.Drawing.Color.Orange;
-            this.Button_Channels.Location = new System.Drawing.Point(156, 3);
+            this.Button_Channels.Location = new System.Drawing.Point(156, 6);
             this.Button_Channels.Name = "Button_Channels";
             this.Button_Channels.Size = new System.Drawing.Size(73, 28);
             this.Button_Channels.TabIndex = 6;
@@ -315,10 +331,10 @@
             // 
             // Label_RecLen
             // 
+            this.Label_RecLen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Label_RecLen.AutoSize = true;
-            this.Label_RecLen.Dock = System.Windows.Forms.DockStyle.Right;
             this.Label_RecLen.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_RecLen.Location = new System.Drawing.Point(850, 0);
+            this.Label_RecLen.Location = new System.Drawing.Point(854, 4);
             this.Label_RecLen.Margin = new System.Windows.Forms.Padding(0);
             this.Label_RecLen.Name = "Label_RecLen";
             this.Label_RecLen.Size = new System.Drawing.Size(120, 31);
@@ -330,7 +346,7 @@
             // 
             this.Label_PlayerPos.AutoSize = true;
             this.Label_PlayerPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_PlayerPos.Location = new System.Drawing.Point(38, -7);
+            this.Label_PlayerPos.Location = new System.Drawing.Point(38, -5);
             this.Label_PlayerPos.Margin = new System.Windows.Forms.Padding(0);
             this.Label_PlayerPos.Name = "Label_PlayerPos";
             this.Label_PlayerPos.Size = new System.Drawing.Size(120, 31);
@@ -338,29 +354,15 @@
             this.Label_PlayerPos.Text = "00:00:00";
             this.Label_PlayerPos.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // Button_Mute
-            // 
-            this.Button_Mute.BackColor = System.Drawing.Color.Black;
-            this.Button_Mute.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Button_Mute.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Button_Mute.Location = new System.Drawing.Point(970, 0);
-            this.Button_Mute.Margin = new System.Windows.Forms.Padding(0);
-            this.Button_Mute.Name = "Button_Mute";
-            this.Button_Mute.Size = new System.Drawing.Size(38, 40);
-            this.Button_Mute.TabIndex = 0;
-            this.Button_Mute.TabStop = false;
-            this.Button_Mute.UseVisualStyleBackColor = false;
-            this.Button_Mute.Click += new System.EventHandler(this.Button_Mute_Click);
-            // 
             // TextBox_ShortName
             // 
             this.TextBox_ShortName.BackColor = System.Drawing.Color.Black;
             this.TextBox_ShortName.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TextBox_ShortName.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TextBox_ShortName.Dock = System.Windows.Forms.DockStyle.Top;
             this.TextBox_ShortName.ForeColor = System.Drawing.Color.White;
             this.TextBox_ShortName.Location = new System.Drawing.Point(3, 3);
             this.TextBox_ShortName.Name = "TextBox_ShortName";
-            this.TextBox_ShortName.Size = new System.Drawing.Size(573, 22);
+            this.TextBox_ShortName.Size = new System.Drawing.Size(491, 22);
             this.TextBox_ShortName.TabIndex = 12;
             this.TextBox_ShortName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TextBox_ShortName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_ShortName_KeyDown);
@@ -378,23 +380,22 @@
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Black;
-            this.panel4.Controls.Add(this.panel7);
-            this.panel4.Controls.Add(this.TextBox_Url);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(400, 0);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel4.Location = new System.Drawing.Point(897, 0);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(608, 43);
+            this.panel4.Size = new System.Drawing.Size(82, 44);
             this.panel4.TabIndex = 9;
             // 
             // panel7
             // 
+            this.panel7.BackColor = System.Drawing.Color.Black;
+            this.panel7.Controls.Add(this.TextBox_Url);
             this.panel7.Controls.Add(this.TextBox_ShortName);
-            this.panel7.Controls.Add(this.Label_Toggle_ListBox_Titles);
             this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel7.Location = new System.Drawing.Point(0, 0);
+            this.panel7.Location = new System.Drawing.Point(400, 0);
             this.panel7.Name = "panel7";
             this.panel7.Padding = new System.Windows.Forms.Padding(3);
-            this.panel7.Size = new System.Drawing.Size(608, 28);
+            this.panel7.Size = new System.Drawing.Size(497, 44);
             this.panel7.TabIndex = 19;
             // 
             // Label_Toggle_ListBox_Titles
@@ -402,7 +403,7 @@
             this.Label_Toggle_ListBox_Titles.AutoSize = true;
             this.Label_Toggle_ListBox_Titles.Dock = System.Windows.Forms.DockStyle.Right;
             this.Label_Toggle_ListBox_Titles.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_Toggle_ListBox_Titles.Location = new System.Drawing.Point(576, 3);
+            this.Label_Toggle_ListBox_Titles.Location = new System.Drawing.Point(979, 0);
             this.Label_Toggle_ListBox_Titles.Name = "Label_Toggle_ListBox_Titles";
             this.Label_Toggle_ListBox_Titles.Size = new System.Drawing.Size(29, 29);
             this.Label_Toggle_ListBox_Titles.TabIndex = 19;
@@ -427,7 +428,7 @@
             // 
             this.FlowPanel_Recording_Buttons.AutoSize = true;
             this.FlowPanel_Recording_Buttons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.FlowPanel_Recording_Buttons.Location = new System.Drawing.Point(0, 664);
+            this.FlowPanel_Recording_Buttons.Location = new System.Drawing.Point(0, 659);
             this.FlowPanel_Recording_Buttons.Name = "FlowPanel_Recording_Buttons";
             this.FlowPanel_Recording_Buttons.Size = new System.Drawing.Size(1008, 0);
             this.FlowPanel_Recording_Buttons.TabIndex = 2;
@@ -560,10 +561,10 @@
             this.Panel_Files.Controls.Add(this.ListView_Recordings);
             this.Panel_Files.Controls.Add(this.Panel_StreamFilter);
             this.Panel_Files.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Panel_Files.Location = new System.Drawing.Point(0, 43);
+            this.Panel_Files.Location = new System.Drawing.Point(0, 44);
             this.Panel_Files.Name = "Panel_Files";
             this.Panel_Files.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
-            this.Panel_Files.Size = new System.Drawing.Size(400, 621);
+            this.Panel_Files.Size = new System.Drawing.Size(400, 615);
             this.Panel_Files.TabIndex = 13;
             this.Panel_Files.Visible = false;
             // 
@@ -578,7 +579,7 @@
             this.ListView_Streams.HideSelection = false;
             this.ListView_Streams.Location = new System.Drawing.Point(0, 30);
             this.ListView_Streams.Name = "ListView_Streams";
-            this.ListView_Streams.Size = new System.Drawing.Size(390, 591);
+            this.ListView_Streams.Size = new System.Drawing.Size(390, 585);
             this.ListView_Streams.TabIndex = 11;
             this.ListView_Streams.UseCompatibleStateImageBehavior = false;
             this.ListView_Streams.View = System.Windows.Forms.View.Details;
@@ -594,7 +595,7 @@
             this.ListView_Files.HideSelection = false;
             this.ListView_Files.Location = new System.Drawing.Point(0, 30);
             this.ListView_Files.Name = "ListView_Files";
-            this.ListView_Files.Size = new System.Drawing.Size(390, 591);
+            this.ListView_Files.Size = new System.Drawing.Size(390, 585);
             this.ListView_Files.TabIndex = 13;
             this.ListView_Files.UseCompatibleStateImageBehavior = false;
             this.ListView_Files.View = System.Windows.Forms.View.Details;
@@ -611,7 +612,7 @@
             this.ListView_Exports.HideSelection = false;
             this.ListView_Exports.Location = new System.Drawing.Point(0, 30);
             this.ListView_Exports.Name = "ListView_Exports";
-            this.ListView_Exports.Size = new System.Drawing.Size(390, 591);
+            this.ListView_Exports.Size = new System.Drawing.Size(390, 585);
             this.ListView_Exports.TabIndex = 12;
             this.ListView_Exports.UseCompatibleStateImageBehavior = false;
             this.ListView_Exports.View = System.Windows.Forms.View.Details;
@@ -628,7 +629,7 @@
             this.ListView_Recordings.HideSelection = false;
             this.ListView_Recordings.Location = new System.Drawing.Point(0, 30);
             this.ListView_Recordings.Name = "ListView_Recordings";
-            this.ListView_Recordings.Size = new System.Drawing.Size(390, 591);
+            this.ListView_Recordings.Size = new System.Drawing.Size(390, 585);
             this.ListView_Recordings.TabIndex = 10;
             this.ListView_Recordings.UseCompatibleStateImageBehavior = false;
             this.ListView_Recordings.View = System.Windows.Forms.View.Details;
@@ -680,7 +681,7 @@
             this.Combo_FilterCountry.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Combo_FilterCountry.ForeColor = System.Drawing.Color.White;
             this.Combo_FilterCountry.FormattingEnabled = true;
-            this.Combo_FilterCountry.Location = new System.Drawing.Point(682, 461);
+            this.Combo_FilterCountry.Location = new System.Drawing.Point(681, 501);
             this.Combo_FilterCountry.Margin = new System.Windows.Forms.Padding(0);
             this.Combo_FilterCountry.Name = "Combo_FilterCountry";
             this.Combo_FilterCountry.Size = new System.Drawing.Size(51, 24);
@@ -692,7 +693,7 @@
             // 
             this.LabelCounter.AutoSize = true;
             this.LabelCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelCounter.Location = new System.Drawing.Point(749, 464);
+            this.LabelCounter.Location = new System.Drawing.Point(767, 509);
             this.LabelCounter.Margin = new System.Windows.Forms.Padding(0, 7, 0, 0);
             this.LabelCounter.Name = "LabelCounter";
             this.LabelCounter.Size = new System.Drawing.Size(14, 16);
@@ -703,7 +704,7 @@
             // Label_Status
             // 
             this.Label_Status.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_Status.Location = new System.Drawing.Point(419, 633);
+            this.Label_Status.Location = new System.Drawing.Point(419, 572);
             this.Label_Status.Name = "Label_Status";
             this.Label_Status.Size = new System.Drawing.Size(384, 16);
             this.Label_Status.TabIndex = 20;
@@ -712,13 +713,15 @@
             // 
             // panel6
             // 
-            this.panel6.Controls.Add(this.panel4);
+            this.panel6.Controls.Add(this.panel7);
             this.panel6.Controls.Add(this.FlowPanel_FileStream_Buttons);
             this.panel6.Controls.Add(this.Label_Toggle_ListBox_Files);
+            this.panel6.Controls.Add(this.panel4);
+            this.panel6.Controls.Add(this.Label_Toggle_ListBox_Titles);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel6.Location = new System.Drawing.Point(0, 0);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(1008, 43);
+            this.panel6.Size = new System.Drawing.Size(1008, 44);
             this.panel6.TabIndex = 9;
             // 
             // FlowPanel_FileStream_Buttons
@@ -732,7 +735,7 @@
             this.FlowPanel_FileStream_Buttons.Location = new System.Drawing.Point(29, 0);
             this.FlowPanel_FileStream_Buttons.Margin = new System.Windows.Forms.Padding(0);
             this.FlowPanel_FileStream_Buttons.Name = "FlowPanel_FileStream_Buttons";
-            this.FlowPanel_FileStream_Buttons.Size = new System.Drawing.Size(371, 43);
+            this.FlowPanel_FileStream_Buttons.Size = new System.Drawing.Size(371, 44);
             this.FlowPanel_FileStream_Buttons.TabIndex = 15;
             // 
             // Button_ListStreams
@@ -868,6 +871,7 @@
             this.TextBox_TitleEdit.Name = "TextBox_TitleEdit";
             this.TextBox_TitleEdit.Size = new System.Drawing.Size(320, 38);
             this.TextBox_TitleEdit.TabIndex = 15;
+            this.TextBox_TitleEdit.Click += new System.EventHandler(this.TextBox_TitleEdit_Click);
             // 
             // Label_TitleTime
             // 
@@ -897,6 +901,29 @@
             this.Button_Title_Add.UseVisualStyleBackColor = false;
             this.Button_Title_Add.Click += new System.EventHandler(this.Button_TitleAdd_Click);
             // 
+            // panel9
+            // 
+            this.panel9.BackColor = System.Drawing.Color.Black;
+            this.panel9.Controls.Add(this.label1);
+            this.panel9.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel9.Location = new System.Drawing.Point(400, 44);
+            this.panel9.Name = "panel9";
+            this.panel9.Size = new System.Drawing.Size(608, 32);
+            this.panel9.TabIndex = 21;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(608, 0);
+            this.label1.Margin = new System.Windows.Forms.Padding(0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(0, 31);
+            this.label1.TabIndex = 1;
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // radioZiner
             // 
             this.AllowDrop = true;
@@ -905,6 +932,7 @@
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1008, 729);
             this.Controls.Add(this.LabelEnterChannelName);
+            this.Controls.Add(this.panel9);
             this.Controls.Add(this.LabelCounter);
             this.Controls.Add(this.Combo_FilterCountry);
             this.Controls.Add(this.textBox1);
@@ -933,8 +961,6 @@
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            this.panel4.ResumeLayout(false);
-            this.panel4.PerformLayout();
             this.panel7.ResumeLayout(false);
             this.panel7.PerformLayout();
             this.panel5.ResumeLayout(false);
@@ -948,6 +974,8 @@
             this.FlowPanel_FileStream_Buttons.PerformLayout();
             this.panel8.ResumeLayout(false);
             this.panel8.PerformLayout();
+            this.panel9.ResumeLayout(false);
+            this.panel9.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1013,6 +1041,8 @@
         private System.Windows.Forms.Label Label_TitleTimeFrac;
         private System.Windows.Forms.Label Label_EndTimeFrac;
         private System.Windows.Forms.Label Label_StartTimeFrac;
+        private System.Windows.Forms.Panel panel9;
+        private System.Windows.Forms.Label label1;
     }
 }
 

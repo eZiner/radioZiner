@@ -2,7 +2,7 @@
 
 /* Copyright (c) 2017 Fabrice Lacharme
  * This code is inspired from Michal Brylka 
- * https://www.codeproject.com/Articles/17395/Owner-drawn-trackbar-slider
+ * https://www.codeproject.com/Articles/17395/Owner-drawn-trackbar-slider1
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to 
@@ -36,15 +36,18 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace radioZiner
 {
     /* Original code from Michal Brylka on Code Project
-    * see https://www.codeproject.com/Articles/17395/Owner-drawn-trackbar-slider
+    * see https://www.codeproject.com/Articles/17395/Owner-drawn-trackbar-slider1
     * ColorSlider is a trackbar control written in C# as a replacement of the trackbar 
     * 
     * CodeProject: https://www.codeproject.com/Tips/1193311/Csharp-Slider-Trackbar-Control-using-Windows-Forms
@@ -106,6 +109,8 @@ namespace radioZiner
         // Margin left & right (bottom & Top)
         private int OffsetL = 0;
         private int OffsetR = 0;
+
+        public List<string> Labels = new List<string>();
 
         #region thumb
 
@@ -860,11 +865,11 @@ namespace radioZiner
                     
                     Color.Black,                    // bar inner    
 
-                    Color.FromArgb(95, 140, 180),     // slider elapsed top                   
-                    Color.FromArgb(99, 130, 208),     // slider elapsed bottom                    
+                    Color.FromArgb(95, 140, 180),     // slider1 elapsed top                   
+                    Color.FromArgb(99, 130, 208),     // slider1 elapsed bottom                    
 
-                    Color.FromArgb(55, 60, 74),     // slider remain top                    
-                    Color.FromArgb(87, 94, 110),     // slider remain bottom
+                    Color.FromArgb(55, 60, 74),     // slider1 remain top                    
+                    Color.FromArgb(87, 94, 110),     // slider1 remain bottom
                                          
                     Color.FromArgb(21, 56, 152)     // elapsed interieur centre
                 },
@@ -875,12 +880,12 @@ namespace radioZiner
                     
                     Color.Black,                    // bar inner    
 
-                    Color.LightCoral,     // slider elapsed top                   
-                    Color.Salmon,     // slider elapsed bottom
+                    Color.LightCoral,     // slider1 elapsed top                   
+                    Color.Salmon,     // slider1 elapsed bottom
                     
 
-                    Color.FromArgb(55, 60, 74),     // slider remain top                    
-                    Color.FromArgb(87, 94, 110),     // slider remain bottom
+                    Color.FromArgb(55, 60, 74),     // slider1 remain top                    
+                    Color.FromArgb(87, 94, 110),     // slider1 remain bottom
                                          
                     Color.Red     // gauche interieur centre
                 },
@@ -891,12 +896,12 @@ namespace radioZiner
                     
                     Color.Black,                    // bar inner    
 
-                    Color.SpringGreen,     // slider elapsed top                   
-                    Color.LightGreen,     // slider elapsed bottom
+                    Color.SpringGreen,     // slider1 elapsed top                   
+                    Color.LightGreen,     // slider1 elapsed bottom
                     
 
-                    Color.FromArgb(55, 60, 74),     // slider remain top                    
-                    Color.FromArgb(87, 94, 110),     // slider remain bottom
+                    Color.FromArgb(55, 60, 74),     // slider1 remain top                    
+                    Color.FromArgb(87, 94, 110),     // slider1 remain bottom
                                          
                     Color.Green     // gauche interieur centre
                 },
@@ -912,7 +917,7 @@ namespace radioZiner
         private ColorSchemas colorSchema = ColorSchemas.BlueColors;
 
         /// <summary>
-        /// Sets color schema. Color generalization / fast color changing. Has no effect when slider colors are changed manually after schema was applied. 
+        /// Sets color schema. Color generalization / fast color changing. Has no effect when slider1 colors are changed manually after schema was applied. 
         /// </summary>
         /// <value>New color schema value</value>
         [Description("Set Slider color schema. Has no effect when slider colors are changed manually after schema was applied.")]
@@ -968,7 +973,7 @@ namespace radioZiner
 
             // Font
             //this.Font = new Font("Tahoma", 6.75f);
-            this.Font = new Font("Microsoft Sans Serif", 6f);
+            this.Font = new Font("Microsoft Sans Serif", 8f);
 
             Minimum = min;
             Maximum = max;
@@ -1304,6 +1309,42 @@ namespace radioZiner
                     }
                 #endregion draw focusing rectangle
 
+
+                #region draw labels
+
+                // Quick hack to draw horizontal Labels
+
+                if (true)
+                {
+                    int offset = 5;
+                    SolidBrush br = new SolidBrush(Color.White);
+                    Font font = this.Font;
+
+                    foreach (var label in Labels)
+                    {
+                        var a = label.Split('@');
+                        if (a.Count()==2)
+                        {
+                            string str = a[0];
+                            try
+                            {
+                                decimal labelPos = decimal.Parse(a[1], CultureInfo.InvariantCulture);
+                                SizeF maxsize = e.Graphics.MeasureString(str, font);
+                                SizeF size = e.Graphics.MeasureString(str, font);
+                                int labelOffset = (int)(OffsetL + labelPos * (ClientRectangle.Width - OffsetL - OffsetR) / (_maximum - _minimum));
+                                float tx = (barRect.X + labelOffset) - (float)(size.Width * 0.5);
+                                float ty = barRect.Y + barRect.Height / 2 - size.Height - offset;
+                                e.Graphics.DrawString(str, font, br, tx, ty);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Error drawing label: " + ex.Message);
+                            }
+                        }
+                    }
+                }
+
+                #endregion
 
                 #region draw ticks
 

@@ -297,7 +297,8 @@ namespace radioZiner
 
         MenuStrip MenuBar = new MenuStrip();
 
-        private ColorSlider slider;
+        private ColorSlider slider1;
+        private ColorSlider slider2;
 
         public radioZiner()
         {
@@ -459,7 +460,7 @@ namespace radioZiner
 
             videoRecorder = new VideoRecorder(recordingFolder);
 
-            slider = new ColorSlider
+            slider1 = new ColorSlider
             {
                 Dock = DockStyle.Top,
                 Visible = true,
@@ -476,17 +477,50 @@ namespace radioZiner
                 ThumbRoundRectSize = new Size(0, 0),
                 ThumbSize = new Size(1, 10),
                 Width = panel3.Width,
-                Height = 20,
+                Height = 45,
                 MouseWheelBarPartitions = 1000,
 
-                SmallChange = 10,
-                LargeChange = 60
+                SmallChange = 1,
+                LargeChange = 10
             };
-            slider.Scroll += Slider_Scroll;
-            slider.MouseWheel += Slider_MouseWheel;
-            slider.ValueChanged += Slider_ValueChanged;
+            slider1.Scroll += Slider_Scroll;
+            slider1.MouseWheel += Slider_MouseWheel;
+            slider1.ValueChanged += Slider_ValueChanged;
 
-            panel3.Controls.Add(slider);
+            panel3.Controls.Add(slider1);
+
+
+
+            slider2 = new ColorSlider
+            {
+                Dock = DockStyle.Top,
+                Visible = true,
+                ForeColor = Color.Blue,
+                BackColor = Color.Black,
+                ElapsedInnerColor = Color.Blue,
+                ElapsedPenColorTop = Color.Blue,
+                ElapsedPenColorBottom = Color.Blue,
+                ThumbInnerColor = Color.Blue,
+                ThumbOuterColor = Color.Blue,
+                ThumbPenColor = Color.Blue,
+                TickStyle = TickStyle.None,
+
+                ThumbRoundRectSize = new Size(0, 0),
+                ThumbSize = new Size(1, 10),
+                Width = panel3.Width,
+                Height = 45,
+                MouseWheelBarPartitions = 1000,
+
+                SmallChange = 1,
+                LargeChange = 10
+            };
+            slider2.Scroll += Slider_Scroll;
+            slider2.MouseWheel += Slider_MouseWheel;
+            slider2.ValueChanged += Slider_ValueChanged;
+
+            panel9.Controls.Add(slider2);
+            slider2.BringToFront();
+
 
             await Task.Delay(100);
             ReadChannelSets();
@@ -860,6 +894,7 @@ namespace radioZiner
         }
 
         private readonly Regex Rgx_TitlePos = new Regex(@"(?<hours>[0-9][0-9]):(?<minutes>[0-5][0-9]):(?<seconds>[0-5][0-9])((\s)|(.(?<milliseconds>[0-9]{3})))");
+        private readonly Regex Rgx_TitleLabels = new Regex(@"(\S+@([0-9]|\.)+)\b"); //(\w+@([0-9]|\.)+)\b
 
         private string TitlePos2TimeString (string line)
         {
@@ -893,6 +928,20 @@ namespace radioZiner
                 return s;
             }
             return "";
+        }
+
+        private int TitlePos2secsInt(string line)
+        {
+            Match m = Rgx_TitlePos.Match(line);
+            if (m.Success)
+            {
+                int i = int.Parse(m.Groups["hours"].Value) * 3600;
+                i += int.Parse(m.Groups["minutes"].Value) * 60;
+                i += int.Parse(m.Groups["seconds"].Value);
+
+                return i;
+            }
+            return -1;
         }
 
         private void ListBox_Titles_LoadFromFile(string sTitlesFile)
@@ -929,6 +978,42 @@ namespace radioZiner
                 TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(sTitlesFile);
                 Combo_ExportFileExtension.Text = ".mp4";
             }
+        }
+
+        private void SetSlider2 ()
+        {
+            slider2.Labels.Clear();
+            int val = (int)slider1.Value;
+            if (ListBox_Titles.SelectedItem != null)
+            {
+                // (\w+@([0-9]|\.)+)\b
+                string s = ListBox_Titles.SelectedItem.ToString();
+                var matches = Rgx_TitleLabels.Matches(s);
+
+                foreach (var m in matches)
+                {
+                    slider2.Labels.Add(m.ToString());
+                }
+                int min = TitlePos2secsInt(s);
+                int max = (int)slider1.Maximum;
+                int index = ListBox_Titles.SelectedIndex + 1;
+                if (index < ListBox_Titles.Items.Count)
+                {
+                    max = TitlePos2secsInt(ListBox_Titles.Items[index].ToString());
+                }
+                if (min>=0 && max>=0 && max>min && val>=min && val<=max)
+                {
+                    slider2.Maximum = max;
+                    slider2.Minimum = min;
+                    slider2.Value = val;
+                    return;
+                }
+            }
+
+            slider2.Maximum = slider1.Maximum;
+            slider2.Minimum = 0;
+            slider2.Value = val <= slider1.Maximum ? val : 0;
+            
         }
 
         private void ListBox_Titles_Click(object sender, MouseEventArgs e)
@@ -1234,11 +1319,13 @@ namespace radioZiner
             }
         }
 
-        private static void UpdateSlider (ColorSlider slider, double min, double max, double val)
+        private void UpdateSlider (ColorSlider slider, double min, double max, double val)
         {
             slider.Minimum = 0;
             slider.Maximum = (int)max > 0 ? (int)max : 7200;
             slider.Value = (int)val > 0 && (int)val <= max ? (int)val : 0;
+
+            SetSlider2();
         }
 
         private void UpdateTitlesPos (double pos)
@@ -1313,6 +1400,32 @@ namespace radioZiner
             return (changed);
         }
 
+        private void UpdateMainLabels ()
+        {
+            slider1.Labels.Clear();
+            foreach (string line in ListBox_Titles.Items)
+            {
+                string pos = TitlePos2secs(line);
+                int leadLen = TitlePos2TimeString(line).Length;
+                string tag = "";
+                if (leadLen + 3 < line.Length)
+                {
+                    tag = line.Substring(leadLen, 3);
+                }
+                if (tag == " - ")
+                {
+                    slider1.Labels.Add(".@" + pos);
+                }
+                else
+                {
+                    if (leadLen < line.Length)
+                    {
+                        slider1.Labels.Add(line.Substring(leadLen).Trim().Split(' ')[0] + @"@" + pos);
+                    }
+                }
+            }
+        }
+
         private void Timer1_Tick(object sender, EventArgs e)
         {
             if (Player.GetPropertyString("video-codec") != "")
@@ -1338,7 +1451,7 @@ namespace radioZiner
                 Label_PlayerPosFrac.Text = GetPlayerPosFractionalPart(curPos);
                 Label_RecLen.Text = GetFormatedPlayerPos(recLen);
 
-                UpdateSlider(slider, 0, recLen, curPos);
+                UpdateSlider(slider1, 0, recLen, curPos);
                 if (CurSource == "live")
                 {
                     UpdateTitles();
@@ -1355,7 +1468,7 @@ namespace radioZiner
                 double curPos = Player.GetPropertyDouble("time-pos");
                 double recLen = recorders[curRecChannelName].GetRecordLength();
 
-                UpdateSlider(slider, 0, recLen, curPos);
+                UpdateSlider(slider1, 0, recLen, curPos);
                 UpdateTitlesPos(curPos);
 
                 Label_PlayerPos.Text = GetFormatedPlayerPos(curPos);
@@ -1363,7 +1476,9 @@ namespace radioZiner
                 Label_RecLen.Text = GetFormatedPlayerPos(recLen);
 
                 SeekToLastRecorderPos();
-           }
+            }
+            label1.Text = GetFormatedPlayerPos((double)(slider2.Maximum - slider2.Value)).TrimStart('0').TrimStart(':').TrimStart('0').TrimStart(':');
+            UpdateMainLabels();
         }
 
         public string ReplaceInvalidChars(string filename)
@@ -2119,11 +2234,11 @@ namespace radioZiner
         {
             if (curRecChannelName != "" && recorders.ContainsKey(curRecChannelName))
             {
-                recorders[curRecChannelName].AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text, "");
+                recorders[curRecChannelName].AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, " " + TextBox_TitleEdit.Text.Trim(), "");
             }
             else
             {
-                AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text);
+                AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, " " + TextBox_TitleEdit.Text.Trim());
             }
         }
 
@@ -2180,6 +2295,22 @@ namespace radioZiner
                 {
                     CancelSearch = true;
                 }
+            }
+        }
+
+        private void TextBox_TitleEdit_Click(object sender, EventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                decimal pos = 0;
+                if (!Label_PlayerPos.Text.Contains("-"))
+                {
+                    pos = decimal.Parse(TitlePos2secs(Label_PlayerPos.Text + Label_PlayerPosFrac.Text), CultureInfo.InvariantCulture) - slider2.Minimum;
+                }
+                var insertText = "@" + pos.ToString(CultureInfo.InvariantCulture);
+                var selectionIndex = TextBox_TitleEdit.SelectionStart;
+                TextBox_TitleEdit.Text = TextBox_TitleEdit.Text.Insert(selectionIndex, insertText);
+                TextBox_TitleEdit.SelectionStart = selectionIndex + insertText.Length;
             }
         }
     }
