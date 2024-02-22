@@ -101,13 +101,13 @@ namespace radioZiner
             icyPosTitles.Clear();
         }
 
-        public void DeleteTitle(string pos, string title)
+        public void DeleteTitleAtPos(string pos, string title)
         {
             ChkStreamTimer.Enabled = false;
 
             foreach (var line in icyPosTitles)
             {
-                if (line == pos + title) // " - " + 
+                if (line.StartsWith(pos + " " + title.Trim()) || line.StartsWith(pos.Split('.')[0] + " " + title.Trim())) // // " - " + 
                 {
                     icyTitles.Remove(title);
                     icyPosTitles.Remove(line);
@@ -129,8 +129,10 @@ namespace radioZiner
             }
         }
 
-        public void AddTitle(string pos, string title = "", string delim = " - ")
+        public void AddTitlePos(string pos, string title = "", string delim = " ") //" - "
         {
+            pos = pos.Trim();
+            title = title.Trim();
             if (title != "")
             {
                 ChkStreamTimer.Enabled = false;
@@ -141,7 +143,17 @@ namespace radioZiner
 
                 if (streamingFolder != "" && Player.GetPropertyString("path").StartsWith("http"))
                 {
-                    File.WriteAllLines(Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".txt"), icyPosTitles);
+                    List<string> titles = new List<string>();
+                    for (int i = 0; i < icyPosTitles.Count; i++)
+                    {
+                        var a = icyPosTitles[i].Split('|');
+                        for (int j = 0; j < a.Count(); j++)
+                        {
+                            titles.Add(a[j].Trim());
+                        }
+                    }
+                    File.WriteAllLines(Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".txt"), titles);
+                    //File.WriteAllLines(Path.Combine(streamingFolder, shortName + "_" + recTimeStamp + ".txt"), icyPosTitles);
                     TitleAdded?.Invoke(shortName);
                 }
 
@@ -158,12 +170,13 @@ namespace radioZiner
         {
             bool changed = false;
 
+            title = title.Trim();
             if (title != "" && !icyTitles.Contains(title))
             {
                 icyTitles.Add(title);
                 TimeSpan tPos = TimeSpan.FromSeconds(pos);
                 string sPos = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
-                string sPosTitle = sPos + " - " + title;
+                string sPosTitle = sPos + " " + title; // " - "
                 icyPosTitles.Add(sPosTitle);
 
                 icyPosTitles.Sort();

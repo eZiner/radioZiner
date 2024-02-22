@@ -42,6 +42,10 @@ namespace radioZiner
 
         private string curChannelName = "";
 
+        List<Font> LV_FontSizes = new List<Font>();
+        int LV_Font_Index = 4;
+
+
         private void setChannelName (string s)
         {
             curChannelName = s;
@@ -108,7 +112,7 @@ namespace radioZiner
                     }
                     break;
                 case "titleList":
-                    Toggle_ListBox_Titles();
+                    Toggle_ListView_Titles();
                     break;
                 case "fileBrowser":
                     Toggle_ListBox_Files();
@@ -227,7 +231,7 @@ namespace radioZiner
                     CurSource = "live";
                     icyTitles.Clear();
                     icyPosTitles.Clear();
-                    ListBox_Titles.Items.Clear();
+                    ListView_Titles_Clear();
 
                     curRecChannelName = "";
 
@@ -241,7 +245,7 @@ namespace radioZiner
                         ListBox_Files_LoadFromDir(val);
                     }
 
-                    ListBox_Titles_LoadFromFile(val);
+                    ListView_Titles_LoadFromFile(val);
                     break;
                 case "new":
                     TextBox_ChannelSet.Text = "";
@@ -355,9 +359,9 @@ namespace radioZiner
 
             Player = new MpvPlayer();
 
-            ListBox_Titles.Dock = DockStyle.Fill;
-            ListBox_Titles.Visible = false;
-            ListBox_Titles.BackColor = ColorTranslator.FromHtml("#000000");
+            ListView_Titles.Dock = DockStyle.Fill;
+            ListView_Titles.Visible = false;
+            ListView_Titles.BackColor = ColorTranslator.FromHtml("#000000");
 
             PictureBox_Player.Dock = DockStyle.Fill;
             PictureBox_Player.Visible = true;
@@ -374,12 +378,18 @@ namespace radioZiner
             panel8.Location = panel1.Location;
             panel8.BringToFront();
 
-            PictureBox_Player.MouseWheel += new MouseEventHandler(MouseWheelHandler);
-            Label_PlayerPos.MouseWheel += new MouseEventHandler(MouseWheelHandler);
+            PictureBox_Player.MouseWheel += new MouseEventHandler(PictureBox_MouseWheelHandler);
+            Label_PlayerPos.MouseWheel += new MouseEventHandler(PictureBox_MouseWheelHandler);
             Label_PlayerPosFrac.MouseWheel += new MouseEventHandler(MouseWheelTicHandler);
-            ListBox_Titles.MouseWheel += new MouseEventHandler(MouseWheelHandler);
+            ListView_Titles.MouseWheel += new MouseEventHandler(ListView_Titles_MouseWheelHandler);
             PictureBox_Player.MouseClick += new MouseEventHandler(PictureBox_Player_MouseClick);
-            ListBox_Titles.MouseDown += new MouseEventHandler(ListBox_Titles_Click);
+            ListView_Titles.MouseUp += new MouseEventHandler(ListView_Titles_Click);
+
+            ListView_Files.MouseWheel += new MouseEventHandler(ListView_MouseWheelHandler);
+            ListView_Exports.MouseWheel += new MouseEventHandler(ListView_MouseWheelHandler);
+            ListView_Recordings.MouseWheel += new MouseEventHandler(ListView_MouseWheelHandler);
+            ListView_Streams.MouseWheel += new MouseEventHandler(ListView_MouseWheelHandler);
+
 
             TextBox_ShortName.Multiline = true;
             TextBox_ShortName.MinimumSize = new Size(0, 40);
@@ -390,6 +400,36 @@ namespace radioZiner
             TextBox_SearchFilter.MinimumSize = new Size(0, 25);
             TextBox_SearchFilter.Size = new Size(TextBox_SearchFilter.Size.Width, 25);
             TextBox_SearchFilter.Multiline = false;
+
+            TextBox_FileFilter.Multiline = true;
+            TextBox_FileFilter.MinimumSize = new Size(0, 25);
+            TextBox_FileFilter.Size = new Size(TextBox_FileFilter.Size.Width, 25);
+            TextBox_FileFilter.Multiline = false;
+
+            for (int i = 8; i <= 28; i++)
+            {
+                LV_FontSizes.Add(new Font(ListView_Titles.Font.FontFamily, i));
+            }
+            ListView_Titles.Font = LV_FontSizes[LV_Font_Index];
+
+            ListView_Titles_Clear();
+        }
+
+        private void ListView_Titles_Clear()
+        {
+            ListView_Titles.Clear();
+            ListView_Titles.Columns.Add("Time", -2, HorizontalAlignment.Left); // 80
+            ListView_Titles.Columns.Add(" * ", -2, HorizontalAlignment.Right);    // 25
+            ListView_Titles.Columns.Add("Title", -2, HorizontalAlignment.Left); // 400
+        }
+
+        private void ListView_Titles_AutoResizeColumns()
+        {
+            var resizeStyle = ListView_Titles.Items.Count > 0 ? ColumnHeaderAutoResizeStyle.ColumnContent : ColumnHeaderAutoResizeStyle.HeaderSize;
+            for (int i = 0; i < ListView_Titles.Columns.Count; i++)
+            {
+                ListView_Titles.AutoResizeColumn(i, resizeStyle);
+            }
         }
 
         Timer timer1 = new System.Windows.Forms.Timer();
@@ -478,14 +518,14 @@ namespace radioZiner
                 ThumbSize = new Size(1, 10),
                 Width = panel3.Width,
                 Height = 45,
-                MouseWheelBarPartitions = 1000,
+                MouseWheelBarPartitions = 100,
 
                 SmallChange = 1,
                 LargeChange = 10
             };
             slider1.Scroll += Slider_Scroll;
             slider1.MouseWheel += Slider_MouseWheel;
-            slider1.ValueChanged += Slider_ValueChanged;
+            slider1.MouseUp += Slider_MouseUp;
 
             panel3.Controls.Add(slider1);
 
@@ -509,14 +549,14 @@ namespace radioZiner
                 ThumbSize = new Size(1, 10),
                 Width = panel3.Width,
                 Height = 45,
-                MouseWheelBarPartitions = 1000,
+                MouseWheelBarPartitions = 100,
 
                 SmallChange = 1,
                 LargeChange = 10
             };
             slider2.Scroll += Slider_Scroll;
             slider2.MouseWheel += Slider_MouseWheel;
-            slider2.ValueChanged += Slider_ValueChanged;
+            slider2.MouseUp += Slider_MouseUp;
 
             panel9.Controls.Add(slider2);
             slider2.BringToFront();
@@ -533,20 +573,55 @@ namespace radioZiner
             Set_SearchButton_Text();
         }
 
-        private void Slider_ValueChanged(object sender, EventArgs e)
+        private void Slider_MouseUp(object sender, EventArgs e)
         {
+            ColorSlider slider = ((ColorSlider)sender);
+            if (slider.SelectedLabelIndex >= 0)
+            {
+                if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+                {
+                    int index = -1;
+                    double pos = double.Parse(slider.SelectedLabelPos, CultureInfo.InvariantCulture);
+                    for (int i = ListView_Titles.Items.Count - 1; i >= 0; i--)
+                    {
+                        var a = GetTitle(i).Substring(0, 8).Split(':');
+                        double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
+                        if (seconds <= pos)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index>=0)
+                    {
+                        Select_TitleToEdit(index);
+                    }
+                }
+                else
+                {
+                    Player.CommandV("seek", slider.SelectedLabelPos, "absolute");
+                    //UpdateTitlesPos(double.Parse(slider.SelectedLabelPos, CultureInfo.InvariantCulture));
+                }
+            }
         }
 
         private void Slider_MouseWheel(object sender, EventArgs e)
         {
+            timer1.Stop();
             int seconds = Convert.ToInt32(((ColorSlider)sender).Value);
             Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+            timer1.Start();
         }
 
         private void Slider_Scroll(object sender, EventArgs e)
         {
-            int seconds = Convert.ToInt32(((ColorSlider)sender).Value);
-            Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+            ColorSlider slider = ((ColorSlider)sender);
+            if (!((Control.ModifierKeys & Keys.Control) == Keys.Control) && slider.SelectedLabelIndex < 0)
+            {
+                int seconds = Convert.ToInt32(slider.Value);
+                Player.CommandV("seek", seconds.ToString(CultureInfo.InvariantCulture), "absolute");
+            }
         }
 
         private void RadioZiner_FormClosing(object sender, FormClosingEventArgs e)
@@ -721,18 +796,19 @@ namespace radioZiner
                 c.BackColor = Color.Black;
             }
             Combo_ShortName.BackColor = Color.Black;
-
         }
 
         private void UpdateTitleList(string recShortName)
         {
-            if (recShortName == curRecChannelName)
+            if (recShortName!="" && recShortName == curRecChannelName)
             {
-                ListBox_Titles.Items.Clear();
+                ListView_Titles_Clear();
+                Cur_LV_Titles_Item = null;
                 foreach (var t in recorders[recShortName].icyPosTitles)
                 {
-                    ListBox_Titles.Items.Add(t);
+                    AddTitleLine(t);
                 }
+                ListView_Titles_AutoResizeColumns();
             }
         }
 
@@ -809,7 +885,7 @@ namespace radioZiner
                         break;
                     }
                 }
-                ListBox_Titles.Items.Clear();
+                ListView_Titles_Clear();
                 var r = recorders[curRecChannelName];
                 recorders.Remove(curRecChannelName);
                 curRecChannelName = "";
@@ -849,7 +925,7 @@ namespace radioZiner
             CurSource = "timeshift";
             icyTitles.Clear();
             icyPosTitles.Clear();
-            ListBox_Titles.Items.Clear();
+            ListView_Titles_Clear();
             UpdateTitleList(curRecChannelName);
 
             TextBox_Url.Text = recorders[curRecChannelName].url;
@@ -873,7 +949,7 @@ namespace radioZiner
             Panel_Files_Hide();
         }
 
-        private void ListBox_Titles_SaveToFile(string sTitlesFile)
+        private void ListView_Titles_SaveToFile(string sTitlesFile)
         {
             if (File.Exists(sTitlesFile))
             {
@@ -885,9 +961,13 @@ namespace radioZiner
                 }
                 fName += ".txt";
                 List<string> titles = new List<string>();
-                foreach (var item in ListBox_Titles.Items)
+                for (int i = 0; i < ListView_Titles.Items.Count; i++)
                 {
-                    titles.Add((string)item);
+                    var a = GetTitle(i).Split('|');
+                    for (int j = 0; j < a.Count(); j++)
+                    {
+                        titles.Add(a[j].Trim());
+                    }
                 }
                 File.WriteAllLines(fName, titles);
             }
@@ -944,8 +1024,14 @@ namespace radioZiner
             return -1;
         }
 
-        private void ListBox_Titles_LoadFromFile(string sTitlesFile)
+        private string LastLoadedTitleFile = "";
+        private void ListView_Titles_LoadFromFile(string sTitlesFile="", bool refreshOnly = false)
         {
+            if (sTitlesFile == "")
+            {
+                sTitlesFile = LastLoadedTitleFile;
+            }
+            LastLoadedTitleFile = sTitlesFile;
             if (File.Exists(sTitlesFile))
             {
                 string fName = sTitlesFile;
@@ -956,27 +1042,31 @@ namespace radioZiner
                     fName = fName.Substring(0, pos);
                 }
                 fName += ".txt";
-                ListBox_Titles.Items.Clear();
+
+                ListView_Titles_Clear();
+
                 if (File.Exists(fName))
                 {
+                    Cur_LV_Titles_Item = null;
                     foreach (var line in File.ReadAllLines(fName))
                     {
-                        if (Rgx_TitlePos.IsMatch(line))
-                        {
-                            ListBox_Titles.Items.Add(line);
-                        }
+                        AddTitleLine(line);
                     }
                 }
+                ListView_Titles_AutoResizeColumns();
 
-                Label_TitleTime.Text = "00:00:00";
-                Label_TitleTimeFrac.Text = ".000";
-                Label_StartTime.Text = "00:00:00";
-                Label_StartTimeFrac.Text = ".000";
-                Label_EndTime.Text = "00:00:00";
-                Label_EndTimeFrac.Text = ".000";
+                if (!refreshOnly)
+                {
+                    Label_TitleTime.Text = "00:00:00";
+                    Label_TitleTimeFrac.Text = ".000";
+                    Label_StartTime.Text = "00:00:00";
+                    Label_StartTimeFrac.Text = ".000";
+                    Label_EndTime.Text = "00:00:00";
+                    Label_EndTimeFrac.Text = ".000";
 
-                TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(sTitlesFile);
-                Combo_ExportFileExtension.Text = ".mp4";
+                    TextBox_ExportFileName.Text = Path.GetFileNameWithoutExtension(sTitlesFile);
+                    Combo_ExportFileExtension.Text = ".mp4";
+                }
             }
         }
 
@@ -984,22 +1074,21 @@ namespace radioZiner
         {
             slider2.Labels.Clear();
             int val = (int)slider1.Value;
-            if (ListBox_Titles.SelectedItem != null)
+            if (ListView_Titles.SelectedItems != null && ListView_Titles.SelectedItems.Count > 0)
             {
-                // (\w+@([0-9]|\.)+)\b
-                string s = ListBox_Titles.SelectedItem.ToString();
+                string s = GetTitle(); ;
                 var matches = Rgx_TitleLabels.Matches(s);
 
                 foreach (var m in matches)
                 {
-                    slider2.Labels.Add(m.ToString());
+                    slider2.Labels.Add(m.ToString().TrimStart('!'));
                 }
                 int min = TitlePos2secsInt(s);
                 int max = (int)slider1.Maximum;
-                int index = ListBox_Titles.SelectedIndex + 1;
-                if (index < ListBox_Titles.Items.Count)
+                int index = ListView_Titles.SelectedIndices[0] + 1;
+                if (index < ListView_Titles.Items.Count)
                 {
-                    max = TitlePos2secsInt(ListBox_Titles.Items[index].ToString());
+                    max = TitlePos2secsInt(GetTitle(index));
                 }
                 if (min>=0 && max>=0 && max>min && val>=min && val<=max)
                 {
@@ -1015,74 +1104,90 @@ namespace radioZiner
             slider2.Value = val <= slider1.Maximum ? val : 0;
             
         }
+        
+        private void Select_TitleToEdit(int index = -1)
+        {
+            if (index < 0)
+            {
+                index = ListView_Titles.SelectedIndices != null ? ListView_Titles.SelectedIndices[0] : -1;
+                if (index < 0)
+                {
+                    return;
+                }
+            }
+ 
+            string sPos = TitlePos2TimeString(GetTitle(index));
 
-        private void ListBox_Titles_Click(object sender, MouseEventArgs e)
+            if (sPos != "")
+            {
+                var a = sPos.Split('.');
+                Label_TitleTime.Text = a[0];
+                if (a.Count() > 1)
+                {
+                    Label_TitleTimeFrac.Text = "." + a[1];
+                }
+                else
+                {
+                    Label_TitleTimeFrac.Text = ".000";
+                }
+
+                TextBox_TitleEdit.Text = GetTitle(index).Substring(sPos.Length).Trim();
+                OldTitle = TextBox_TitleEdit.Text;
+                OldPos = Label_TitleTime.Text + Label_TitleTimeFrac.Text;
+                Label_StartTime.Text = Label_TitleTime.Text;
+                Label_StartTimeFrac.Text = Label_TitleTimeFrac.Text;
+                TextBox_ExportFileName.Text = TextBox_TitleEdit.Text;
+
+                if (Player.GetPropertyString("video-codec") != "")
+                {
+                    Combo_ExportFileExtension.Text = ".mp4";
+                }
+                else
+                {
+                    Combo_ExportFileExtension.Text = ".mp3";
+                }
+
+                if ((index+1) < ListView_Titles.Items.Count)
+                {
+                    sPos = TitlePos2TimeString(GetTitle(index));
+                    if (sPos != "")
+                    {
+                        a = sPos.Split('.');
+                        Label_EndTime.Text = a[0];
+                        if (a.Count() > 1)
+                        {
+                            Label_EndTimeFrac.Text = "." + a[1];
+                        }
+                        else
+                        {
+                            Label_EndTimeFrac.Text = ".000";
+                        }
+                    }
+                }
+                else
+                {
+                    Label_EndTime.Text = Label_RecLen.Text;
+                    Label_EndTimeFrac.Text = ".000";
+                }
+            }
+
+        }
+
+ 
+        private void ListView_Titles_Click(object sender, MouseEventArgs e)
         {
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    
-                    if (ListBox_Titles.SelectedItem != null)
+                    if (ListView_Titles.SelectedItems != null && ListView_Titles.SelectedItems.Count > 0)
                     {
                         if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
                         {
-                            string sPos = TitlePos2TimeString(ListBox_Titles.SelectedItem.ToString());
-                            if (sPos!="")
-                            {
-                                var a = sPos.Split('.');
-                                Label_TitleTime.Text = a[0];
-                                if (a.Count()>1)
-                                {
-                                    Label_TitleTimeFrac.Text = "." + a[1];
-                                }
-                                else
-                                {
-                                    Label_TitleTimeFrac.Text = ".000";
-                                }
-                                
-                                TextBox_TitleEdit.Text = ListBox_Titles.SelectedItem.ToString().Substring(sPos.Length);
-
-                                Label_StartTime.Text = Label_TitleTime.Text;
-                                Label_StartTimeFrac.Text = Label_TitleTimeFrac.Text;
-                                TextBox_ExportFileName.Text = TextBox_TitleEdit.Text;
-
-                                if (Player.GetPropertyString("video-codec") != "")
-                                {
-                                    Combo_ExportFileExtension.Text = ".mp4";
-                                }
-                                else
-                                {
-                                    Combo_ExportFileExtension.Text = ".mp3";
-                                }
-                                
-                                int index = ListBox_Titles.SelectedIndex + 1;
-                                if (index < ListBox_Titles.Items.Count)
-                                {
-                                    sPos = TitlePos2TimeString(ListBox_Titles.Items[index].ToString());
-                                    if (sPos != "")
-                                    {
-                                        a = sPos.Split('.');
-                                        Label_EndTime.Text = a[0];
-                                        if (a.Count() > 1)
-                                        {
-                                            Label_EndTimeFrac.Text = "." + a[1];
-                                        }
-                                        else
-                                        {
-                                            Label_EndTimeFrac.Text = ".000";
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    Label_EndTime.Text = Label_RecLen.Text;
-                                    Label_EndTimeFrac.Text = ".000";
-                                }
-                            }
+                            Select_TitleToEdit();
                         }
                         else
                         {
-                            Player.CommandV("seek", TitlePos2secs(ListBox_Titles.SelectedItem.ToString()), "absolute"); // seconds.ToString(CultureInfo.InvariantCulture) + ".260"
+                            Player.CommandV("seek", TitlePos2secs(GetTitle()), "absolute"); // seconds.ToString(CultureInfo.InvariantCulture) + ".260"
                         }
                     }
 
@@ -1116,8 +1221,42 @@ namespace radioZiner
             PictureBox_Player.Focus();
         }
 
-        private void ListBox_Files_LoadFromDir(string val, string source = "files")
+        private int CountMatchingTitlesInFile (string strFile, string strSearch)
         {
+            int iFound = 0;
+
+            int pos = strFile.LastIndexOf('.');
+            if (pos >= 0)
+            {
+                strFile = strFile.Substring(0, pos);
+            }
+            strFile += ".txt";
+
+            if (File.Exists(strFile))
+            {
+                foreach (var line in File.ReadAllLines(strFile))
+                {
+                    if (line.ToLower().Contains(strSearch.ToLower()))
+                    {
+                        iFound++;
+                    }
+                }
+            }
+            else
+            {
+                iFound = -1;
+            }
+
+            return iFound;
+        }
+
+        private string LastDirLoaded = "";
+        private void ListBox_Files_LoadFromDir(string val = "", string source = "files")
+        {
+            if (val == "")
+            {
+                val = LastDirLoaded;
+            }
             if (!Directory.Exists(val))
             {
                 return;
@@ -1133,11 +1272,13 @@ namespace radioZiner
                     break;
                 default:
                     listView = ListView_Files;
+                    LastDirLoaded = val;
                     break;
 
             }
             listView.Clear();
-            listView.Columns.Add("Filename", 450, HorizontalAlignment.Left);
+            listView.Columns.Add("#", 35, HorizontalAlignment.Right);
+            listView.Columns.Add("Filename", 300, HorizontalAlignment.Left);
             listView.Tag = val;
 
 
@@ -1148,10 +1289,16 @@ namespace radioZiner
                 .OrderByDescending(file => new FileInfo(file).CreationTime)
                 )
             {
-                ListViewItem lvItem = new ListViewItem(sFile.Substring(val.Length + (val.EndsWith("\\") ? 0 : 1)), 0);
-                lvItem.SubItems.Add("Test");
-                lvItem.Tag = new M3u.TvgChannel();
-                listView.Items.Add(lvItem);
+                int matches = CountMatchingTitlesInFile(sFile, TextBox_FileFilter.Text);
+                if (TextBox_FileFilter.Text == "" ||
+                    matches > 0 ||
+                    sFile.ToLower().Contains(TextBox_FileFilter.Text.ToLower()))
+                {
+                    ListViewItem lvItem = new ListViewItem(matches >= 0 ? matches.ToString() : "", 0);
+                    lvItem.SubItems.Add(sFile.Substring(val.Length + (val.EndsWith("\\") ? 0 : 1)));
+                    lvItem.Tag = new M3u.TvgChannel();
+                    listView.Items.Add(lvItem);
+                }
             }
 
             Panel_Files_Show();
@@ -1182,7 +1329,8 @@ namespace radioZiner
         private void ListBox_Files_LoadFromChannels()
         {
             ListView_Files.Clear();
-            ListView_Files.Columns.Add("Filename", 450, HorizontalAlignment.Left);
+            ListView_Files.Columns.Add("#", 35, HorizontalAlignment.Right);
+            ListView_Files.Columns.Add("Filename", 300, HorizontalAlignment.Left);
             ListView_Files.Tag = "channels";
             foreach (var channel in allChannels)
             {
@@ -1194,8 +1342,8 @@ namespace radioZiner
                         channelKey = "[" + channelKey + "]";
                     }
 
-                    ListViewItem lvItem = new ListViewItem(channelKey, 0);
-                    lvItem.SubItems.Add("Test");
+                    ListViewItem lvItem = new ListViewItem("", 0);
+                    lvItem.SubItems.Add(channelKey);
                     lvItem.Tag = channel.Value;
                     ListView_Files.Items.Add(lvItem);
                 }
@@ -1234,7 +1382,7 @@ namespace radioZiner
                 CurSource = "live";
                 icyTitles.Clear();
                 icyPosTitles.Clear();
-                ListBox_Titles.Items.Clear();
+                ListView_Titles_Clear();
             }
 
             PictureBox_Player.Focus();
@@ -1265,7 +1413,7 @@ namespace radioZiner
                     CurSource = "live";
                     icyTitles.Clear();
                     icyPosTitles.Clear();
-                    ListBox_Titles.Items.Clear();
+                    ListView_Titles_Clear();
 
                     TextBox_Url.Text = s;
                     Combo_ShortName.SelectedIndexChanged -= Combo_ShortName_SelectedIndexChanged;
@@ -1327,16 +1475,20 @@ namespace radioZiner
 
             SetSlider2();
         }
-
+        
         private void UpdateTitlesPos (double pos)
         {
-            for (int i = ListBox_Titles.Items.Count - 1; i >= 0; i--)
+            for (int i = ListView_Titles.Items.Count - 1; i >= 0; i--)
             {
-                var a = ListBox_Titles.Items[i].ToString().Substring(0, 8).Split(':');
+                var a = GetTitle(i).Substring(0, 8).Split(':');
                 double seconds = int.Parse(a[0]) * 3600 + int.Parse(a[1]) * 60 + int.Parse(a[2]);
                 if (seconds <= pos)
                 {
-                    ListBox_Titles.SelectedIndex = i;
+                    if (!ListView_Titles.Items[i].Selected)
+                    {
+                        ListView_Titles.Items[i].Selected = true;
+                        ListView_Titles.Items[i].EnsureVisible();
+                    }
                     break;
                 }
             }
@@ -1379,17 +1531,19 @@ namespace radioZiner
                 icyTitles.Add(title);
                 TimeSpan tPos = TimeSpan.FromSeconds(pos);
                 string sPos = string.Format("{0:D2}:{1:D2}:{2:D2}", tPos.Hours, tPos.Minutes, tPos.Seconds);
-                string sPosTitle = sPos + " - " + title;
+                string sPosTitle = sPos + " " + title; //" - "
                 icyPosTitles.Add(sPosTitle);
 
                 icyPosTitles.Sort();
 
-                ListBox_Titles.Items.Clear();
-                foreach (var s in icyPosTitles)
+                ListView_Titles_Clear();
+                Cur_LV_Titles_Item = null;
+                foreach (var line in icyPosTitles)
                 {
-                    ListBox_Titles.Items.Add(s);
+                    AddTitleLine(line);
                 }
                 changed = true;
+                ListView_Titles_AutoResizeColumns();
             }
 
             if (icyTitles.Count() > 1)
@@ -1403,10 +1557,25 @@ namespace radioZiner
         private void UpdateMainLabels ()
         {
             slider1.Labels.Clear();
-            foreach (string line in ListBox_Titles.Items)
+            for (int i = 0; i < ListView_Titles.Items.Count; i++)
             {
+                string line = GetTitle(i);
+                string marker = GetMarker(i);
                 string pos = TitlePos2secs(line);
                 int leadLen = TitlePos2TimeString(line).Length;
+                string title = leadLen < line.Length ? line.Substring(leadLen).Trim() : "";
+                string firstWord = title.Trim().Split(' ')[0];
+                string[] endChars = { "^", "°", "*" };
+                if (endChars.Any(x => firstWord.EndsWith(x)))
+                {
+                    slider1.Labels.Add(firstWord + "@" + pos);
+                }
+                else if (!firstWord.StartsWith("."))
+                {
+                    slider1.Labels.Add(".@" + pos);
+                }
+
+                /*
                 string tag = "";
                 if (leadLen + 3 < line.Length)
                 {
@@ -1423,6 +1592,24 @@ namespace radioZiner
                         slider1.Labels.Add(line.Substring(leadLen).Trim().Split(' ')[0] + @"@" + pos);
                     }
                 }
+                */
+
+                if (marker!="")
+                {
+                    slider1.Labels.Add(marker+ "°" + @"@" + pos);
+                }
+
+                var matches = Rgx_TitleLabels.Matches(line);
+
+                foreach (var m in matches)
+                {
+                    string str = m.ToString();
+                    if (str.StartsWith("!"))
+                    {
+                        slider1.Labels.Add(str.TrimStart('!'));
+                    }
+                }
+
             }
         }
 
@@ -1430,16 +1617,16 @@ namespace radioZiner
         {
             if (Player.GetPropertyString("video-codec") != "")
             {
-                ListBox_Titles.Dock = DockStyle.Top;
-                ListBox_Titles.Height = 250;
+                ListView_Titles.Dock = DockStyle.Top;
+                ListView_Titles.Height = 250;
                 PictureBox_Player.Show();
                 PictureBox_Player.BringToFront();
             }
             else if (Player.GetPropertyString("audio-codec") != "")
             {
-                ListBox_Titles.Dock = DockStyle.Fill;
+                ListView_Titles.Dock = DockStyle.Fill;
                 PictureBox_Player.Hide();
-                ListBox_Titles_Show();
+                ListView_Titles_Show();
             }
 
             if (curRecChannelName=="")
@@ -1639,16 +1826,97 @@ namespace radioZiner
             }
         }
 
-        public void MouseWheelHandler(object sender, MouseEventArgs e)
+        public void ListView_MouseWheelHandler(object sender, MouseEventArgs e)
         {
-            if (Player.GetPropertyString("video-codec") != "" && !(sender is PictureBox))
+            if (e.Location.X > 100)
             {
                 return;
             }
-            if (e.Location.X > ListBox_Titles.Width - 100 && !(sender is PictureBox))
+            ((HandledMouseEventArgs)e).Handled = true;
+            if (e.Delta > 0)
+            {
+                if (LV_Font_Index + 1 < LV_FontSizes.Count)
+                {
+                    ((ListView)sender).Font = LV_FontSizes[++LV_Font_Index];
+                }
+            }
+            else
+            {
+                if (LV_Font_Index > 0)
+                {
+                    ((ListView)sender).Font = LV_FontSizes[--LV_Font_Index];
+                }
+            }
+            var resizeStyle = ((ListView)sender).Items.Count > 0 ? ColumnHeaderAutoResizeStyle.ColumnContent : ColumnHeaderAutoResizeStyle.HeaderSize;
+            for (int i = 0; i < ((ListView)sender).Columns.Count; i++)
+            {
+                ((ListView)sender).AutoResizeColumn(i, resizeStyle);
+            }
+
+        }
+
+        public void ListView_Titles_MouseWheelHandler(object sender, MouseEventArgs e)
+        {
+            if (e.Location.X > ListView_Titles.Width - 100 && !(sender is PictureBox))
             {
                 return;
             }
+            ((HandledMouseEventArgs)e).Handled = true;
+            if (e.Location.X > 100 && (Control.ModifierKeys & Keys.Control) != Keys.Control)
+            {
+                if (e.Delta > 0)
+                {
+                    if (Player.GetPropertyBool("pause"))
+                    {
+                        if (Player.GetPropertyString("video-codec") != "")
+                        {
+                            Player.CommandV("frame-step");
+                        }
+                        else
+                        {
+                            Player.CommandV("seek", "0.1", "relative");
+                        }
+                        return;
+                    }
+
+                    Player.CommandV("seek", "3", "relative");
+                }
+                else if (Player.GetPropertyBool("pause"))
+                {
+                    if (Player.GetPropertyString("video-codec") != "")
+                    {
+                        Player.CommandV("frame-back-step");
+                    }
+                    else
+                    {
+                        Player.CommandV("seek", "-0.1", "relative");
+                    }
+                }
+                else
+                {
+                    Player.CommandV("seek", "-3", "relative");
+                }
+            }
+            else if (e.Delta > 0)
+            {
+                if (LV_Font_Index + 1 < LV_FontSizes.Count)
+                {
+                    ListView_Titles.Font = LV_FontSizes[++LV_Font_Index];
+                    ListView_Titles_AutoResizeColumns();
+                }
+            }
+            else
+            {
+                if (LV_Font_Index > 0)
+                {
+                    ListView_Titles.Font = LV_FontSizes[--LV_Font_Index];
+                    ListView_Titles_AutoResizeColumns();
+                }
+            }
+        }
+
+        public void PictureBox_MouseWheelHandler(object sender, MouseEventArgs e)
+        {
             ((HandledMouseEventArgs)e).Handled = true;
             if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
             {
@@ -1737,7 +2005,7 @@ namespace radioZiner
             }
         }
 
-        private void ListBox_Titles_DoubleClick(object sender, EventArgs e)
+        private void ListView_Titles_DoubleClick(object sender, EventArgs e)
         {
             ExecuteCommand("fullScreen");
 
@@ -1823,17 +2091,17 @@ namespace radioZiner
             Label_Toggle_ListBox_Files.Text = "▼";
         }
 
-        private void ListBox_Titles_Hide()
+        private void ListView_Titles_Hide()
         {
             PictureBox_Player.Show();
-            ListBox_Titles.Hide();
-            Label_Toggle_ListBox_Titles.Text = "◁";
+            ListView_Titles.Hide();
+            Label_Toggle_ListView_Titles.Text = "◁";
         }
 
-        private void ListBox_Titles_Show()
+        private void ListView_Titles_Show()
         {
-            ListBox_Titles.Show();
-            Label_Toggle_ListBox_Titles.Text = "▼";
+            ListView_Titles.Show();
+            Label_Toggle_ListView_Titles.Text = "▼";
         }
 
         private void Select_ListFiles_Button (string sButton = "")
@@ -1861,6 +2129,7 @@ namespace radioZiner
             {
                 case "streams":
                     Panel_StreamFilter.Show();
+                    Panel_FileFilter.Hide();
 
                     ListView_Streams.Show();
                     ListView_Recordings.Hide();
@@ -1869,9 +2138,11 @@ namespace radioZiner
                     break;
                 case "recordings":
                     Panel_StreamFilter.Hide();
+                    Panel_FileFilter.Show();
 
                     ListView_Streams.Hide();
                     ListView_Recordings.Show();
+                    ListView_Recordings.BringToFront();
                     ListView_Exports.Hide();
                     ListView_Files.Hide();
                     if (ListView_Recordings.Items.Count == 0 || Panel_Files.Visible && ((Button)sender).ForeColor == Color.Orange)
@@ -1881,10 +2152,12 @@ namespace radioZiner
                     break;
                 case "exports":
                     Panel_StreamFilter.Hide();
+                    Panel_FileFilter.Show();
 
                     ListView_Streams.Hide();
                     ListView_Recordings.Hide();
                     ListView_Exports.Show();
+                    ListView_Exports.BringToFront();
                     ListView_Files.Hide();
                     if (ListView_Exports.Items.Count == 0 || Panel_Files.Visible && ((Button)sender).ForeColor == Color.Orange)
                     {
@@ -1893,11 +2166,13 @@ namespace radioZiner
                     break;
                 case "files":
                     Panel_StreamFilter.Hide();
+                    Panel_FileFilter.Show();
 
                     ListView_Streams.Hide();
                     ListView_Recordings.Hide();
                     ListView_Exports.Hide();
                     ListView_Files.Show();
+                    ListView_Files.BringToFront();
                     if (ListView_Files.Items.Count == 0 || Panel_Files.Visible && ((Button)sender).ForeColor == Color.Orange)
                     {
                         ListBox_Files_LoadFromChannels();
@@ -1920,15 +2195,15 @@ namespace radioZiner
             }
         }
 
-        private void Toggle_ListBox_Titles()
+        private void Toggle_ListView_Titles()
         {
-            if (ListBox_Titles.Visible)
+            if (ListView_Titles.Visible)
             {
-                ListBox_Titles_Hide();
+                ListView_Titles_Hide();
             }
             else
             {
-                ListBox_Titles_Show();
+                ListView_Titles_Show();
             }
         }
 
@@ -1937,9 +2212,9 @@ namespace radioZiner
             Toggle_ListBox_Files();
         }
 
-        private void Label_Toggle_ListBox_Titles_Click(object sender, EventArgs e)
+        private void Label_Toggle_ListView_Titles_Click(object sender, EventArgs e)
         {
-            Toggle_ListBox_Titles();
+            Toggle_ListView_Titles();
         }
 
         private void Combo_FilterCountry_SelectedIndexChanged(object sender, EventArgs e)
@@ -1955,7 +2230,7 @@ namespace radioZiner
             M3u.TvgChannel item = (M3u.TvgChannel)(listView.SelectedItems[0].Tag);
 
             string sTag = listView.Tag.ToString();
-            string selectedItem = listView.SelectedItems[0].Text;//item.id.ToString();
+            string selectedItem = listView.SelectedItems[0].SubItems[1].Text;//item.id.ToString();
             string sUrl = "";
             string sTitle = "";
 
@@ -1991,14 +2266,14 @@ namespace radioZiner
             setChannelName(sTitle);
             icyTitles.Clear();
             icyPosTitles.Clear();
-            ListBox_Titles.Items.Clear();
+            ListView_Titles_Clear();
 
             curRecChannelName = "";
 
             Player.CommandV("loadfile", TextBox_Url.Text, "replace");
             Button_Rec.Text = "Rec";
 
-            ListBox_Titles_LoadFromFile(sUrl);
+            ListView_Titles_LoadFromFile(sUrl);
             return true;
         }
 
@@ -2210,49 +2485,252 @@ namespace radioZiner
             panel8.Visible = true;
         }
 
-        public void DeleteTitle(string pos, string title)
+
+
+
+        private ListViewItem Cur_LV_Titles_Item = null;
+        private void AddTitleLine(string line)
+        {
+            Match m = Rgx_TitlePos.Match(line);
+            if (m.Success)
+            {
+                string marker = "     ";
+                if (TextBox_FileFilter.Text != "" && line.ToLower().Contains(TextBox_FileFilter.Text.ToLower()))
+                {
+                    marker = "⚫";
+                }
+                Cur_LV_Titles_Item = new ListViewItem(m.Value, 0);
+                Cur_LV_Titles_Item.SubItems.Add(marker);
+                //Cur_LV_Titles_Item.SubItems.Add(line.Substring(m.Length).Trim());
+                var a = line.Substring(m.Length).Trim().Split('|');
+                for (int j = 0; j < a.Count(); j++)
+                {
+                    int curIndex = Cur_LV_Titles_Item.SubItems.Count;
+                    int curCols = ListView_Titles.Columns.Count;
+                    int maxIndex = 2;
+                    if (curIndex > maxIndex && curIndex >= curCols)
+                    {
+                        ListView_Titles.Columns.Add("*", -2, HorizontalAlignment.Left);
+                    }
+                    Cur_LV_Titles_Item.SubItems.Add(a[j].Trim());
+                    //titles.Add(a[j].Trim());
+                }
+
+                ListView_Titles.Items.Add(Cur_LV_Titles_Item);
+            }
+            else if (Cur_LV_Titles_Item != null)
+            {
+                int curIndex = Cur_LV_Titles_Item.SubItems.Count;
+                int curCols = ListView_Titles.Columns.Count;
+                int maxIndex = 2;
+                if (curIndex > maxIndex && curIndex >= curCols)
+                {
+                    ListView_Titles.Columns.Add("*", -2, HorizontalAlignment.Left);
+                }
+
+                Cur_LV_Titles_Item.SubItems.Add(line);
+            }
+            //ListView_Titles_AutoResizeColumns();
+        }
+
+        public void AddTitlePos(string pos, string title = "")
         {
             timer1.Enabled = false;
 
-            ListBox_Titles.Items.Remove(pos + title);
-            ListBox_Titles_SaveToFile(TextBox_Url.Text);
+            pos = pos.Trim();
+            title = title.Trim();
 
+            string marker = "";
+            if (TextBox_FileFilter.Text != "" && title.ToLower().Contains(TextBox_FileFilter.Text.ToLower()))
+            {
+               marker = "⚫";
+            }
+
+            ListViewItem lvItem = new ListViewItem(pos, 0);
+            lvItem.SubItems.Add(marker);
+            var a = title.Split('|');
+            for (int j = 0; j < a.Count(); j++)
+            {
+                lvItem.SubItems.Add(a[j].Trim());
+            }
+            //lvItem.SubItems.Add(title);
+
+            ListView_Titles.Items.Add(lvItem);
+
+            ListView_Titles_SaveToFile(TextBox_Url.Text);
+            ListView_Titles_LoadFromFile(TextBox_Url.Text, true);
+            //RefreshTitles();
+            //ListView_Titles_AutoResizeColumns();
             timer1.Enabled = true;
         }
 
-        public void AddTitle(string pos, string title = "")
+        private string GetMarker (int index = -1)
+        {
+            string title = "";
+            if (index < 0)
+            {
+                title = ListView_Titles.SelectedItems[0].SubItems[1].Text;
+            }
+            else
+            {
+                title = ListView_Titles.Items[index].SubItems[1].Text;
+            }
+            return title;
+
+        }
+
+        private string GetTitle(int index = -1)
+        {
+            if (index < 0)
+            {
+                index = ListView_Titles.SelectedIndices[0];
+            }
+            string title = ListView_Titles.Items[index].SubItems[0].Text.Trim();
+            title += " " + ListView_Titles.Items[index].SubItems[2].Text.Trim();
+            for (int i = 3; i < ListView_Titles.Items[index].SubItems.Count; i++)
+            {
+                if (ListView_Titles.Items[index]?.SubItems[i].Text.Trim() != "")
+                {
+                    title += " | " + ListView_Titles.Items[index].SubItems[i].Text.Trim();
+                }
+            }
+            return title;
+        }
+
+        public void DeleteTitleAtPos(string pos, string title)
         {
             timer1.Enabled = false;
 
-            ListBox_Titles.Items.Add(pos + title);
-            ListBox_Titles_SaveToFile(TextBox_Url.Text);
-
+            string s = pos.Trim() + " " + title.Trim();
+            
+            for (int i=0; i < ListView_Titles.Items.Count; i++)
+            {
+                if (GetTitle(i) == s)
+                {
+                    ListView_Titles.Items.RemoveAt(i);
+                    break;
+                }
+            }
+            ListView_Titles_SaveToFile(TextBox_Url.Text);
+            ListView_Titles_AutoResizeColumns();
             timer1.Enabled = true;
+        }
+
+        private void AddTitle(string title)
+        {
+            //string newTitle = " " + title.Trim();
+            string newTitle = title.Trim();
+            if (curRecChannelName != "" && recorders.ContainsKey(curRecChannelName))
+            {
+                recorders[curRecChannelName].AddTitlePos(Label_TitleTime.Text + Label_TitleTimeFrac.Text, newTitle);
+            }
+            else
+            {
+                AddTitlePos(Label_TitleTime.Text + Label_TitleTimeFrac.Text, newTitle);
+            }
+            OldTitle = newTitle;
+            OldPos = Label_TitleTime.Text + Label_TitleTimeFrac.Text;
         }
 
         private void Button_TitleAdd_Click(object sender, EventArgs e)
         {
+            Label_TitleTime.Text = Label_PlayerPos.Text;
+            Label_TitleTimeFrac.Text = Label_PlayerPosFrac.Text;
+            AddTitle(TextBox_TitleEdit.Text);
+        }
+
+        private void DeleteTitle (string title, string pos = "")
+        {
+            if (pos == "")
+            {
+                pos = Label_TitleTime.Text + Label_TitleTimeFrac.Text;
+            }
+
             if (curRecChannelName != "" && recorders.ContainsKey(curRecChannelName))
             {
-                recorders[curRecChannelName].AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, " " + TextBox_TitleEdit.Text.Trim(), "");
+                recorders[curRecChannelName].DeleteTitleAtPos(pos, title);
+                recorders[curRecChannelName].DeleteTitleAtPos(pos.Split('.')[0], title);
             }
             else
             {
-                AddTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, " " + TextBox_TitleEdit.Text.Trim());
+                DeleteTitleAtPos(pos, title);
+                DeleteTitleAtPos(pos.Split('.')[0], title);
             }
         }
 
         private void Button_Title_Delete_Click(object sender, EventArgs e)
         {
-            if (curRecChannelName != "" && recorders.ContainsKey(curRecChannelName))
+            DeleteTitle(TextBox_TitleEdit.Text);
+        }
+
+        /*
+        private string InsertStringIntoTitle(string s, string title)
+        {
+            Match m = Rgx_TitlePos.Match(title);
+            if (m.Success)
             {
-                recorders[curRecChannelName].DeleteTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text);
-                recorders[curRecChannelName].DeleteTitle(Label_TitleTime.Text, TextBox_TitleEdit.Text);
+                if (m.Groups["milliseconds"].Value != "")
+                {
+                }
+                int pos = m.Groups["milliseconds"].Value == "" ? 8 : 12;
+                title = title.Substring(0, pos) + s + title.Substring(pos, title.Length - pos);
             }
-            else
+            return title;
+        }
+
+        private string MarkTitleIfSearchStringMatches (string s)
+        {
+            if (TextBox_FileFilter.Text != "" && s.ToLower().Contains(TextBox_FileFilter.Text.ToLower()))
             {
-                DeleteTitle(Label_TitleTime.Text + Label_TitleTimeFrac.Text, TextBox_TitleEdit.Text);
-                DeleteTitle(Label_TitleTime.Text, TextBox_TitleEdit.Text);
+                s = InsertStringIntoTitle(" ⚫", s);
+            }
+            return s;
+        }
+        */
+
+
+        private void RefreshTitles()
+        {
+            if (CurSource == "live")
+            {
+                ListView_Titles_Clear();
+                Cur_LV_Titles_Item = null;
+                foreach (var line in icyPosTitles)
+                {
+                    AddTitleLine(line);
+                }
+                ListView_Titles_AutoResizeColumns();
+            }
+        }
+
+        private void UpdateFileSearch()
+        {
+            ListBox_Files_LoadFromDir(recordingFolder, "recordings");
+            ListBox_Files_LoadFromDir(exportFolder, "exports");
+            ListBox_Files_LoadFromDir();
+            ListView_Titles_LoadFromFile();
+            RefreshTitles();
+            UpdateTitleList(curRecChannelName);
+        }
+
+        private void TextBox_FileFilter_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                UpdateFileSearch();
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void TextBox_FileFilter_TextChanged(object sender, EventArgs e)
+        {
+            if (TextBox_FileFilter.Text.Length == 0 || TextBox_FileFilter.Text.Length > 1)
+            {
+                UpdateFileSearch();
             }
         }
 
@@ -2300,12 +2778,40 @@ namespace radioZiner
 
         private void TextBox_TitleEdit_Click(object sender, EventArgs e)
         {
+        }
+
+        private string OldTitle = "";
+        private string OldPos = "";
+        private void TextBox_TitleEdit_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (OldTitle != "")
+                {
+                    DeleteTitle(OldTitle, OldPos);
+                }
+
+                AddTitle(TextBox_TitleEdit.Text);
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                e.SuppressKeyPress = true;
+                TextBox_TitleEdit.Text = OldTitle;
+                var a = OldPos.Split('.');
+                Label_TitleTime.Text = a[0];
+                Label_TitleTimeFrac.Text = a.Count() > 1 ? "." + a[1] : "";
+            }
+        }
+
+        private void TextBox_TitleEdit_MouseDown(object sender, MouseEventArgs e)
+        {
             if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
             {
                 decimal pos = 0;
                 if (!Label_PlayerPos.Text.Contains("-"))
                 {
-                    pos = decimal.Parse(TitlePos2secs(Label_PlayerPos.Text + Label_PlayerPosFrac.Text), CultureInfo.InvariantCulture) - slider2.Minimum;
+                    pos = decimal.Parse(TitlePos2secs(Label_PlayerPos.Text + Label_PlayerPosFrac.Text), CultureInfo.InvariantCulture); // - slider2.Minimum
                 }
                 var insertText = "@" + pos.ToString(CultureInfo.InvariantCulture);
                 var selectionIndex = TextBox_TitleEdit.SelectionStart;
@@ -2313,5 +2819,5 @@ namespace radioZiner
                 TextBox_TitleEdit.SelectionStart = selectionIndex + insertText.Length;
             }
         }
-    }
+   }
 }

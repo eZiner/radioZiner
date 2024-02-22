@@ -51,7 +51,7 @@
             this.LabelEnterChannelName = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.panel7 = new System.Windows.Forms.Panel();
-            this.Label_Toggle_ListBox_Titles = new System.Windows.Forms.Label();
+            this.Label_Toggle_ListView_Titles = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.FlowPanel_Recording_Buttons = new System.Windows.Forms.FlowLayoutPanel();
             this.panel5 = new System.Windows.Forms.Panel();
@@ -68,6 +68,9 @@
             this.ListView_Files = new System.Windows.Forms.ListView();
             this.ListView_Exports = new System.Windows.Forms.ListView();
             this.ListView_Recordings = new System.Windows.Forms.ListView();
+            this.Panel_FileFilter = new System.Windows.Forms.Panel();
+            this.TextBox_FileFilter = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.Panel_StreamFilter = new System.Windows.Forms.FlowLayoutPanel();
             this.Button_StreamSearch = new System.Windows.Forms.Button();
             this.TextBox_SearchFilter = new System.Windows.Forms.TextBox();
@@ -89,6 +92,7 @@
             this.Button_Title_Add = new System.Windows.Forms.Button();
             this.panel9 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
+            this.ListView_Titles = new System.Windows.Forms.ListView();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Player)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -96,6 +100,7 @@
             this.panel7.SuspendLayout();
             this.panel5.SuspendLayout();
             this.Panel_Files.SuspendLayout();
+            this.Panel_FileFilter.SuspendLayout();
             this.Panel_StreamFilter.SuspendLayout();
             this.panel6.SuspendLayout();
             this.FlowPanel_FileStream_Buttons.SuspendLayout();
@@ -167,12 +172,13 @@
             this.ListBox_Titles.ForeColor = System.Drawing.Color.White;
             this.ListBox_Titles.FormattingEnabled = true;
             this.ListBox_Titles.ItemHeight = 29;
-            this.ListBox_Titles.Location = new System.Drawing.Point(412, 140);
+            this.ListBox_Titles.Location = new System.Drawing.Point(667, 415);
             this.ListBox_Titles.Name = "ListBox_Titles";
-            this.ListBox_Titles.Size = new System.Drawing.Size(363, 87);
+            this.ListBox_Titles.Size = new System.Drawing.Size(258, 58);
             this.ListBox_Titles.Sorted = true;
             this.ListBox_Titles.TabIndex = 7;
-            this.ListBox_Titles.DoubleClick += new System.EventHandler(this.ListBox_Titles_DoubleClick);
+            this.ListBox_Titles.Visible = false;
+            this.ListBox_Titles.DoubleClick += new System.EventHandler(this.ListView_Titles_DoubleClick);
             // 
             // PictureBox_Player
             // 
@@ -182,16 +188,16 @@
             this.PictureBox_Player.Size = new System.Drawing.Size(170, 146);
             this.PictureBox_Player.TabIndex = 2;
             this.PictureBox_Player.TabStop = false;
-            this.PictureBox_Player.DoubleClick += new System.EventHandler(this.ListBox_Titles_DoubleClick);
+            this.PictureBox_Player.DoubleClick += new System.EventHandler(this.ListView_Titles_DoubleClick);
             // 
             // panel3
             // 
             this.panel3.Controls.Add(this.panel1);
             this.panel3.Controls.Add(this.panel2);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(0, 659);
+            this.panel3.Location = new System.Drawing.Point(0, 639);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1008, 70);
+            this.panel3.Size = new System.Drawing.Size(1008, 90);
             this.panel3.TabIndex = 3;
             // 
             // panel1
@@ -202,7 +208,7 @@
             this.panel1.Controls.Add(this.Combo_ChannelSet);
             this.panel1.Controls.Add(this.Combo_ShortName);
             this.panel1.Controls.Add(this.Button_Rec);
-            this.panel1.Location = new System.Drawing.Point(340, 29);
+            this.panel1.Location = new System.Drawing.Point(340, 49);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(518, 38);
             this.panel1.TabIndex = 7;
@@ -256,7 +262,7 @@
             this.panel2.Controls.Add(this.Label_PlayerPos);
             this.panel2.Controls.Add(this.btnPlayPause);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 30);
+            this.panel2.Location = new System.Drawing.Point(0, 50);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1008, 40);
             this.panel2.TabIndex = 6;
@@ -398,17 +404,17 @@
             this.panel7.Size = new System.Drawing.Size(497, 44);
             this.panel7.TabIndex = 19;
             // 
-            // Label_Toggle_ListBox_Titles
+            // Label_Toggle_ListView_Titles
             // 
-            this.Label_Toggle_ListBox_Titles.AutoSize = true;
-            this.Label_Toggle_ListBox_Titles.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Label_Toggle_ListBox_Titles.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_Toggle_ListBox_Titles.Location = new System.Drawing.Point(979, 0);
-            this.Label_Toggle_ListBox_Titles.Name = "Label_Toggle_ListBox_Titles";
-            this.Label_Toggle_ListBox_Titles.Size = new System.Drawing.Size(29, 29);
-            this.Label_Toggle_ListBox_Titles.TabIndex = 19;
-            this.Label_Toggle_ListBox_Titles.Text = "◁";
-            this.Label_Toggle_ListBox_Titles.Click += new System.EventHandler(this.Label_Toggle_ListBox_Titles_Click);
+            this.Label_Toggle_ListView_Titles.AutoSize = true;
+            this.Label_Toggle_ListView_Titles.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Label_Toggle_ListView_Titles.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Label_Toggle_ListView_Titles.Location = new System.Drawing.Point(979, 0);
+            this.Label_Toggle_ListView_Titles.Name = "Label_Toggle_ListView_Titles";
+            this.Label_Toggle_ListView_Titles.Size = new System.Drawing.Size(29, 29);
+            this.Label_Toggle_ListView_Titles.TabIndex = 19;
+            this.Label_Toggle_ListView_Titles.Text = "◁";
+            this.Label_Toggle_ListView_Titles.Click += new System.EventHandler(this.Label_Toggle_ListView_Titles_Click);
             // 
             // textBox1
             // 
@@ -428,7 +434,7 @@
             // 
             this.FlowPanel_Recording_Buttons.AutoSize = true;
             this.FlowPanel_Recording_Buttons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.FlowPanel_Recording_Buttons.Location = new System.Drawing.Point(0, 659);
+            this.FlowPanel_Recording_Buttons.Location = new System.Drawing.Point(0, 639);
             this.FlowPanel_Recording_Buttons.Name = "FlowPanel_Recording_Buttons";
             this.FlowPanel_Recording_Buttons.Size = new System.Drawing.Size(1008, 0);
             this.FlowPanel_Recording_Buttons.TabIndex = 2;
@@ -559,12 +565,13 @@
             this.Panel_Files.Controls.Add(this.ListView_Files);
             this.Panel_Files.Controls.Add(this.ListView_Exports);
             this.Panel_Files.Controls.Add(this.ListView_Recordings);
+            this.Panel_Files.Controls.Add(this.Panel_FileFilter);
             this.Panel_Files.Controls.Add(this.Panel_StreamFilter);
             this.Panel_Files.Dock = System.Windows.Forms.DockStyle.Left;
             this.Panel_Files.Location = new System.Drawing.Point(0, 44);
             this.Panel_Files.Name = "Panel_Files";
             this.Panel_Files.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
-            this.Panel_Files.Size = new System.Drawing.Size(400, 615);
+            this.Panel_Files.Size = new System.Drawing.Size(400, 595);
             this.Panel_Files.TabIndex = 13;
             this.Panel_Files.Visible = false;
             // 
@@ -577,9 +584,9 @@
             this.ListView_Streams.ForeColor = System.Drawing.Color.White;
             this.ListView_Streams.FullRowSelect = true;
             this.ListView_Streams.HideSelection = false;
-            this.ListView_Streams.Location = new System.Drawing.Point(0, 30);
+            this.ListView_Streams.Location = new System.Drawing.Point(0, 60);
             this.ListView_Streams.Name = "ListView_Streams";
-            this.ListView_Streams.Size = new System.Drawing.Size(390, 585);
+            this.ListView_Streams.Size = new System.Drawing.Size(390, 535);
             this.ListView_Streams.TabIndex = 11;
             this.ListView_Streams.UseCompatibleStateImageBehavior = false;
             this.ListView_Streams.View = System.Windows.Forms.View.Details;
@@ -593,9 +600,9 @@
             this.ListView_Files.ForeColor = System.Drawing.Color.White;
             this.ListView_Files.FullRowSelect = true;
             this.ListView_Files.HideSelection = false;
-            this.ListView_Files.Location = new System.Drawing.Point(0, 30);
+            this.ListView_Files.Location = new System.Drawing.Point(0, 60);
             this.ListView_Files.Name = "ListView_Files";
-            this.ListView_Files.Size = new System.Drawing.Size(390, 585);
+            this.ListView_Files.Size = new System.Drawing.Size(390, 535);
             this.ListView_Files.TabIndex = 13;
             this.ListView_Files.UseCompatibleStateImageBehavior = false;
             this.ListView_Files.View = System.Windows.Forms.View.Details;
@@ -610,9 +617,9 @@
             this.ListView_Exports.ForeColor = System.Drawing.Color.White;
             this.ListView_Exports.FullRowSelect = true;
             this.ListView_Exports.HideSelection = false;
-            this.ListView_Exports.Location = new System.Drawing.Point(0, 30);
+            this.ListView_Exports.Location = new System.Drawing.Point(0, 60);
             this.ListView_Exports.Name = "ListView_Exports";
-            this.ListView_Exports.Size = new System.Drawing.Size(390, 585);
+            this.ListView_Exports.Size = new System.Drawing.Size(390, 535);
             this.ListView_Exports.TabIndex = 12;
             this.ListView_Exports.UseCompatibleStateImageBehavior = false;
             this.ListView_Exports.View = System.Windows.Forms.View.Details;
@@ -627,14 +634,47 @@
             this.ListView_Recordings.ForeColor = System.Drawing.Color.White;
             this.ListView_Recordings.FullRowSelect = true;
             this.ListView_Recordings.HideSelection = false;
-            this.ListView_Recordings.Location = new System.Drawing.Point(0, 30);
+            this.ListView_Recordings.Location = new System.Drawing.Point(0, 60);
             this.ListView_Recordings.Name = "ListView_Recordings";
-            this.ListView_Recordings.Size = new System.Drawing.Size(390, 585);
+            this.ListView_Recordings.Size = new System.Drawing.Size(390, 535);
             this.ListView_Recordings.TabIndex = 10;
             this.ListView_Recordings.UseCompatibleStateImageBehavior = false;
             this.ListView_Recordings.View = System.Windows.Forms.View.Details;
             this.ListView_Recordings.Visible = false;
             this.ListView_Recordings.SelectedIndexChanged += new System.EventHandler(this.ListView_Recordings_SelectedIndexChanged);
+            // 
+            // Panel_FileFilter
+            // 
+            this.Panel_FileFilter.Controls.Add(this.TextBox_FileFilter);
+            this.Panel_FileFilter.Controls.Add(this.label2);
+            this.Panel_FileFilter.Dock = System.Windows.Forms.DockStyle.Top;
+            this.Panel_FileFilter.Location = new System.Drawing.Point(0, 30);
+            this.Panel_FileFilter.Name = "Panel_FileFilter";
+            this.Panel_FileFilter.Size = new System.Drawing.Size(390, 30);
+            this.Panel_FileFilter.TabIndex = 14;
+            this.Panel_FileFilter.Visible = false;
+            // 
+            // TextBox_FileFilter
+            // 
+            this.TextBox_FileFilter.BackColor = System.Drawing.Color.Black;
+            this.TextBox_FileFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextBox_FileFilter.ForeColor = System.Drawing.Color.White;
+            this.TextBox_FileFilter.Location = new System.Drawing.Point(75, 0);
+            this.TextBox_FileFilter.Margin = new System.Windows.Forms.Padding(0);
+            this.TextBox_FileFilter.Name = "TextBox_FileFilter";
+            this.TextBox_FileFilter.Size = new System.Drawing.Size(315, 22);
+            this.TextBox_FileFilter.TabIndex = 24;
+            this.TextBox_FileFilter.TextChanged += new System.EventHandler(this.TextBox_FileFilter_TextChanged);
+            this.TextBox_FileFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_FileFilter_KeyDown);
+            // 
+            // label2
+            // 
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(19, 2);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(49, 16);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "Filter";
             // 
             // Panel_StreamFilter
             // 
@@ -717,7 +757,7 @@
             this.panel6.Controls.Add(this.FlowPanel_FileStream_Buttons);
             this.panel6.Controls.Add(this.Label_Toggle_ListBox_Files);
             this.panel6.Controls.Add(this.panel4);
-            this.panel6.Controls.Add(this.Label_Toggle_ListBox_Titles);
+            this.panel6.Controls.Add(this.Label_Toggle_ListView_Titles);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel6.Location = new System.Drawing.Point(0, 0);
             this.panel6.Name = "panel6";
@@ -872,6 +912,8 @@
             this.TextBox_TitleEdit.Size = new System.Drawing.Size(320, 38);
             this.TextBox_TitleEdit.TabIndex = 15;
             this.TextBox_TitleEdit.Click += new System.EventHandler(this.TextBox_TitleEdit_Click);
+            this.TextBox_TitleEdit.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_TitleEdit_KeyDown);
+            this.TextBox_TitleEdit.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TextBox_TitleEdit_MouseDown);
             // 
             // Label_TitleTime
             // 
@@ -908,8 +950,9 @@
             this.panel9.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel9.Location = new System.Drawing.Point(400, 44);
             this.panel9.Name = "panel9";
-            this.panel9.Size = new System.Drawing.Size(608, 32);
+            this.panel9.Size = new System.Drawing.Size(608, 45);
             this.panel9.TabIndex = 21;
+            this.panel9.DoubleClick += new System.EventHandler(this.ListView_Titles_DoubleClick);
             // 
             // label1
             // 
@@ -924,6 +967,25 @@
             this.label1.TabIndex = 1;
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // ListView_Titles
+            // 
+            this.ListView_Titles.BackColor = System.Drawing.Color.Black;
+            this.ListView_Titles.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ListView_Titles.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ListView_Titles.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ListView_Titles.ForeColor = System.Drawing.Color.White;
+            this.ListView_Titles.FullRowSelect = true;
+            this.ListView_Titles.HideSelection = false;
+            this.ListView_Titles.LabelWrap = false;
+            this.ListView_Titles.Location = new System.Drawing.Point(400, 89);
+            this.ListView_Titles.MultiSelect = false;
+            this.ListView_Titles.Name = "ListView_Titles";
+            this.ListView_Titles.Size = new System.Drawing.Size(608, 145);
+            this.ListView_Titles.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.ListView_Titles.TabIndex = 22;
+            this.ListView_Titles.UseCompatibleStateImageBehavior = false;
+            this.ListView_Titles.View = System.Windows.Forms.View.Details;
+            // 
             // radioZiner
             // 
             this.AllowDrop = true;
@@ -931,12 +993,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1008, 729);
+            this.Controls.Add(this.ListView_Titles);
+            this.Controls.Add(this.ListBox_Titles);
             this.Controls.Add(this.LabelEnterChannelName);
-            this.Controls.Add(this.panel9);
             this.Controls.Add(this.LabelCounter);
             this.Controls.Add(this.Combo_FilterCountry);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.ListBox_Titles);
+            this.Controls.Add(this.panel9);
             this.Controls.Add(this.Label_Status);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel8);
@@ -966,6 +1029,8 @@
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             this.Panel_Files.ResumeLayout(false);
+            this.Panel_FileFilter.ResumeLayout(false);
+            this.Panel_FileFilter.PerformLayout();
             this.Panel_StreamFilter.ResumeLayout(false);
             this.Panel_StreamFilter.PerformLayout();
             this.panel6.ResumeLayout(false);
@@ -1018,7 +1083,7 @@
         private System.Windows.Forms.Button Button_ListStreams;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Panel panel7;
-        private System.Windows.Forms.Label Label_Toggle_ListBox_Titles;
+        private System.Windows.Forms.Label Label_Toggle_ListView_Titles;
         private System.Windows.Forms.Label Label_Toggle_ListBox_Files;
         private System.Windows.Forms.FlowLayoutPanel Panel_StreamFilter;
         private System.Windows.Forms.ComboBox Combo_FilterCountry;
@@ -1043,6 +1108,10 @@
         private System.Windows.Forms.Label Label_StartTimeFrac;
         private System.Windows.Forms.Panel panel9;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel Panel_FileFilter;
+        private System.Windows.Forms.TextBox TextBox_FileFilter;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ListView ListView_Titles;
     }
 }
 

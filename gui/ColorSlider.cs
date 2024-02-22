@@ -111,6 +111,7 @@ namespace radioZiner
         private int OffsetR = 0;
 
         public List<string> Labels = new List<string>();
+        public List<Rectangle> LabelRects = new List<Rectangle>();
 
         #region thumb
 
@@ -1312,7 +1313,7 @@ namespace radioZiner
 
                 #region draw labels
 
-                // Quick hack to draw horizontal Labels
+                // Draw horizontal Labels
 
                 if (true)
                 {
@@ -1320,21 +1321,45 @@ namespace radioZiner
                     SolidBrush br = new SolidBrush(Color.White);
                     Font font = this.Font;
 
+                    LabelRects.Clear();
                     foreach (var label in Labels)
                     {
                         var a = label.Split('@');
                         if (a.Count()==2)
                         {
                             string str = a[0];
+                            int vOffset = 0;
+                            if (str.EndsWith("^"))
+                            {
+                                vOffset = 0;
+                                str = str.Length > 1 ? str.TrimEnd('^') : "◯";
+                            }
+                            else if (str.EndsWith("°"))
+                            {
+                                vOffset = 12;
+                                str = str.Length > 1 ? str.TrimEnd('°') : "◯";
+                            }
+                            else if (str.EndsWith("*"))
+                            {
+                                vOffset = 24;
+                                str = str.Length > 1 ? str.TrimEnd('*') : "◯";
+                            }
+
                             try
                             {
-                                decimal labelPos = decimal.Parse(a[1], CultureInfo.InvariantCulture);
-                                SizeF maxsize = e.Graphics.MeasureString(str, font);
+                                decimal labelPos = decimal.Parse(a[1], CultureInfo.InvariantCulture) - _minimum;
                                 SizeF size = e.Graphics.MeasureString(str, font);
                                 int labelOffset = (int)(OffsetL + labelPos * (ClientRectangle.Width - OffsetL - OffsetR) / (_maximum - _minimum));
-                                float tx = (barRect.X + labelOffset) - (float)(size.Width * 0.5);
-                                float ty = barRect.Y + barRect.Height / 2 - size.Height - offset;
+
+                                float tx = (barRect.X + labelOffset);// - (float)(size.Width * 0.5);
+                                float ty = barRect.Y + barRect.Height / 2 - size.Height - offset + vOffset;
                                 e.Graphics.DrawString(str, font, br, tx, ty);
+
+                                Rectangle labelRect = new Rectangle((int)tx, (int)ty, (int)size.Width, (int)size.Height);
+                                LabelRects.Add(labelRect);
+                                
+                                //Pen pen = new Pen(Color.Blue);
+                                //e.Graphics.DrawRectangle(pen, labelRect);
                             }
                             catch (Exception ex)
                             {
@@ -1629,6 +1654,24 @@ namespace radioZiner
         /// <param name="e">A <see cref="T:System.Windows.Forms.MouseEventArgs"></see> that contains the event data.</param>
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            SelectedLabelIndex = -1;
+            SelectedLabelTitle = "";
+            SelectedLabelPos = "";
+            for (int i = 0; i < LabelRects.Count; i++)
+            {
+                if (LabelRects[i].Contains(((MouseEventArgs)e).Location))
+                {
+                    var a = Labels[i].Split('@');
+                    if (a.Count() == 2)
+                    {
+                        SelectedLabelIndex = i;
+                        SelectedLabelTitle = a[0];
+                        SelectedLabelPos = a[1];
+                        //base.OnMouseUp(e);
+                    }
+                }
+            }
+
             base.OnMouseDown(e);
             if (e.Button == MouseButtons.Left)
             {
@@ -1703,6 +1746,9 @@ namespace radioZiner
             Invalidate();
         }
 
+        public int SelectedLabelIndex = -1;
+        public string SelectedLabelTitle = "";
+        public string SelectedLabelPos = "";
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Control.MouseUp"></see> event.
         /// </summary>
@@ -1710,11 +1756,14 @@ namespace radioZiner
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            Capture = false;
-            mouseInThumbRegion = IsPointInRect(e.Location, thumbRect);
-            if (Scroll != null) Scroll(this, new ScrollEventArgs(ScrollEventType.EndScroll, (int)_trackerValue));
-            if (ValueChanged != null) ValueChanged(this, new EventArgs());
-            Invalidate();
+            if (SelectedLabelIndex < 0)
+            {
+                Capture = false;
+                mouseInThumbRegion = IsPointInRect(e.Location, thumbRect);
+                if (Scroll != null) Scroll(this, new ScrollEventArgs(ScrollEventType.EndScroll, (int)_trackerValue));
+                if (ValueChanged != null) ValueChanged(this, new EventArgs());
+                Invalidate();
+            }
         }
 
         /// <summary>
