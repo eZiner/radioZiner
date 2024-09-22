@@ -50,5 +50,5 @@ to be continued ...
 ---
 
 Needed binaries:<br>
-[ffmpeg.exe](https://www.ffmpeg.org/) FFmpeg<br>
+[ffmpeg.exe](https://www.ffmpeg.org/download.html) FFmpeg [project](https://www.ffmpeg.org/)<br>
 [libmpv-2.dll](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/) mpv-player [project](https://github.com/mpv-player/mpv)<br>
