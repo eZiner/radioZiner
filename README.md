@@ -43,12 +43,12 @@ First steps after installation
   - Click Rec button at the bottom middle/left
   - Recording will start immediately and the channel name is added as a button to the recording list
   - For read after write monitoring (listen / watch while recording) click on that button
-  - The new channel had been automatically added to the selected channel group
+  - The new channel had been added automatically to the selected channel group
 
 to be continued ...
 
 ---
 
-Assets<br>
-[ffmpeg.exe](https://www.ffmpeg.org/)<br>
-[libmpv-2.dll](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/)<br>
+Needed binaries:<br>
+[ffmpeg.exe](https://www.ffmpeg.org/) FFmpeg<br>
+[libmpv-2.dll](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/) mpv-player [project](https://github.com/mpv-player/mpv)<br>
