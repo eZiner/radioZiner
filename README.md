@@ -28,7 +28,7 @@ First steps after installation
 * Create new channel-group(s)
   - Select File/New (Strg+N) from menu
   - Enter name for channel group (e.g. "Radio") and commit with \<Enter\> or cancel with \<Esc\>
-  - Repeat if you want more channel groups (e.g. "TV", "Irish Folk", ...)
+  - Repeat if you want (e.g. "TV", "Irish Folk", ...)
   - To change the title of a channel group select channel and hit \<Enter\>, edit title and hit \<Enter\> again
   
 * Tune in radio/tv station
