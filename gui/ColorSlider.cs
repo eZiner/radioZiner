@@ -1339,10 +1339,10 @@ namespace radioZiner
                                 vOffset = 12;
                                 str = str.Length > 1 ? str.TrimEnd('°') : "◯";
                             }
-                            else if (str.EndsWith("*"))
+                            else //if (str.EndsWith("*"))
                             {
                                 vOffset = 24;
-                                str = str.Length > 1 ? str.TrimEnd('*') : "◯";
+                                str = str.Length > 0 ? str : "◯";
                             }
 
                             try

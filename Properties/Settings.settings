@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="mainDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">G:\Temp\mpv-streaming\_debug</Value>
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

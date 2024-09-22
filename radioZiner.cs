@@ -974,7 +974,7 @@ namespace radioZiner
         }
 
         private readonly Regex Rgx_TitlePos = new Regex(@"(?<hours>[0-9][0-9]):(?<minutes>[0-5][0-9]):(?<seconds>[0-5][0-9])((\s)|(.(?<milliseconds>[0-9]{3})))");
-        private readonly Regex Rgx_TitleLabels = new Regex(@"(\S+@([0-9]|\.)+)\b"); //(\w+@([0-9]|\.)+)\b
+        private readonly Regex Rgx_TitleLabels = new Regex(@"(\S*@([0-9]|\.)+)\b"); //(\w+@([0-9]|\.)+)\b
 
         private string TitlePos2TimeString (string line)
         {
@@ -1565,10 +1565,10 @@ namespace radioZiner
                 int leadLen = TitlePos2TimeString(line).Length;
                 string title = leadLen < line.Length ? line.Substring(leadLen).Trim() : "";
                 string firstWord = title.Trim().Split(' ')[0];
-                string[] endChars = { "^", "°", "*" };
-                if (endChars.Any(x => firstWord.EndsWith(x)))
+                //string[] endChars = { "^", "°" }; // , "*"
+                if (firstWord.StartsWith("!")) // endChars.Any(x => firstWord.EndsWith(x)) || 
                 {
-                    slider1.Labels.Add(firstWord + "@" + pos);
+                    slider1.Labels.Add(firstWord.TrimStart('!') + "@" + pos);
                 }
                 else if (!firstWord.StartsWith("."))
                 {
@@ -1991,6 +1991,7 @@ namespace radioZiner
                 panel4.Visible = false;
                 TextBox_Url.Visible = false;
                 panel6.Hide();
+                panel9.Hide();
                 Panel_Files_Hide();
             }
             else
@@ -2002,6 +2003,7 @@ namespace radioZiner
                 panel4.Visible = true;
                 TextBox_Url.Visible = true;
                 panel6.Show();
+                panel9.Show();
             }
         }
 
