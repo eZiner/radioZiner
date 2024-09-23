@@ -32,20 +32,20 @@ First steps after installation
   - Repeat if you want (e.g. "TV", "Irish Folk", ...)
   - To change the name of a channel group select name and hit \<Enter\>, edit name and hit \<Enter\> again
   
-* Tune in radio/tv station
+* Find radio / tv station
   - Click into textbox right to the search button at the upper left
   - Enter search terms (e.g. "pub .ie" for Irish stations with "pub" in their name or key words)
   - Select a station 
   - Playback will start immediately
-  - To pause/play click right mouse button or use pause button at the bottom left
+  - To pause / play click right mouse button or use pause button at the bottom left
   
 * Record stream and automatically add new station to channel group
-
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
-  - Click Rec button at the bottom middle/left
+  - Click Rec button at the bottom middle / left
   - Recording will start immediately and the channel name is added as a button to the recording list
   - For read after write monitoring (listen / watch while recording) click on that button
   - The new channel had been added automatically to the selected channel group
+  - To stop recording click Stop button at the bottom middle / left
 
 to be continued ...
 
