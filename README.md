@@ -3,6 +3,7 @@ Streaming audio & video recorder
 
 ![radioZiner-01](https://github.com/user-attachments/assets/0515a02e-0fe9-430b-8b56-72bc49409164)
 
+
 Installation
 
 * [Download](https://github.com/eZiner/radioZiner/releases/) latest version (e.g. radioZiner-v#.#.#.zip)
@@ -37,6 +38,10 @@ First steps after installation
   - Select a station 
   - Playback will start immediately
   - To pause / play click right mouse button or use pause button at the bottom left
+
+* Drag & Drop or Copy & Paste
+  - Drag or copy any valid steam / file url into right panal to play audio or video
+  - Free Radio Stations: [fmstream.org](http://fmstream.org/) [RadioBrowser](https://www.radio-browser.info/) [Icecast Directory](http://dir.xiph.org/)
   
 * Record stream and automatically add new station to channel group
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
