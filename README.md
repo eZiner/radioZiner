@@ -1,6 +1,7 @@
 # radioZiner
 Streaming audio & video recorder
 
+![radioZiner-01](https://github.com/user-attachments/assets/0515a02e-0fe9-430b-8b56-72bc49409164)
 
 Installation
 
@@ -39,6 +40,7 @@ First steps after installation
   - To pause/play click right mouse button or use pause button at the bottom left
   
 * Record stream and automatically add new station to channel group
+
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
   - Click Rec button at the bottom middle/left
   - Recording will start immediately and the channel name is added as a button to the recording list
@@ -52,3 +54,4 @@ to be continued ...
 Needed binaries:<br>
 [ffmpeg.exe](https://www.ffmpeg.org/download.html) FFmpeg [project](https://www.ffmpeg.org/)<br>
 [libmpv-2.dll](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/) mpv-player [project](https://github.com/mpv-player/mpv)<br>
+
