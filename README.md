@@ -50,7 +50,8 @@ First steps after installation
 
 *  Add new station to channel group
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
-
+  - Click into Channel Name / New Channel text at the top
+  - Edit the name and commit with \<Enter\> or cancel with \<Esc\>
   
 * Record stream
   - Click Rec button at the bottom middle / left
