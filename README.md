@@ -5,8 +5,7 @@ Streaming audio & video recorder
 
 Installation
 
-* Goto https://github.com/eZiner/radioZiner/releases/ 
-* Download latest version (e.g. radioZiner-v#.#.#.zip)
+* [Download](https://github.com/eZiner/radioZiner/releases/) latest version (e.g. radioZiner-v#.#.#.zip)
 * Create a folder "radioZiner" and unzip files into it
 * Within the folder start radioZiner.exe
 * You should get a message:
