@@ -52,12 +52,18 @@ First steps after installation
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
   - Click into Channel Name / New Channel text at the top
   - Edit the name and commit with \<Enter\> or cancel with \<Esc\>
+  - The channel name can be changed at any time in the same way
+ 
+* Move / Delete channel
+  - Choose channel and select Edit/Cut (Strg+X) from menu
+  - Skip next steps to delete channel
+  - Choose channel group and select Edit/Paste (Strg+V) from menu
   
 * Record stream
   - Click Rec button at the bottom middle / left
   - Recording will start immediately and the channel name is added as a button to the recording list
   - For read after write monitoring (listen / watch while recording) click on that button
-  - IF the channel was new it had been added automatically to the selected channel group
+  - If the channel was new it had been added automatically to the selected channel group
   - To stop recording click Stop button at the bottom middle / left
 
 to be continued ...
