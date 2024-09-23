@@ -37,19 +37,26 @@ First steps after installation
   - Enter search terms (e.g. "pub .ie" for Irish stations with "pub" in their name or key words)
   - Select a station 
   - Playback will start immediately
+ 
+* Control playback
   - To pause / play click right mouse button or use pause button at the bottom left
+  - Use sliders or mouse wheel to seek forward/backward
+  - When paused the mouse wheel will step frame by frame (Jog/Shuttle)
 
 * Drag & Drop or Copy & Paste
   - Drag or copy any valid stream or file url into right panel to play audio or video
   - Free Radio Stations: [fmstream.org](http://fmstream.org/) | [Icecast Directory](http://dir.xiph.org/) | [RadioBrowser](https://www.radio-browser.info/)
   - Free TV Stations: [iptv-org](https://iptv-org.github.io/) | [MediathekViewWeb (Germany)](https://mediathekviewweb.de/)
-  
-* Record stream and automatically add new station to channel group
+
+*  Add new station to channel group
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
+
+  
+* Record stream
   - Click Rec button at the bottom middle / left
   - Recording will start immediately and the channel name is added as a button to the recording list
   - For read after write monitoring (listen / watch while recording) click on that button
-  - The new channel had been added automatically to the selected channel group
+  - IF the channel was new it had been added automatically to the selected channel group
   - To stop recording click Stop button at the bottom middle / left
 
 to be continued ...
