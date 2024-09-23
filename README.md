@@ -4,7 +4,7 @@ Streaming audio & video recorder
 ![radioZiner-01](https://github.com/user-attachments/assets/0515a02e-0fe9-430b-8b56-72bc49409164)
 
 
-Installation
+# Installation
 
 * [Download](https://github.com/eZiner/radioZiner/releases/) latest version (e.g. radioZiner-v#.#.#.zip)
 * Create a folder "radioZiner" and unzip files into it
@@ -24,7 +24,7 @@ Installation
 * radioZiner is ready to use
 
 
-First steps after installation
+# First steps after installation
 
 * Create new channel-group(s)
   - Select File/New (Strg+N) from menu
