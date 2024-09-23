@@ -30,11 +30,11 @@ First steps after installation
   - Select File/New (Strg+N) from menu
   - Enter name for channel group (e.g. "Radio") and commit with \<Enter\> or cancel with \<Esc\>
   - Repeat if you want (e.g. "TV", "Irish Folk", ...)
-  - To change the title of a channel group select channel and hit \<Enter\>, edit title and hit \<Enter\> again
+  - To change the name of a channel group select name and hit \<Enter\>, edit name and hit \<Enter\> again
   
 * Tune in radio/tv station
   - Click into textbox right to the search button at the upper left
-  - Enter search terms (e.g. "pub .ie" for Irish stations with "pub" in their name)
+  - Enter search terms (e.g. "pub .ie" for Irish stations with "pub" in their name or key words)
   - Select a station 
   - Playback will start immediately
   - To pause/play click right mouse button or use pause button at the bottom left
