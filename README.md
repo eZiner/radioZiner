@@ -16,7 +16,7 @@ Streaming audio & video recorder
 * Select File/Home (Strg+H) from menu to open streaming directory in file explorer
 * Close the application
 * Go to the radioZiner application folder and select the files
-  - backup_de1_2024-03-21.sql
+  - backup_de1_2024-03-21.sql [Download update from radio-browser.info](https://backups.radio-browser.info/)
   - index-1.m3u
 * Move them to "\<Your-Videos-Folder\>\\radioZiner\\streams\\"
 * Start radioZiner.exe again
