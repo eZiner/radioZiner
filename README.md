@@ -48,7 +48,7 @@ First steps after installation
   - Free Radio Stations: [fmstream.org](http://fmstream.org/) | [Icecast Directory](http://dir.xiph.org/) | [RadioBrowser](https://www.radio-browser.info/)
   - Free TV Stations: [iptv-org](https://iptv-org.github.io/) | [MediathekViewWeb (Germany)](https://mediathekviewweb.de/)
 
-*  Add new station to channel group
+* Add new station to channel group
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
   - Click into Channel Name / New Channel text at the top
   - Edit the name and commit with \<Enter\> or cancel with \<Esc\>
