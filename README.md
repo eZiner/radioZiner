@@ -31,7 +31,7 @@ First steps after installation
   - Repeat if you want (e.g. "TV", "Irish Folk", ...)
   - To change the name of a channel group select name and hit \<Enter\>, edit name and hit \<Enter\> again
   
-* Find radio / tv station
+* Find radio / tv station in database
   - Click into textbox right to the search button at the upper left
   - Enter search terms (e.g. "pub .ie" for Irish stations with "pub" in their name or key words)
   - Select a station 
