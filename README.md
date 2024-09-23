@@ -16,8 +16,8 @@ Streaming audio & video recorder
 * Select File/Home (Strg+H) from menu to open streaming directory in file explorer
 * Close the application
 * Go to the radioZiner application folder and select the files
-  - backup_de1_2024-03-21.sql [Download update from radio-browser.info](https://backups.radio-browser.info/)
-  - index-1.m3u
+  - backup_de1_2024-03-21.sql - Latest version can be [downloaded](https://backups.radio-browser.info/latest.sql.gz) from radio-browser.info
+  - index-1.m3u - Latest version can be [downloaded](https://iptv-org.github.io/iptv/index.m3u) from iptv-org
 * Move them to "\<Your-Videos-Folder\>\\radioZiner\\streams\\"
 * Start radioZiner.exe again
 * After a few seconds the text of the "Search" button at the upper left should change from grey to black
