@@ -40,9 +40,9 @@ First steps after installation
   - To pause / play click right mouse button or use pause button at the bottom left
 
 * Drag & Drop or Copy & Paste
-  - Drag or copy any valid steam / file url into right panal to play audio or video
-  - Free Radio Stations: [fmstream.org](http://fmstream.org/) [Icecast Directory](http://dir.xiph.org/) [RadioBrowser](https://www.radio-browser.info/)
-  - Free TV Stations: [iptv-org](https://iptv-org.github.io/) [MediathekViewWeb (Germany)](https://mediathekviewweb.de/)
+  - Drag or copy any valid stream or file url into right panel to play audio or video
+  - Free Radio Stations: [fmstream.org](http://fmstream.org/) | [Icecast Directory](http://dir.xiph.org/) | [RadioBrowser](https://www.radio-browser.info/)
+  - Free TV Stations: [iptv-org](https://iptv-org.github.io/) | [MediathekViewWeb (Germany)](https://mediathekviewweb.de/)
   
 * Record stream and automatically add new station to channel group
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
