@@ -32,14 +32,14 @@ Streaming audio & video recorder
   - Repeat if you want (e.g. "TV", "Irish Folk", ...)
   - To change the name of a channel group select name and hit \<Enter\>, edit name and hit \<Enter\> again
   
-* Find radio / tv station in database
+* Find radio/tv station in database
   - Click into textbox right to the search button at the upper left
   - Enter search terms (e.g. "pub .ie" for Irish stations with "pub" in their name or key words)
   - Select a station 
   - Playback will start immediately
  
 * Control playback
-  - To pause / play click right mouse button or use pause button at the bottom left
+  - To pause/play click right mouse button or use pause button at the bottom left
   - Use sliders or mouse wheel to seek forward/backward
   - The use of the mouse wheel is somewhat unusual: with the mouse pointer on the left-hand side of the panel, the wheel changes the font size, in the middle it seeks forwards/backwards and on the right-hand side it scrolls the content up and down
   - When paused the mouse wheel will step frame by frame (Jog/Shuttle)
@@ -51,23 +51,44 @@ Streaming audio & video recorder
 
 * Add new station to channel group
   - Choose appropriate channel group for new station (i.e. "Irish Folk")
-  - Click into Channel Name / New Channel text at the top
+  - Click into Channel Name/New Channel text at the top
   - Edit the name and commit with \<Enter\> or cancel with \<Esc\>
   - The channel name can be changed at any time in the same way
  
-* Move / Delete channel
+* Move/Delete channel
   - Choose channel and select Edit/Cut (Strg+X) from menu
   - To delete the channel skip next steps
   - To move the channel choose a channel group and select Edit/Paste (Strg+V) from menu
   
 * Record stream
-  - Click Rec button at the bottom middle / left
+  - Click Rec button at the bottom middle/left
   - Recording will start immediately and the channel name is added as a button to the recording list
-  - For read after write monitoring (listen / watch while recording) click on that button
+  - For read after write monitoring (listen/watch while recording) click on that button
   - If the channel was new it had been added automatically to the selected channel group
-  - To stop recording click Stop button at the bottom middle / left
+  - To stop recording click Stop button at the bottom middle/left
+  - All recordings are stored in your streaming directory together with a textfile that holds the playlist
+  - To listen/watch the audio/video files click on the "Recordings" button at the top
+
 
 # Export music titles to audio files
+
+To save individual titles from the recorded radio broadcasts as an audio file, first click on the "Recordings" button at the top left and select the desired recording. Then click on the “Export” button at the bottom to show up controls needed for setting start/end time, the filename and export format.
+
+Locate the start of the title you want to export. If the radio station the audio file was recorded from supports icecast you already have a playlist. Just click on the title and you are almost done. Often the displayed start time does not exactly correspond with the title start, in which case some fine tuning is still to be done.
+
+* To set the export name and start time hold the \<Ctrl\> key and select the title from the playlist
+* Enter/edit the export name and set the two timestamps on the left-hand side of the input field.
+* To set the start time hold the \<Ctrl\> key and click on the left timestamp
+* To set the end time hold the \<Ctrl\> key and click on the right timestamp
+* To verify the position click on the start/end timestamp while playing
+* Select .mp3 (in most cases) or .aac depending on the stream format
+* Finally click on the green "Export" button
+
+The exported audio file will be stored in your streaming directory. Click on the "Exports" button at the upper left to get a list of your exports. Click again to refresh the list.
+
+
+
+
 
 
 to be continued ...
