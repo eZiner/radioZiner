@@ -56,8 +56,8 @@ Streaming audio & video recorder
  
 * Move / Delete channel
   - Choose channel and select Edit/Cut (Strg+X) from menu
-  - Skip next steps to delete channel
-  - Choose channel group and select Edit/Paste (Strg+V) from menu
+  - To delete the channel skip next steps
+  - To move the channel choose a channel group and select Edit/Paste (Strg+V) from menu
   
 * Record stream
   - Click Rec button at the bottom middle / left
