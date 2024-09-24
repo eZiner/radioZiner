@@ -13,7 +13,7 @@ Streaming audio & video recorder
   - No streaming directory
   - Create new streaming directory in "\<Your-Videos-Folder\>\\radioZiner"?
 * Click on "Yes"
-* Select File/Home (Strg+H) from menu to open streaming directory in file explorer
+* Select File/Home (Ctrl+H) from menu to open streaming directory in file explorer
 * Close the application
 * Go to the radioZiner application folder and select the files
   - backup_de1_2024-03-21.sql - Latest version can be [downloaded](https://backups.radio-browser.info/latest.sql.gz) from radio-browser.info
@@ -27,7 +27,7 @@ Streaming audio & video recorder
 # First steps after installation
 
 * Create new channel group(s)
-  - Select File/New (Strg+N) from menu
+  - Select File/New (Ctrl+N) from menu
   - Enter name for channel group (e.g. "Radio") and commit with \<Enter\> or cancel with \<Esc\>
   - Repeat if you want (e.g. "TV", "Irish Folk", ...)
   - To change the name of a channel group select name and hit \<Enter\>, edit name and hit \<Enter\> again
@@ -56,9 +56,9 @@ Streaming audio & video recorder
   - The channel name can be changed at any time in the same way
  
 * Move/Delete channel
-  - Choose channel and select Edit/Cut (Strg+X) from menu
+  - Choose channel and select Edit/Cut (Ctrl+X) from menu
   - To delete the channel skip next steps
-  - To move the channel choose a channel group and select Edit/Paste (Strg+V) from menu
+  - To move the channel choose a channel group and select Edit/Paste (Ctrl+V) from menu
   
 * Record stream
   - Click Rec button at the bottom middle/left
