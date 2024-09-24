@@ -26,7 +26,7 @@ Streaming audio & video recorder
 
 # First steps after installation
 
-* Create new channel-group(s)
+* Create new channel group(s)
   - Select File/New (Strg+N) from menu
   - Enter name for channel group (e.g. "Radio") and commit with \<Enter\> or cancel with \<Esc\>
   - Repeat if you want (e.g. "TV", "Irish Folk", ...)
@@ -41,6 +41,7 @@ Streaming audio & video recorder
 * Control playback
   - To pause / play click right mouse button or use pause button at the bottom left
   - Use sliders or mouse wheel to seek forward/backward
+  - The use of the mouse wheel is somewhat unusual: with the mouse pointer on the left-hand side of the panel, the wheel changes the font size, in the middle it seeks forwards/backwards and on the right-hand side it scrolls the content up and down
   - When paused the mouse wheel will step frame by frame (Jog/Shuttle)
 
 * Drag & Drop or Copy & Paste
@@ -66,11 +67,14 @@ Streaming audio & video recorder
   - If the channel was new it had been added automatically to the selected channel group
   - To stop recording click Stop button at the bottom middle / left
 
+# Export music titles to audio files
+
+
 to be continued ...
 
 ---
 
-Needed binaries:<br>
-[ffmpeg.exe](https://www.ffmpeg.org/download.html) FFmpeg [project](https://www.ffmpeg.org/)<br>
-[libmpv-2.dll](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/) mpv-player [project](https://github.com/mpv-player/mpv)<br>
+Needed binaries:
+[ffmpeg.exe](https://www.ffmpeg.org/download.html) FFmpeg [project](https://www.ffmpeg.org/)  
+[libmpv-2.dll](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/) mpv-player [project](https://github.com/mpv-player/mpv)  
 
