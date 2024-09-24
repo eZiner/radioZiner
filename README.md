@@ -66,7 +66,7 @@ Streaming audio & video recorder
   - If the channel was new it had been added automatically to the selected channel group
   - To stop recording click Stop button at the bottom middle / left
 
-to be continued ......
+to be continued ...
 
 ---
 
