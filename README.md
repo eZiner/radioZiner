@@ -1,4 +1,4 @@
-# radioZiner
+﻿# radioZiner
 Streaming audio & video recorder
 
 ![radioZiner-01](https://github.com/user-attachments/assets/0515a02e-0fe9-430b-8b56-72bc49409164)
@@ -43,6 +43,10 @@ Streaming audio & video recorder
   - Use sliders or mouse wheel to seek forward/backward
   - The use of the mouse wheel is somewhat unusual: with the mouse pointer on the left-hand side of the panel, the wheel changes the font size, in the middle it seeks forwards/backwards and on the right-hand side it scrolls the content up and down
   - When paused the mouse wheel will step frame by frame (Jog/Shuttle)
+  - To show/hide the station list click on the ▷ Left Panel Toggle ▼
+  - To show/hide the play list when watching a video click on the ◁ Right Panel Toggle ▼ 
+  - To show/hide all controls press \<F12\>
+  - To toggle fullscreen press \<F11\>
 
 * Drag & Drop or Copy & Paste
   - Drag or copy any valid stream or file url into right panel to play audio or video
@@ -72,7 +76,7 @@ Streaming audio & video recorder
 
 # Export music titles to audio files
 
-To save individual titles from the recorded radio broadcasts as an audio file, first click on the "Recordings" button at the top left and select the desired recording. Then click on the �Export� button at the bottom to show up controls needed for setting start/end time, the filename and export format.
+To save individual titles from the recorded radio broadcasts as an audio file, first click on the "Recordings" button at the top left and select the desired recording. Then click on the "Export" button at the bottom to show the controls needed for setting start/end time, the filename and export format.
 
 Locate the start of the title you want to export. If the radio station the audio file was recorded from supports icecast you already have a playlist. Just click on the title and you are almost done. Often the displayed start time does not exactly correspond with the title start, in which case some fine tuning is still to be done.
 
@@ -86,12 +90,22 @@ Locate the start of the title you want to export. If the radio station the audio
 
 The exported audio file will be stored in your streaming directory. Click on the "Exports" button at the upper left to get a list of your exports. Click again to refresh the list.
 
+# Cut & export to video files
+
+Exporting movies, scenes or sequences works in pretty much the same way as with audio files. Enter title, set start/end time, select .mp4 (in most cases) or .ts as export  format and finally click on the green "Export" button.
+
+# Editing the playlist
+Click on the "Title" button at the bottom to show the controls needed for adding, deleting and editing playlist titles.
+
+* To edit/copy/delete a title hold the \<Ctrl\> key and select the title from the playlist
+* To delete the title click on the red "Delete" button
+* If needed: To set the title time seek to new position, hold the \<Ctrl\> key and click on the timestamp. To verify the position click on the timestamp while playing
+* Edit the title and commit with \<Enter\> or cancel with \<Esc\>
+* To add a new title click on the green "Add" button
+
+All changes to the playlist can be done while recording. There is no backup or undo - so be careful.
 
 
-
-
-
-to be continued ...
 
 ---
 
