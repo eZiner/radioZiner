@@ -117,7 +117,17 @@ Click on the "Title" button at the bottom to show the controls needed for adding
 
 All changes to the playlist can be done while recording. There is no backup or undo - so be careful.
 
+# Setting labels on slidebars
 
+Inserting an exclamation mark ! as the first character in a playlist title will place the first word as a clickable label under the main slider at the bottom.
+
+To place a label under the title slider at the top append an at sign @ to the relevant word followed by the absolute position in seconds. To get the position hold the \<Ctrl\> key and click into the edit field.
+
+In order to place the label above the line insert a circumflex \^ directly after the word. Use the degree sign ° to place the label on the line.
+
+# Multi column playlist
+
+Use the vertical bar | to separate titles into columns. This can be helpful for example if you use radioZiner as a karaoke tool with differnt languages.
 
 ---
 
