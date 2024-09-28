@@ -42,7 +42,7 @@ Create new streaming directory in "C:\Users\<username>\Videos\radioZiner"?
     * Select File/New (Ctrl+N) from menu
     * Enter name for channel group (e.g. "Radio") and commit with \<Enter\> or cancel with \<Esc\>
     * Repeat if you want (e.g. "TV", "Irish Folk", ...)
-    * To change the name of a channel group select name and hit \<Enter\>, edit name and hit \<Enter\> again
+    * To change the name of a channel group select name twice and hit \<Enter\>, edit name and hit \<Enter\> again
   
 * Find radio/tv station in database
     * Click into textbox right to the search button at the upper left
@@ -69,7 +69,7 @@ Create new streaming directory in "C:\Users\<username>\Videos\radioZiner"?
     * Choose appropriate channel group for new station (i.e. "Irish Folk")
     * Click into Channel Name/New Channel text at the top
     * Edit the name and commit with \<Enter\> or cancel with \<Esc\>
-    * The channel name can be changed at any time in the same way
+    * The channel name can be changed at any time in the same way. After the change, a copy with the old name of the channel remains, which can be deleted.
  
 * Move/Delete channel
     * Choose channel and select Edit/Cut (Ctrl+X) from menu
@@ -128,6 +128,10 @@ In order to place the label above the line insert a circumflex \^ directly after
 # Multi column playlist
 
 Use the vertical bar | to separate titles into columns. This can be helpful for example if you use radioZiner as a karaoke tool with differnt languages.
+
+# Hack
+
+Some video channels, such as ARTE Germany, cannot be recorded correctly due to stream errors that cause problems for mpv recording. In these cases, you can try to force the use of ffmpeg instead of mpv by appending an @ to the channel name.
 
 ---
 
