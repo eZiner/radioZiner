@@ -72,19 +72,19 @@ Create new streaming directory in "C:\Users\<username>\Videos\radioZiner"?
     * Freie Radiostationen finden Sie hier: [fmstream.org](http://fmstream.org/) | [Icecast Directory](http://dir.xiph.org/) | [RadioBrowser](https://www.radio-browser.info/)
     * Freie TV-Sender/Filme finden Sie hier: [iptv-org](https://iptv-org.github.io/) | [MediathekViewWeb (Deutschland)](https://mediathekviewweb.de/)
 
-* Neue Sender, Dateien oder Ordner zur Kanalgruppe hinzufügen.
+* Neue Sender, Dateien oder Ordner zur Kanalgruppe hinzufügen
     * Während der Wiedergabe eines neuen Senders, einer neuen Datei oder nach dem Ziehen/Einfügen eines Ordners ...
     * Wählen Sie die passende Kanalgruppe für den neuen Sender, dei neue Datei oder den neuen Ordner (z.B. "Irish Folk").
     * Klicken Sie oben auf den Kanalnamen ("Neuer Kanal", wenn er neu ist).
-    * Bearbeiten Sie den Namen und bestätigen Sie ihn mit \<Eingabe\> oder brechen Sie ihn mit \<Esc\> ab.
+    * Bearbeiten Sie den Namen und bestätigen Sie die Änderung mit \<Eingabe\> oder brechen Sie mit \<Esc\> ab.
     * Der Channel-Name kann jederzeit auf dieselbe Weise geändert werden. Nach der Änderung bleibt eine Kopie mit dem alten Namen des Kanals bestehen. Löschen Sie die alte Kopie oder verwenden Sie sie als Alias.
-    * Lokale Dateien und Ordner, die als Kanäle hinzugefügt wurden, können durch Klicken auf die Schaltfläche "Files" oben ausgewählt werden. Ordner sind durch eckige Klammern \[ \] um den Namen gekennzeichnet. Wenn Sie auf einen Ordner klicken, werden alle abspielbaren Audios/Videos in diesem Ordner und seinen Unterordnern in absteigender Reihenfolge nach Datum aufgelistet. Klicken Sie auf die Schaltfläche "Files" am oberen Rand, um die Liste der Dateien und Ordner erneut aufzurufen/zu aktualisieren.
+    * Lokale Dateien und Ordner, die als Kanäle hinzugefügt wurden, können durch Klicken auf die Schaltfläche "Files" oben ausgewählt werden. Ordner sind durch eckige Klammern \[ \] um den Namen gekennzeichnet. Wenn Sie auf einen Ordner klicken, werden alle abspielbaren Audios/Videos in diesem Ordner und seinen Unterordnern in absteigender Reihenfolge nach Datum aufgelistet. Klicken Sie erneut auf die Schaltfläche "Files", um wieder die Liste der Dateien und Ordner aufzurufen/zu aktualisieren.
 
     
 * Kanal verschieben/löschen
     * Wählen Sie einen Kanal und wählen Sie im Menü Edit/Cut (Strg+X).
     * Um den Kanal zu verschieben, wählen Sie eine Kanalgruppe und wählen Sie im Menü Edit/Paste (Strg+V).
-    * Der Kanal ist gelöscht, wenn Sie ihn nicht wieder einsetzen.
+    * Löschen Sie den Kanal, indem Sie ihn einfach nicht wieder einsetzen.
   
 * Stream aufnehmen
     * Klicken Sie unten auf die Schaltfläche "Rec".
