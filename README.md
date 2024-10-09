@@ -139,9 +139,25 @@ In order to place the label above the timeline, insert a circumflex \^ directly 
 
 Use the vertical bar | to separate titles into columns. This can be helpful for example if you use radioZiner as a karaoke tool with differnt languages.
 
-# Sharing (export/import) of channel groups
+# Search in playlists and file names
+
+Use the filter function to search for music titles, artists or any words in playlists and file names. After you have selected "Recordings", "Exports" or "Files" at the top, enter the desired search terms in the filter text field. As you type, the file list and, if applicable, the playlist will be updated.
+
+The filtered file list contains all files that match the search criterion or whose playlist has at least one hit. The number of hits is displayed in the left-hand column. In the playlist, all hits are marked with a large dot ⚫ in before the title and on the timeline.
+
+# Sharing (export/import) of channels
 
 Channel groups are stored as separate M3U/TVG formatted (.m3u) text files in the folder \<*PathToYourStreamingDirectory*\>\\channels. To import a channel group, place the .m3u file (e.g. [All German TV Stations](https://iptv-org.github.io/iptv/countries/de.m3u)) in the channels folder and restart radioZiner. To share channel groups with your friends simply send them your .m3u files.
+
+### Copying and pasting individual channels
+
+Alternatively, you can also copy individual channels previously selected from the channel list with \<Ctrl+C\> and send them as a two-line text, e.g. in an e-mail. The recipient then only has to copy both lines and paste them into the desired channel group with \<Ctrl+V\>.
+
+Finally, an example to try out - simply copy the following two lines with \<Ctrl+C\> and paste them into a channel group of your choice with \<Ctrl+V\>:
+
+#EXTINF:-1 tvg-id="NDR-1" tvg-logo="" group-title="Radio",NDR 1 Braunschweig<br>
+http://icecast.ndr.de/ndr/ndr1niedersachsen/braunschweig/mp3/128/stream.mp3
+
 
 ---
 

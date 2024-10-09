@@ -52,7 +52,7 @@ Create new streaming directory in "C:\Users\<username>\Videos\radioZiner"?
     * Um den Namen einer Kanalgruppe zu ändern, wählen Sie den Namen zweimal aus und drücken Sie \<Enter\>, bearbeiten Sie den Namen und drücken Sie erneut \<Enter\>.
   
 * Radio-/Fernsehsender in der Datenbank suchen
-    * Klicken Sie in das Textfeld rechts neben der Suchschaltfläche oben links.
+    * Klicken Sie in das Textfeld rechts neben der Schaltfläche "Search" oben links.
     * Geben Sie Suchbegriffe ein (z. B. "pub .ie" für irische Sender mit "pub" im Namen oder in Schlüsselwörtern).
     * Wählen Sie einen Sender aus.
     * Die Wiedergabe beginnt sofort.
@@ -140,9 +140,26 @@ Um die Beschriftung oberhalb der Linie zu platzieren, fügen Sie einen Zirkumfle
 
 Benutzen Sie den vertikalen Balken | um Titel in Spalten zu trennen. Dies kann zum Beispiel hilfreich sein, wenn Sie radioZiner als Karaoke-Tool mit verschiedenen Sprachen verwenden.
 
-# Gemeinsame Nutzung (Export/Import) von Kanalgruppen
+
+# In Wiedergabelisten und Dateinamen suchen
+
+Verwenden Sie die Filterfunktion, um in Wiedergabelisten und Dateinamen nach Musiktiteln, Interpreten oder beliebigen Wörtern zu suchen. Nachdem Sie oben "Recordings", "Exports" oder "Files" gewählt haben, geben Sie in das Filter-Textfeld die gewünschten Suchbegriffe ein. Während Sie tippen wird die Dateiliste und gegebenfalls auch die Wiedergabeliste aktualisiert.
+
+Die gefilterte Dateiliste enthält alle Dateien, die dem Suchkriterium entsprechen oder deren Wiedergabeliste mindestens einen Treffer aufweist. Die Anzahl der Treffer wird in der linken Spalte angezeigt. In der Wiedergabliste werden alle Treffer mit einem großen Punkt ⚫ vor dem Titel und auf der Zeitleiste markiert.
+
+# Gemeinsame Nutzung (Export/Import) von Kanälen
 
 Kanalgruppen werden als separate M3U/TVG-formatierte (.m3u) Textdateien im Ordner \<*Pfad-Zu-Ihrem-Streaming-Verzeichnis*\>\\channels gespeichert. Um eine Kanalgruppe zu importieren, legen Sie die .m3u-Datei (z.B. [Alle deutschen TV-Sender](https://iptv-org.github.io/iptv/countries/de.m3u)) in den Ordner channels und starten Sie radioZiner neu. Um Kanalgruppen mit Ihren Freunden zu teilen, senden Sie ihnen einfach Ihre .m3u-Dateien.
+
+### Einzelne Sender kopieren und einsetzen
+
+Alternativ können Sie auch einzelne Sender, die zuvor aus der Kanalliste gewählt wurden, mit \<Strg\+C> kopieren und als zweizeiligen Text z.B. in einer e-Mail versenden. Der Empfänger muss dann lediglich beide Zeilen kopieren und mit \<Strg\+V> in die gewünschte Kanalgruppe einsetzen.
+
+Zum Schluss ein Beispiel zum ausprobieren - kopieren Sie einfach die folgenden zwei Zeilen mit \<Strg\+C> und setzen Sie diese mit \<Strg\+V> in eine Kanalgruppe ihrer Wahl ein:
+
+#EXTINF:-1 tvg-id="NDR-1" tvg-logo="" group-title="Radio",NDR 1 Braunschweig<br>
+http://icecast.ndr.de/ndr/ndr1niedersachsen/braunschweig/mp3/128/stream.mp3
+
 
 ---
 
