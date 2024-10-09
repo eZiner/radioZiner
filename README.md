@@ -7,7 +7,7 @@
 # radioZiner
 Streaming audio & video recorder
 
-![radioZiner-01](radioZiner-de.png)
+![radioZiner-01](radioZiner-en.png)
 
 
 # Installation
